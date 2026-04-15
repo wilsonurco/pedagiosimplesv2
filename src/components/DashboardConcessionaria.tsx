@@ -291,20 +291,38 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
     return { minDate: min, maxDate: max };
   }, [filtroMes]);
 
+  // Pré-computa as placas reais de cada pedido (calculadas uma única vez)
+  const placasPorPedido = useMemo(() => {
+    const map = new Map<string, string[]>();
+    PEDIDOS_MARCO.forEach((p) => {
+      const { passagens } = gerarDadosComprovante(p);
+      map.set(p.id, passagens.map((ps) => ps.placa));
+    });
+    return map;
+  }, []);
+
+  // Protocolo de exibição (ID legível do pedido)
+  function protocolo(pedido: PedidoPago) {
+    const idNum = parseInt(pedido.id.replace("p", ""), 10);
+    return `FP${pedido.data.split("/").reverse().join("").slice(2)}${String(idNum).padStart(4, "0")}`;
+  }
+
   const pedidosFiltrados = useMemo(() => {
     if (filtroMes !== "03/2026") return [];
     // filtroData está em YYYY-MM-DD; dados estão em DD/MM/YYYY
     const filtroDataBR = filtroData ? filtroData.split("-").reverse().join("/") : "";
     return PEDIDOS_MARCO.filter((p) => {
       const matchData   = !filtroData || p.data === filtroDataBR;
-      const matchPlaca  = filtroPlaca === "" || p.placas.toString().includes(filtroPlaca);
+      const placasDoP   = placasPorPedido.get(p.id) ?? [];
+      const matchPlaca  = filtroPlaca === "" ||
+        placasDoP.some((pl) => pl.replace("-", "").includes(filtroPlaca.replace("-", "")));
       const matchMetodo = filtroMetodo === "todos" ||
         (filtroMetodo === "pix" && p.metodo === "PIX") ||
         (filtroMetodo === "cartao" && p.metodo === "Cartão") ||
         (filtroMetodo === "boleto" && p.metodo === "Boleto");
       return matchData && matchPlaca && matchMetodo;
     });
-  }, [filtroMes, filtroData, filtroPlaca, filtroMetodo]);
+  }, [filtroMes, filtroData, filtroPlaca, filtroMetodo, placasPorPedido]);
 
   const totalPaginasPedidos = Math.ceil(pedidosFiltrados.length / ITEMS_PER_PAGE_PEDIDOS);
   const itensPedidosPagina = pedidosFiltrados.slice(
@@ -841,10 +859,10 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Placa</label>
+                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Passagens</label>
                   <input
                     type="text"
-                    placeholder="Digite a placa"
+                    placeholder="Buscar por placa"
                     value={filtroPlaca}
                     onChange={(e) => { setFiltroPlaca(e.target.value.toUpperCase()); setPaginaPedidos(1); }}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] placeholder-gray-400 focus:outline-none focus:border-[#003566]"
@@ -924,7 +942,16 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                             {pedido.data} às {pedido.hora}
                           </span>
                           <span className="text-xs text-[#6C757D]">·</span>
-                          <span className="text-xs text-[#6C757D]">{pedido.placas} placas</span>
+                          {(placasPorPedido.get(pedido.id) ?? []).slice(0, 3).map((pl) => (
+                            <span key={pl} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#EEF2F7] text-[#003566]">
+                              {pl}
+                            </span>
+                          ))}
+                          {(placasPorPedido.get(pedido.id) ?? []).length > 3 && (
+                            <span className="text-xs text-[#6C757D]">
+                              +{(placasPorPedido.get(pedido.id) ?? []).length - 3}
+                            </span>
+                          )}
                           <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                             {pedido.metodo}
                           </span>
@@ -933,9 +960,14 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
                       {/* Valor e ação */}
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className="text-sm font-semibold text-[#333333]">
-                          {formatBRL(pedido.valor)}
-                        </span>
+                        <div className="text-right">
+                          <span className="block text-sm font-semibold text-[#333333]">
+                            {formatBRL(pedido.valor)}
+                          </span>
+                          <span className="text-[10px] text-[#9CA3AF] font-mono">
+                            #{protocolo(pedido)}
+                          </span>
+                        </div>
                         <button
                           onClick={() => setModalPedido(pedido)}
                           className="flex items-center gap-1.5 text-xs border border-[#90CAF9] text-[#42A5F5] hover:bg-[#E3F2FD] px-4 py-2 rounded-[8px] transition-colors whitespace-nowrap font-medium"
