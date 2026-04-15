@@ -553,7 +553,7 @@ function gerarExcelDetalhado(p: ExportParams) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// Entry point
+// Entry point — Repasse
 // ══════════════════════════════════════════════════════════════════════════════
 export function exportarRepasse(p: ExportParams) {
   if (p.formato === "pdf") {
@@ -563,4 +563,154 @@ export function exportarRepasse(p: ExportParams) {
     if (p.tipo === "consolidado") gerarExcelConsolidado(p);
     else                          gerarExcelDetalhado(p);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Pedidos Pagos — tipos
+// ══════════════════════════════════════════════════════════════════════════════
+export interface PedidoPagoExport {
+  id:        string;
+  data:      string;
+  hora:      string;
+  passagens: number;
+  placas:    number;
+  metodo:    string;
+  valor:     number;
+}
+
+export interface ExportPedidosParams {
+  mes:      string;   // "03/2026"
+  mesLabel: string;   // "Março de 2026"
+  pedidos:  PedidoPagoExport[];
+  total:    number;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PDF — Pedidos Pagos
+// ══════════════════════════════════════════════════════════════════════════════
+function gerarPdfPedidos(p: ExportPedidosParams) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  let y = pdfHeader(
+    doc,
+    `Pedidos Pagos — ${p.mesLabel}`,
+    "Listagem consolidada de pedidos quitados no período · Pedágio Simples",
+  );
+
+  y = pdfInfoBox(doc, [
+    { label: "Mês de referência",  value: p.mesLabel },
+    { label: "Total de pedidos",   value: String(p.pedidos.length) },
+    { label: "Valor total",        value: formatBRL(p.total) },
+    { label: "Método de pagamento", value: "PIX" },
+  ], y);
+
+  y = pdfSectionTitle(doc, `Lista de Pedidos — ${p.pedidos.length} registros`, y);
+
+  let acumulado = 0;
+  autoTable(doc, {
+    startY: y,
+    head: [["#", "ID Pedido", "Data", "Hora", "Passagens", "Placas", "Método", "Valor", "Acumulado", "Status"]],
+    body: p.pedidos.map((ped, i) => {
+      acumulado += ped.valor;
+      return [
+        i + 1,
+        ped.id.toUpperCase(),
+        ped.data,
+        ped.hora,
+        ped.passagens,
+        ped.placas,
+        ped.metodo,
+        formatBRL(ped.valor),
+        formatBRL(acumulado),
+        "Pago",
+      ];
+    }),
+    foot: [["", `${p.pedidos.length} pedidos`, "", "", "", "", "", formatBRL(p.total), formatBRL(p.total), ""]],
+    margin: { left: 14, right: 14 },
+    styles: { fontSize: 8, cellPadding: 3, textColor: PRETO },
+    headStyles: { fillColor: AZUL, textColor: BRANCO, fontStyle: "bold", fontSize: 8 },
+    footStyles: { fillColor: AZUL_CLARO, textColor: AZUL, fontStyle: "bold" },
+    columnStyles: {
+      0:  { cellWidth: 10, halign: "center", textColor: CINZA },
+      1:  { cellWidth: 24, fontStyle: "bold", textColor: AZUL },
+      2:  { cellWidth: 24 },
+      3:  { cellWidth: 18 },
+      4:  { halign: "center", cellWidth: 20 },
+      5:  { halign: "center", cellWidth: 16 },
+      6:  { halign: "center", cellWidth: 16 },
+      7:  { halign: "right" },
+      8:  { halign: "right", fontStyle: "bold", textColor: AZUL },
+      9:  { halign: "center", cellWidth: 18 },
+    },
+    alternateRowStyles: { fillColor: [248, 249, 250] },
+    didParseCell: (data) => {
+      if (data.column.index === 9 && data.section === "body") {
+        data.cell.styles.textColor = VERDE;
+        data.cell.styles.fontStyle = "bold";
+      }
+    },
+  });
+
+  pdfFooter(doc);
+  doc.save(`pedidos-pagos-${p.mes.replace("/", "-")}-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Excel — Pedidos Pagos (2 abas)
+// ══════════════════════════════════════════════════════════════════════════════
+function gerarExcelPedidos(p: ExportPedidosParams) {
+  const wb = XLSX.utils.book_new();
+
+  // Aba 1: Resumo
+  const wsResumo = XLSX.utils.aoa_to_sheet([
+    [`Pedágio Simples — Pedidos Pagos — ${p.mesLabel}`],
+    [`Gerado em: ${hoje()}`],
+    [],
+    ["RESUMO"],
+    ["Mês de referência",          p.mesLabel],
+    ["Total de pedidos",           p.pedidos.length],
+    ["Valor total (R$)",           p.total],
+    ["Método de pagamento",        "PIX"],
+    ["Status geral",               "Pago"],
+  ]);
+  wsResumo["!cols"] = [{ wch: 28 }, { wch: 22 }];
+  wsResumo["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }];
+  XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+
+  // Aba 2: Pedidos
+  let acumulado = 0;
+  const rows = p.pedidos.map((ped, i) => {
+    acumulado += ped.valor;
+    return [i + 1, ped.id.toUpperCase(), ped.data, ped.hora, ped.passagens, ped.placas, ped.metodo, ped.valor, acumulado, "Pago"];
+  });
+
+  const wsPed = XLSX.utils.aoa_to_sheet([
+    [`Pedidos Pagos — ${p.mesLabel}`],
+    [`Gerado em: ${hoje()} · ${p.pedidos.length} registros`],
+    [],
+    ["#", "ID Pedido", "Data", "Hora", "Passagens", "Placas", "Método", "Valor (R$)", "Acumulado (R$)", "Status"],
+    ...rows,
+    [],
+    ["", `${p.pedidos.length} pedidos`, "", "", "", "", "", p.total, p.total, ""],
+  ]);
+  wsPed["!cols"] = [
+    { wch: 6 }, { wch: 14 }, { wch: 14 }, { wch: 10 },
+    { wch: 12 }, { wch: 10 }, { wch: 10 },
+    { wch: 18 }, { wch: 20 }, { wch: 10 },
+  ];
+  wsPed["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } },
+  ];
+  XLSX.utils.book_append_sheet(wb, wsPed, `Pedidos ${p.mes.replace("/", "-")}`);
+
+  downloadXlsx(wb, `pedidos-pagos-${p.mes.replace("/", "-")}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Entry point — Pedidos Pagos
+// ══════════════════════════════════════════════════════════════════════════════
+export function exportarPedidosPagos(params: ExportPedidosParams, formato: "pdf" | "excel") {
+  if (formato === "pdf") gerarPdfPedidos(params);
+  else                   gerarExcelPedidos(params);
 }

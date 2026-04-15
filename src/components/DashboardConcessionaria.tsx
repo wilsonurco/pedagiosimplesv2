@@ -32,7 +32,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import LogoCinza from "../imports/LogoCinza";
-import { exportarRepasse } from "../utils/exportRepasse";
+import { exportarRepasse, exportarPedidosPagos } from "../utils/exportRepasse";
 
 interface DashboardConcessionariaProps {
   dadosGestor: any;
@@ -273,6 +273,9 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   const [exportMes, setExportMes] = useState("04/2026");
   const [exportFormato, setExportFormato] = useState<"pdf" | "excel">("pdf");
   const [exportTipo, setExportTipo] = useState<"consolidado" | "detalhado">("consolidado");
+
+  // Dropdown exportar pedidos pagos
+  const [dropdownPedidos, setDropdownPedidos] = useState(false);
 
   // Filtros — Pedidos pagos
   const [filtroMes, setFiltroMes] = useState("03/2026");
@@ -714,9 +717,59 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   <p className="text-sm text-[#6C757D]">Acompanhe quais pedidos foram pagos</p>
                 </div>
               </div>
-              <button className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors flex-shrink-0">
-                <Download className="h-5 w-5 text-white" />
-              </button>
+              {/* Dropdown exportar pedidos */}
+              <div className="relative flex-shrink-0">
+                <button
+                  onClick={() => setDropdownPedidos((v) => !v)}
+                  className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors"
+                >
+                  <Download className="h-5 w-5 text-white" />
+                </button>
+                {dropdownPedidos && (
+                  <>
+                    {/* overlay para fechar ao clicar fora */}
+                    <div className="fixed inset-0 z-40" onClick={() => setDropdownPedidos(false)} />
+                    <div className="absolute right-0 top-12 z-50 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden w-44">
+                      <p className="px-4 py-2.5 text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wide border-b border-gray-100">
+                        Exportar pedidos
+                      </p>
+                      {(["pdf", "excel"] as const).map((fmt) => (
+                        <button
+                          key={fmt}
+                          onClick={() => {
+                            setDropdownPedidos(false);
+                            try {
+                              exportarPedidosPagos(
+                                {
+                                  mes:      filtroMes,
+                                  mesLabel: MESES_LABEL[filtroMes] ?? filtroMes,
+                                  pedidos:  pedidosFiltrados.map((p) => ({
+                                    id:        p.id,
+                                    data:      p.data,
+                                    hora:      p.hora,
+                                    passagens: p.passagens,
+                                    placas:    p.placas,
+                                    metodo:    p.metodo,
+                                    valor:     p.valor,
+                                  })),
+                                  total: pedidosFiltrados.reduce((a, p) => a + p.valor, 0),
+                                },
+                                fmt,
+                              );
+                            } catch (err) {
+                              console.error("[exportarPedidos]", err);
+                            }
+                          }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#333333] hover:bg-[#F0F4F9] transition-colors"
+                        >
+                          <FileText className="h-3.5 w-3.5 text-[#003566]" />
+                          Baixar {fmt === "pdf" ? "PDF" : "Excel"}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Card de filtros */}
