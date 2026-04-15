@@ -52,18 +52,18 @@ interface PedidoPago {
   valor: number;
 }
 
-// Primeiros 10 itens replicam exatamente o screenshot
+// Primeiros 10 pedidos com quantidade variada de placas (1–4)
 const _primeirosDez: PedidoPago[] = [
-  { id: "p0001", passagens: 12, data: "21/03/2026", hora: "06:53", placas: 12, metodo: "PIX",    valor: 64.80  },
-  { id: "p0002", passagens:  6, data: "01/03/2026", hora: "00:10", placas:  6, metodo: "PIX",    valor: 12.30  },
-  { id: "p0003", passagens: 12, data: "30/03/2026", hora: "23:57", placas: 12, metodo: "PIX",    valor: 57.00  },
-  { id: "p0004", passagens:  8, data: "30/03/2026", hora: "22:56", placas:  8, metodo: "PIX",    valor: 32.40  },
-  { id: "p0005", passagens:  4, data: "30/03/2026", hora: "22:38", placas:  4, metodo: "PIX",    valor: 16.20  },
-  { id: "p0006", passagens: 12, data: "30/03/2026", hora: "23:58", placas: 12, metodo: "PIX",    valor: 57.00  },
-  { id: "p0007", passagens: 30, data: "30/03/2026", hora: "22:36", placas: 30, metodo: "PIX",    valor: 162.00 },
-  { id: "p0008", passagens:  8, data: "30/03/2026", hora: "22:45", placas:  8, metodo: "PIX",    valor: 32.40  },
-  { id: "p0009", passagens:  6, data: "30/03/2026", hora: "21:39", placas:  6, metodo: "PIX",    valor: 32.40  },
-  { id: "p0010", passagens:  4, data: "30/03/2026", hora: "21:21", placas:  4, metodo: "PIX",    valor: 21.60  },
+  { id: "p0001", passagens: 3, data: "21/03/2026", hora: "06:53", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "p0002", passagens: 2, data: "01/03/2026", hora: "00:10", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "p0003", passagens: 4, data: "30/03/2026", hora: "23:57", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "p0004", passagens: 1, data: "30/03/2026", hora: "22:56", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "p0005", passagens: 3, data: "30/03/2026", hora: "22:38", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "p0006", passagens: 2, data: "30/03/2026", hora: "23:58", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "p0007", passagens: 4, data: "30/03/2026", hora: "22:36", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "p0008", passagens: 1, data: "30/03/2026", hora: "22:45", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "p0009", passagens: 3, data: "30/03/2026", hora: "21:39", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "p0010", passagens: 2, data: "30/03/2026", hora: "21:21", placas: 2, metodo: "PIX", valor: 10.80 },
 ];
 
 const _datas = [
@@ -72,23 +72,22 @@ const _datas = [
   "18/03/2026","17/03/2026","14/03/2026","13/03/2026","10/03/2026",
   "07/03/2026","04/03/2026","03/03/2026","01/03/2026",
 ];
-const _passagensOpts = [4, 6, 8, 10, 12, 15, 20, 30, 6, 8, 4, 12, 6, 10, 8, 4];
-const _metodos: Metodo[] = ["PIX","PIX","PIX","PIX","PIX","PIX","PIX","PIX","PIX","PIX"];
+// Cicla entre 1–4 placas por pedido
+const _placasOpts = [1, 2, 3, 4, 1, 2, 3, 4, 2, 1, 3, 2, 4, 1, 2, 3];
 
 const _restante: PedidoPago[] = Array.from({ length: 443 }, (_, i) => {
-  const idx = i + 10;
-  const passagens = _passagensOpts[idx % _passagensOpts.length];
-  const metodo = _metodos[idx % _metodos.length];
-  const valor = +(passagens * (idx % 4 === 0 ? 5.40 : idx % 4 === 1 ? 4.05 : idx % 4 === 2 ? 3.24 : 2.70)).toFixed(2);
-  const hh = String((idx * 3 + 8) % 24).padStart(2, "0");
-  const mm = String((idx * 17 + 5) % 60).padStart(2, "0");
+  const idx    = i + 10;
+  const placas = _placasOpts[idx % _placasOpts.length];
+  const valor  = +(placas * 5.40).toFixed(2);
+  const hh     = String((idx * 3 + 8) % 24).padStart(2, "0");
+  const mm     = String((idx * 17 + 5) % 60).padStart(2, "0");
   return {
     id: `p${String(idx + 1).padStart(4, "0")}`,
-    passagens,
-    data: _datas[idx % _datas.length],
-    hora: `${hh}:${mm}`,
-    placas: passagens,
-    metodo,
+    passagens: placas,
+    data:  _datas[idx % _datas.length],
+    hora:  `${hh}:${mm}`,
+    placas,
+    metodo: "PIX" as Metodo,
     valor,
   };
 });
@@ -942,16 +941,11 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                             {pedido.data} às {pedido.hora}
                           </span>
                           <span className="text-xs text-[#6C757D]">·</span>
-                          {(placasPorPedido.get(pedido.id) ?? []).slice(0, 3).map((pl) => (
+                          {(placasPorPedido.get(pedido.id) ?? []).map((pl) => (
                             <span key={pl} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#EEF2F7] text-[#003566]">
                               {pl}
                             </span>
                           ))}
-                          {(placasPorPedido.get(pedido.id) ?? []).length > 3 && (
-                            <span className="text-xs text-[#6C757D]">
-                              +{(placasPorPedido.get(pedido.id) ?? []).length - 3}
-                            </span>
-                          )}
                           <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                             {pedido.metodo}
                           </span>
