@@ -284,20 +284,21 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   const [filtroMetodo, setFiltroMetodo] = useState("todos");
   const [paginaPedidos, setPaginaPedidos] = useState(1);
 
-  // Dias disponíveis no mês (para o seletor)
-  const diasDisponiveis = useMemo(() => {
-    if (filtroMes !== "03/2026") return [];
-    const set = new Set(PEDIDOS_MARCO.map((p) => p.data));
-    return [...set].sort((a, b) => {
-      const parse = (s: string) => { const [d, m, y] = s.split("/"); return new Date(+y, +m - 1, +d).getTime(); };
-      return parse(a) - parse(b);
-    });
+  // min/max do date picker com base no mês selecionado
+  const { minDate, maxDate } = useMemo(() => {
+    const [mesNum, anoNum] = filtroMes.split("/");
+    const min = `${anoNum}-${mesNum}-01`;
+    const lastDay = new Date(+anoNum, +mesNum, 0).getDate();
+    const max = `${anoNum}-${mesNum}-${String(lastDay).padStart(2, "0")}`;
+    return { minDate: min, maxDate: max };
   }, [filtroMes]);
 
   const pedidosFiltrados = useMemo(() => {
     if (filtroMes !== "03/2026") return [];
+    // filtroData está em YYYY-MM-DD; dados estão em DD/MM/YYYY
+    const filtroDataBR = filtroData ? filtroData.split("-").reverse().join("/") : "";
     return PEDIDOS_MARCO.filter((p) => {
-      const matchData   = filtroData === "todos" || p.data === filtroData;
+      const matchData   = !filtroData || p.data === filtroDataBR;
       const matchPlaca  = filtroPlaca === "" || p.placas.toString().includes(filtroPlaca);
       const matchMetodo = filtroMetodo === "todos" ||
         (filtroMetodo === "pix" && p.metodo === "PIX") ||
@@ -819,19 +820,25 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Dia</label>
-                  <div className="relative">
-                    <select
+                  <div className="relative flex items-center">
+                    <input
+                      type="date"
                       value={filtroData}
+                      min={minDate}
+                      max={maxDate}
+                      disabled={filtroMes !== "03/2026"}
                       onChange={(e) => { setFiltroData(e.target.value); setPaginaPedidos(1); }}
-                      className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
-                      disabled={diasDisponiveis.length === 0}
-                    >
-                      <option value="todos">Todos os dias</option>
-                      {diasDisponiveis.map((d) => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    />
+                    {filtroData && (
+                      <button
+                        onClick={() => { setFiltroData(""); setPaginaPedidos(1); }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        title="Limpar"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div>
