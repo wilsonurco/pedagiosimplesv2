@@ -94,8 +94,6 @@ const _restante: PedidoPago[] = Array.from({ length: 443 }, (_, i) => {
 });
 
 const PEDIDOS_MARCO: PedidoPago[] = [..._primeirosDez, ..._restante];
-const TOTAL_PEDIDOS_MARCO = 453;
-const TOTAL_VALOR_MARCO = 19178.40;
 const ITEMS_PER_PAGE_PEDIDOS = 10;
 
 const MESES_LABEL: Record<string, string> = {
@@ -313,6 +311,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
     (paginaPedidos - 1) * ITEMS_PER_PAGE_PEDIDOS,
     paginaPedidos * ITEMS_PER_PAGE_PEDIDOS
   );
+  const totalValorFiltrado = pedidosFiltrados.reduce((acc, p) => acc + p.valor, 0);
 
   const handleFiltroMes = useCallback((mes: string) => {
     setFiltroMes(mes);
@@ -893,7 +892,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       <p className="text-xs text-[#6C757D]">Lista completa de transações</p>
                     </div>
                     <span className="ml-2 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                      {TOTAL_PEDIDOS_MARCO} pedidos
+                      {pedidosFiltrados.length} pedidos
                     </span>
                   </div>
                   <div className="flex items-center gap-2 bg-[#EEF2F7] rounded-xl px-4 py-2.5">
@@ -901,7 +900,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       <DollarSign className="h-3.5 w-3.5 text-white" />
                     </div>
                     <span className="text-base font-bold text-[#003566]">
-                      {formatBRL(TOTAL_VALOR_MARCO)}
+                      {formatBRL(totalValorFiltrado)}
                     </span>
                   </div>
                 </div>
@@ -954,7 +953,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 {/* Paginação */}
                 <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
                   <span className="text-sm text-[#6C757D]">
-                    Mostrando {Math.min(paginaPedidos * ITEMS_PER_PAGE_PEDIDOS, TOTAL_PEDIDOS_MARCO)} de {TOTAL_PEDIDOS_MARCO} pedidos
+                    Mostrando {Math.min(paginaPedidos * ITEMS_PER_PAGE_PEDIDOS, pedidosFiltrados.length)} de {pedidosFiltrados.length} pedidos
                   </span>
                   <div className="flex gap-2">
                     <button
