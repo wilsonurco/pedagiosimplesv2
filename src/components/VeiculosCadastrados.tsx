@@ -6,17 +6,18 @@ import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Badge } from "./ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { 
-  Car, 
-  Plus, 
-  Edit, 
+import {
+  Car,
+  Plus,
+  Edit,
   Trash2,
   Calendar,
   MapPin,
   AlertTriangle,
   CheckCircle,
   Search,
-  Loader2
+  Loader2,
+  Star
 } from "lucide-react";
 
 interface Veiculo {
@@ -28,6 +29,7 @@ interface Veiculo {
   ano: number;
   categoria: string;
   isAtivo: boolean;
+  isPrincipal?: boolean;
   ultimoUso: string;
   totalPendencias: number;
   valorPendente: number;

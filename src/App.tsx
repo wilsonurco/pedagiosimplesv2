@@ -17,8 +17,10 @@ import { Footer } from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "./utils/placaValidation";
 import LogoCinza from "./imports/LogoCinza";
+import { LoginConcessionaria } from "./components/LoginConcessionaria";
+import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
 
-type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq';
+type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
 
 export default function App() {
   const [telaAtual, setTelaAtual] = useState<TelasApp>('landing');
@@ -30,7 +32,8 @@ export default function App() {
   const [debitosSelecionados, setDebitosSelecionados] = useState<any[]>([]);
   const [valorTotalSelecionado, setValorTotalSelecionado] = useState<number>(0);
   const [placaConsultada, setPlacaConsultada] = useState<string>(''); // Placa que foi consultada para passar ao cadastro
-  
+  const [dadosGestor, setDadosGestor] = useState<any>(null);
+
   // Estados do formulário da landing page
   const [placaValue, setPlacaValue] = useState('');
   const [placaError, setPlacaError] = useState('');
@@ -217,6 +220,16 @@ export default function App() {
     setDadosUsuario(null);
     setDadosPagamento(null);
     setDadosVeiculo(null);
+    setTelaAtual('landing');
+  };
+
+  const handleLoginGestor = (dados: any) => {
+    setDadosGestor(dados);
+    setTelaAtual('dashboard-concessionaria');
+  };
+
+  const handleLogoutGestor = () => {
+    setDadosGestor(null);
     setTelaAtual('landing');
   };
 
@@ -460,6 +473,30 @@ export default function App() {
     );
   }
 
+  if (telaAtual === 'login-concessionaria') {
+    return (
+      <>
+        <Toaster />
+        <LoginConcessionaria
+          onLogin={handleLoginGestor}
+          onVoltar={() => setTelaAtual('landing')}
+        />
+      </>
+    );
+  }
+
+  if (telaAtual === 'dashboard-concessionaria') {
+    return (
+      <>
+        <Toaster />
+        <DashboardConcessionaria
+          dadosGestor={dadosGestor}
+          onLogout={handleLogoutGestor}
+        />
+      </>
+    );
+  }
+
   // Landing Page (tela padrão)
   return (
     <>
@@ -476,11 +513,17 @@ export default function App() {
           
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-            <button 
+            <button
               onClick={() => setTelaAtual('faq')}
               className="text-[#6C757D] hover:text-[#003566] transition-colors text-sm font-medium whitespace-nowrap"
             >
               Perguntas frequentes
+            </button>
+            <button
+              onClick={() => setTelaAtual('login-concessionaria')}
+              className="text-[#6C757D] hover:text-[#003566] transition-colors text-sm font-medium whitespace-nowrap"
+            >
+              Acesso Concessionária
             </button>
             {usuarioLogado ? (
               <Button 
@@ -577,7 +620,7 @@ export default function App() {
 
 
 
-                <button 
+                <button
                   className="block text-lg text-[#000000] hover:text-[#003566] transition-colors py-2 w-full text-left"
                   onClick={() => {
                     setMenuMobileAberto(false);
@@ -585,6 +628,15 @@ export default function App() {
                   }}
                 >
                   FAQ
+                </button>
+                <button
+                  className="block text-lg text-[#000000] hover:text-[#003566] transition-colors py-2 w-full text-left"
+                  onClick={() => {
+                    setMenuMobileAberto(false);
+                    setTelaAtual('login-concessionaria');
+                  }}
+                >
+                  Acesso Concessionária
                 </button>
               </nav>
 
