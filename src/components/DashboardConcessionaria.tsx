@@ -279,7 +279,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   // Filtros — Pedidos pagos
   const [filtroMes, setFiltroMes] = useState("03/2026");
-  const [filtroData, setFiltroData] = useState("todos");
+  const [filtroData, setFiltroData] = useState("");
   const [filtroPlaca, setFiltroPlaca] = useState("");
   const [filtroMetodo, setFiltroMetodo] = useState("todos");
   const [paginaPedidos, setPaginaPedidos] = useState(1);
@@ -316,7 +316,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   const handleFiltroMes = useCallback((mes: string) => {
     setFiltroMes(mes);
-    setFiltroData("todos");
+    setFiltroData("");
     setPaginaPedidos(1);
   }, []);
 
