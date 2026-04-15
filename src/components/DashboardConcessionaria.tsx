@@ -852,17 +852,15 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Método de pagamento</label>
+                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Forma de pagamento</label>
                   <div className="relative">
                     <select
                       value={filtroMetodo}
                       onChange={(e) => { setFiltroMetodo(e.target.value); setPaginaPedidos(1); }}
                       className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
                     >
-                      <option value="todos">Todos os métodos</option>
+                      <option value="todos">Todas as formas</option>
                       <option value="pix">PIX</option>
-                      <option value="cartao">Cartão de crédito</option>
-                      <option value="boleto">Boleto</option>
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
                   </div>
@@ -1203,7 +1201,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Método de Pagamento</p>
+                      <p className="text-xs text-[#9CA3AF] mb-0.5">Forma de Pagamento</p>
                       <span className="inline-block text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
                         {modalPedido.metodo}
                       </span>
