@@ -486,7 +486,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
                 <button
                   onClick={voltarLista}
-                  className="flex items-center gap-1.5 bg-[#003566] hover:bg-[#002a52] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 border border-gray-300 text-[#6C757D] hover:border-[#003566] hover:text-[#003566] bg-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar
@@ -1096,6 +1096,22 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                     <div>
                       <p className="text-xs text-[#9CA3AF] mb-0.5">Data e Hora</p>
                       <p className="text-xs font-semibold text-[#333333]">{modalPedido.data} às {modalPedido.hora}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-xs text-[#9CA3AF] mb-1">Placas dos Veículos</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {passagens.map((p) => (
+                          <span
+                            key={p.idPassagem}
+                            className="inline-flex items-center gap-1 bg-[#EEF2F7] text-[#003566] text-xs font-semibold px-2 py-0.5 rounded-md"
+                          >
+                            <svg className="h-3 w-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                            {p.placa}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                     <div>
                       <p className="text-xs text-[#9CA3AF] mb-0.5">Método de Pagamento</p>
