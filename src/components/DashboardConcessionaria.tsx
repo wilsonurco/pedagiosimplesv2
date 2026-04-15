@@ -279,21 +279,33 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   // Filtros — Pedidos pagos
   const [filtroMes, setFiltroMes] = useState("03/2026");
+  const [filtroData, setFiltroData] = useState("todos");
   const [filtroPlaca, setFiltroPlaca] = useState("");
   const [filtroMetodo, setFiltroMetodo] = useState("todos");
   const [paginaPedidos, setPaginaPedidos] = useState(1);
 
+  // Dias disponíveis no mês (para o seletor)
+  const diasDisponiveis = useMemo(() => {
+    if (filtroMes !== "03/2026") return [];
+    const set = new Set(PEDIDOS_MARCO.map((p) => p.data));
+    return [...set].sort((a, b) => {
+      const parse = (s: string) => { const [d, m, y] = s.split("/"); return new Date(+y, +m - 1, +d).getTime(); };
+      return parse(a) - parse(b);
+    });
+  }, [filtroMes]);
+
   const pedidosFiltrados = useMemo(() => {
     if (filtroMes !== "03/2026") return [];
     return PEDIDOS_MARCO.filter((p) => {
-      const matchPlaca = filtroPlaca === "" || p.placas.toString().includes(filtroPlaca);
+      const matchData   = filtroData === "todos" || p.data === filtroData;
+      const matchPlaca  = filtroPlaca === "" || p.placas.toString().includes(filtroPlaca);
       const matchMetodo = filtroMetodo === "todos" ||
         (filtroMetodo === "pix" && p.metodo === "PIX") ||
         (filtroMetodo === "cartao" && p.metodo === "Cartão") ||
         (filtroMetodo === "boleto" && p.metodo === "Boleto");
-      return matchPlaca && matchMetodo;
+      return matchData && matchPlaca && matchMetodo;
     });
-  }, [filtroMes, filtroPlaca, filtroMetodo]);
+  }, [filtroMes, filtroData, filtroPlaca, filtroMetodo]);
 
   const totalPaginasPedidos = Math.ceil(pedidosFiltrados.length / ITEMS_PER_PAGE_PEDIDOS);
   const itensPedidosPagina = pedidosFiltrados.slice(
@@ -303,6 +315,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   const handleFiltroMes = useCallback((mes: string) => {
     setFiltroMes(mes);
+    setFiltroData("todos");
     setPaginaPedidos(1);
   }, []);
 
@@ -788,7 +801,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   <Search className="h-4 w-4" />
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
                   <div className="relative">
@@ -799,6 +812,23 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                     >
                       {Object.entries(MESES_LABEL).map(([val, label]) => (
                         <option key={val} value={val}>{label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Dia</label>
+                  <div className="relative">
+                    <select
+                      value={filtroData}
+                      onChange={(e) => { setFiltroData(e.target.value); setPaginaPedidos(1); }}
+                      className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
+                      disabled={diasDisponiveis.length === 0}
+                    >
+                      <option value="todos">Todos os dias</option>
+                      {diasDisponiveis.map((d) => (
+                        <option key={d} value={d}>{d}</option>
                       ))}
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
