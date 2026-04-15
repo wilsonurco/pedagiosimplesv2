@@ -1203,7 +1203,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3.5">
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Protocolo</p>
+                      <p className="text-xs text-[#9CA3AF] mb-0.5">Pedido</p>
                       <p className="text-xs font-semibold text-[#333333]">{protocolo}</p>
                     </div>
                     <div>
