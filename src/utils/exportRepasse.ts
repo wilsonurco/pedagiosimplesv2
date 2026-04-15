@@ -714,3 +714,193 @@ export function exportarPedidosPagos(params: ExportPedidosParams, formato: "pdf"
   if (formato === "pdf") gerarPdfPedidos(params);
   else                   gerarExcelPedidos(params);
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Comprovante — tipos
+// ══════════════════════════════════════════════════════════════════════════════
+export interface PassagemComprovanteExport {
+  idPassagem: string;
+  placa:      string;
+  rodovia:    string;
+  praca:      string;
+  km:         number;
+  data:       string;
+  hora:       string;
+  valor:      number;
+}
+
+export interface ComprovanteExportParams {
+  protocolo:  string;
+  data:       string;   // "21/03/2026"
+  hora:       string;   // "06:53"
+  metodo:     string;
+  status:     string;
+  valorTotal: number;
+  passagens:  PassagemComprovanteExport[];
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PDF — Comprovante de Pagamento
+// ══════════════════════════════════════════════════════════════════════════════
+function gerarPdfComprovante(p: ComprovanteExportParams) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const W   = doc.internal.pageSize.getWidth();
+
+  // ── Cabeçalho ────────────────────────────────────────────────────────────
+  doc.setFillColor(...AZUL);
+  doc.rect(0, 0, W, 30, "F");
+  doc.setFillColor(...AZUL_MED);
+  doc.rect(0, 24, W, 4, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(...BRANCO);
+  doc.text("Pedágio Simples", 14, 12);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(200, 220, 240);
+  doc.text("Comprovante de Pagamento", 14, 19);
+
+  doc.setFontSize(7.5);
+  doc.setTextColor(...BRANCO);
+  doc.text(`Emitido em: ${hoje()}`, W - 14, 12, { align: "right" });
+  doc.text("Documento oficial", W - 14, 19, { align: "right" });
+
+  // ── Título + status ───────────────────────────────────────────────────────
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(...AZUL);
+  doc.text("Comprovante de Pagamento", 14, 44);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...VERDE);
+  doc.text("Pagamento Aprovado · Pendências quitadas com sucesso", 14, 51);
+
+  doc.setDrawColor(...AZUL_CLARO);
+  doc.setLineWidth(0.6);
+  doc.line(14, 55, W - 14, 55);
+
+  let y = 62;
+
+  // ── Caixas de info ────────────────────────────────────────────────────────
+  y = pdfInfoBox(doc, [
+    { label: "Protocolo",          value: p.protocolo },
+    { label: "Data e hora",        value: `${p.data} às ${p.hora}` },
+    { label: "Método de pagamento", value: p.metodo },
+    { label: "Status",             value: p.status },
+  ], y);
+
+  // ── Valor total ───────────────────────────────────────────────────────────
+  doc.setFillColor(...AZUL);
+  doc.roundedRect(14, y, W - 28, 16, 3, 3, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(...BRANCO);
+  doc.text("VALOR TOTAL PAGO", 20, y + 7);
+  doc.setFontSize(13);
+  doc.text(formatBRL(p.valorTotal), W - 20, y + 10, { align: "right" });
+  y += 24;
+
+  // ── Tabela de passagens ───────────────────────────────────────────────────
+  y = pdfSectionTitle(doc, `Passagens (${p.passagens.length} registros)`, y);
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Placa", "ID Passagem", "Data", "Hora", "Rodovia", "Praça", "Km", "Valor"]],
+    body: p.passagens.map((ps) => [
+      ps.placa,
+      ps.idPassagem,
+      ps.data,
+      ps.hora,
+      ps.rodovia,
+      ps.praca,
+      ps.km,
+      formatBRL(ps.valor),
+    ]),
+    foot: [["", "", "", "", "", "", `${p.passagens.length} passagens`, formatBRL(p.valorTotal)]],
+    margin: { left: 14, right: 14 },
+    styles: { fontSize: 8, cellPadding: 3, textColor: PRETO },
+    headStyles: { fillColor: AZUL, textColor: BRANCO, fontStyle: "bold", fontSize: 8 },
+    footStyles: { fillColor: AZUL_CLARO, textColor: AZUL, fontStyle: "bold" },
+    columnStyles: {
+      0: { fontStyle: "bold", textColor: AZUL, cellWidth: 26 },
+      1: { cellWidth: 34, textColor: CINZA },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 22 },
+      4: { cellWidth: 28 },
+      5: { cellWidth: 22 },
+      6: { halign: "center", cellWidth: 12 },
+      7: { halign: "right", fontStyle: "bold" },
+    },
+    alternateRowStyles: { fillColor: [248, 249, 250] },
+  });
+
+  pdfFooter(doc);
+  doc.save(`comprovante-${p.protocolo}-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Excel — Comprovante de Pagamento
+// ══════════════════════════════════════════════════════════════════════════════
+function gerarExcelComprovante(p: ComprovanteExportParams) {
+  const wb = XLSX.utils.book_new();
+
+  // Aba 1: Resumo do comprovante
+  const wsResumo = XLSX.utils.aoa_to_sheet([
+    [`Pedágio Simples — Comprovante de Pagamento`],
+    [`Emitido em: ${hoje()}`],
+    [],
+    ["DETALHES DA TRANSAÇÃO"],
+    ["Protocolo",            p.protocolo],
+    ["Data e hora",          `${p.data} às ${p.hora}`],
+    ["Método de pagamento",  p.metodo],
+    ["Status",               p.status],
+    ["Valor total pago (R$)", p.valorTotal],
+    [],
+    ["Total de passagens",   p.passagens.length],
+  ]);
+  wsResumo["!cols"] = [{ wch: 28 }, { wch: 30 }];
+  wsResumo["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } },
+  ];
+  XLSX.utils.book_append_sheet(wb, wsResumo, "Comprovante");
+
+  // Aba 2: Passagens individuais
+  const rows = p.passagens.map((ps, i) => [
+    i + 1, ps.placa, ps.idPassagem, ps.data, ps.hora,
+    ps.rodovia, ps.praca, ps.km, ps.valor,
+  ]);
+
+  const wsPass = XLSX.utils.aoa_to_sheet([
+    [`Passagens — Comprovante ${p.protocolo}`],
+    [`Emitido em: ${hoje()} · ${p.passagens.length} registros`],
+    [],
+    ["#", "Placa", "ID Passagem", "Data", "Hora", "Rodovia", "Praça", "Km", "Valor (R$)"],
+    ...rows,
+    [],
+    ["", "", "", "", "", "", "", `${p.passagens.length} passagens`, p.valorTotal],
+  ]);
+  wsPass["!cols"] = [
+    { wch: 5 }, { wch: 14 }, { wch: 20 }, { wch: 14 }, { wch: 12 },
+    { wch: 20 }, { wch: 16 }, { wch: 8 }, { wch: 16 },
+  ];
+  wsPass["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+  ];
+  XLSX.utils.book_append_sheet(wb, wsPass, `Passagens`);
+
+  downloadXlsx(wb, `comprovante-${p.protocolo}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Entry point — Comprovante
+// ══════════════════════════════════════════════════════════════════════════════
+export function exportarComprovante(params: ComprovanteExportParams, formato: "pdf" | "excel") {
+  if (formato === "pdf") gerarPdfComprovante(params);
+  else                   gerarExcelComprovante(params);
+}

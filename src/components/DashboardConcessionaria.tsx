@@ -32,7 +32,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import LogoCinza from "../imports/LogoCinza";
-import { exportarRepasse, exportarPedidosPagos } from "../utils/exportRepasse";
+import { exportarRepasse, exportarPedidosPagos, exportarComprovante } from "../utils/exportRepasse";
 
 interface DashboardConcessionariaProps {
   dadosGestor: any;
@@ -1298,11 +1298,17 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
               {/* Botões — fixos no rodapé */}
               <div className="px-6 pb-5 pt-4 flex items-center gap-2 flex-shrink-0">
-                <button className="flex-1 flex items-center justify-center gap-1.5 bg-[#003566] hover:bg-[#002a52] text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors">
+                <button
+                  onClick={() => exportarComprovante({ protocolo, data: modalPedido.data, hora: modalPedido.hora, metodo: modalPedido.metodo, status: "Aprovado",valorTotal: modalPedido.valor, passagens }, "pdf")}
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-[#003566] hover:bg-[#002a52] text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
+                >
                   <Download className="h-3.5 w-3.5" />
                   PDF
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors">
+                <button
+                  onClick={() => exportarComprovante({ protocolo, data: modalPedido.data, hora: modalPedido.hora, metodo: modalPedido.metodo, status: "Aprovado",valorTotal: modalPedido.valor, passagens }, "excel")}
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
+                >
                   <Download className="h-3.5 w-3.5" />
                   Excel
                 </button>
