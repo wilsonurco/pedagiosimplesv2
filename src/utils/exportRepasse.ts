@@ -305,13 +305,15 @@ function gerarPdfConsolidado(p: ExportParams) {
 // ══════════════════════════════════════════════════════════════════════════════
 // PDF — Detalhado  (landscape A4 — uma linha por passagem/placa)
 // ══════════════════════════════════════════════════════════════════════════════
+const _SUBTOTAL_MARKER = "__SUB__";
+
 function gerarPdfDetalhado(p: ExportParams) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
 
   const totalPassagens = p.pedidos.reduce((a, x) => a + x.placas.length, 0);
   const totalValor     = p.pedidos.reduce((a, x) => a + x.valorTotal, 0);
 
-  // Expande todas as placas em linhas individuais
+  // Monta linhas com subtotal após cada grupo de passagens do mesmo pedido
   const linhas: (string | number)[][] = [];
   let seq = 1;
   for (const ped of p.pedidos) {
@@ -322,7 +324,7 @@ function gerarPdfDetalhado(p: ExportParams) {
         pl.placa,
         pl.idPassagem,
         pl.data,
-        pl.hora,          // HH:MM:SS
+        pl.hora,
         pl.praca,
         `km ${pl.km}`,
         pl.rodovia,
@@ -331,28 +333,37 @@ function gerarPdfDetalhado(p: ExportParams) {
         "Aprovado",
       ]);
     }
+    // Linha de subtotal por pedido (marcador na coluna 0)
+    linhas.push([
+      _SUBTOTAL_MARKER,
+      ped.id.toUpperCase(),
+      `Subtotal — ${ped.placas.length} passagem(ns)`,
+      "", "", "", "", "", "", "",
+      formatBRL(ped.valorTotal),
+      "",
+    ]);
   }
 
   let y = pdfHeader(
     doc,
     `Relatório Detalhado — ${p.mesLabel}`,
-    "Uma linha por passagem · inclui placa, ID da passagem, praça, quilômetro, rodovia, data, hora e valor individual",
+    "Passagens agrupadas por pedido com subtotal · placa, praça, quilômetro, rodovia, data e hora",
     true,
   );
 
   y = pdfInfoBox(doc, [
-    { label: "Mês de referência",         value: p.mesLabel },
-    { label: "Total de pedidos",          value: String(p.pedidos.length) },
+    { label: "Mês de referência",           value: p.mesLabel },
+    { label: "Total de pedidos",            value: String(p.pedidos.length) },
     { label: "Total de passagens / placas", value: String(totalPassagens) },
-    { label: "Valor total",               value: formatBRL(totalValor) },
-    { label: "Método de pagamento",       value: "PIX" },
+    { label: "Valor total",                 value: formatBRL(totalValor) },
+    { label: "Método de pagamento",         value: "PIX" },
   ], y);
 
-  y = pdfSectionTitle(doc, `Passagens Individuais — ${totalPassagens} registros`, y);
+  y = pdfSectionTitle(doc, `Passagens por Pedido — ${totalPassagens} registros · ${p.pedidos.length} pedidos`, y);
 
   autoTable(doc, {
     startY: y,
-    head: [["#", "ID Pedido", "Placa", "ID Passagem", "Data", "Hora", "Praça", "Km", "Rodovia", "Método", "Valor", "Status"]],
+    head: [["#", "ID Pedido", "Placa / Descrição", "ID Passagem", "Data", "Hora", "Praça", "Km", "Rodovia", "Método", "Valor", "Status"]],
     body: linhas,
     foot: [["", `${p.pedidos.length} pedidos`, `${totalPassagens} passagens`,
       "", "", "", "", "", "", "", formatBRL(totalValor), ""]],
@@ -363,25 +374,46 @@ function gerarPdfDetalhado(p: ExportParams) {
     columnStyles: {
       0:  { cellWidth: 10, halign: "center", textColor: CINZA },
       1:  { cellWidth: 22, fontStyle: "bold", textColor: AZUL },
-      2:  { cellWidth: 22, fontStyle: "bold" },
+      2:  { cellWidth: 28, fontStyle: "bold" },
       3:  { cellWidth: 26 },
-      4:  { cellWidth: 22 },
-      5:  { cellWidth: 20 },
+      4:  { cellWidth: 20 },
+      5:  { cellWidth: 18 },
       6:  { cellWidth: 18 },
       7:  { cellWidth: 12, halign: "center" },
-      8:  { cellWidth: 36 },
-      9:  { cellWidth: 16, halign: "center" },
-      10: { halign: "right", cellWidth: 26 },
-      11: { halign: "center", cellWidth: 18 },
+      8:  { cellWidth: 34 },
+      9:  { cellWidth: 14, halign: "center" },
+      10: { halign: "right", cellWidth: 24 },
+      11: { halign: "center", cellWidth: 16 },
     },
-    alternateRowStyles: { fillColor: [248, 249, 250] },
+    // Desliga zebra alternada globalmente — vamos controlar manualmente
+    alternateRowStyles: { fillColor: [255, 255, 255] },
     didParseCell: (data) => {
-      if (data.column.index === 11 && data.section === "body") {
-        data.cell.styles.textColor = VERDE;
-        data.cell.styles.fontStyle = "bold";
-      }
-      if (data.column.index === 10 && data.section === "body") {
-        data.cell.styles.textColor = AZUL;
+      if (data.section !== "body") return;
+      const raw = data.row.raw as (string | number)[];
+      const isSub = raw[0] === _SUBTOTAL_MARKER;
+
+      if (isSub) {
+        // Estilo da linha de subtotal
+        data.cell.styles.fillColor   = AZUL_CLARO;
+        data.cell.styles.textColor   = AZUL;
+        data.cell.styles.fontStyle   = "bold";
+        data.cell.styles.fontSize    = 7.2;
+        // Esconde o marcador da coluna 0
+        if (data.column.index === 0) data.cell.text = [""];
+        // Coluna de valor
+        if (data.column.index === 10) data.cell.styles.halign = "right";
+      } else {
+        // Zebra manual apenas nas linhas de passagem
+        if (data.row.index % 2 === 0) {
+          data.cell.styles.fillColor = [248, 249, 250];
+        }
+        if (data.column.index === 11) {
+          data.cell.styles.textColor = VERDE;
+          data.cell.styles.fontStyle = "bold";
+        }
+        if (data.column.index === 10) {
+          data.cell.styles.textColor = AZUL;
+        }
       }
     },
   });
@@ -497,13 +529,13 @@ function gerarExcelDetalhado(p: ExportParams) {
   wsPed["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
   XLSX.utils.book_append_sheet(wb, wsPed, "Pedidos");
 
-  // ── Aba 3: Passagens (detalhe por placa) ───────────────────────────────────
+  // ── Aba 3: Passagens agrupadas por pedido com subtotal ─────────────────────
   const headerPass = [
     "ID Pedido", "Data Pedido", "Hora Pedido",
     "Placa", "ID da Passagem",
     "Data da Passagem", "Hora da Passagem",
     "Praça", "Quilômetro", "Rodovia",
-    "Método de Pagamento", "Valor da Passagem (R$)", "Status",
+    "Método de Pagamento", "Valor (R$)", "Status",
   ];
 
   const rowsPass: (string | number)[][] = [];
@@ -525,23 +557,33 @@ function gerarExcelDetalhado(p: ExportParams) {
         "Aprovado",
       ]);
     }
+    // Linha de subtotal após cada pedido
+    rowsPass.push([
+      `SUBTOTAL — ${ped.id.toUpperCase()}`,
+      "", "",
+      `${ped.placas.length} passagem(ns)`,
+      "", "", "", "", "", "",
+      "",
+      ped.valorTotal,
+      "",
+    ]);
   }
 
   const wsPass = XLSX.utils.aoa_to_sheet([
-    [`Passagens Detalhadas — ${p.mesLabel}`],
-    [`Gerado em: ${hoje()} · ${totalPassagens} registros`],
+    [`Passagens Detalhadas por Pedido — ${p.mesLabel}`],
+    [`Gerado em: ${hoje()} · ${totalPassagens} passagens · ${totalPedidos} pedidos`],
     [],
     headerPass,
     ...rowsPass,
     [],
-    ["TOTAL", "", "", `${totalPassagens} passagens`, "", "", "", "", "", "", "", totalValor, ""],
+    ["TOTAL GERAL", "", "", `${totalPassagens} passagens`, "", "", "", "", "", "", "", totalValor, ""],
   ]);
   wsPass["!cols"] = [
     { wch: 14 }, { wch: 14 }, { wch: 13 },
-    { wch: 14 }, { wch: 18 },
+    { wch: 20 }, { wch: 18 },
     { wch: 18 }, { wch: 16 },
     { wch: 12 }, { wch: 12 }, { wch: 26 },
-    { wch: 22 }, { wch: 24 }, { wch: 12 },
+    { wch: 22 }, { wch: 18 }, { wch: 12 },
   ];
   wsPass["!merges"] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } },
