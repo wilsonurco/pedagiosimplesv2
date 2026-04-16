@@ -353,7 +353,7 @@ function gerarPdfDetalhado(p: ExportParams) {
       for (const pl of ped.placas) {
         linhas.push([
           seq++,
-          ped.id.toUpperCase(),
+          ped.id,
           pl.placa,
           pl.idPassagem,
           pl.data,
@@ -548,7 +548,7 @@ function gerarExcelDetalhado(p: ExportParams) {
     for (const ped of pedidosDoDia) {
       rowsPed.push([
         tituloNoPed,
-        ped.id.toUpperCase(),
+        ped.id,
         ped.data,
         ped.hora,
         ped.passagens,
@@ -611,7 +611,7 @@ function gerarExcelDetalhado(p: ExportParams) {
         rowsPass.push([
           tituloExcel,
           data,
-          ped.id.toUpperCase(),
+          ped.id,
           ped.hora,
           pl.placa,
           pl.idPassagem,
@@ -716,7 +716,7 @@ function gerarPdfPedidos(p: ExportPedidosParams) {
       acumulado += ped.valor;
       return [
         i + 1,
-        ped.id.toUpperCase(),
+        ped.id,
         ped.data,
         ped.hora,
         ped.passagens,
@@ -783,7 +783,7 @@ function gerarExcelPedidos(p: ExportPedidosParams) {
   let acumulado = 0;
   const rows = p.pedidos.map((ped, i) => {
     acumulado += ped.valor;
-    return [i + 1, ped.id.toUpperCase(), ped.data, ped.hora, ped.passagens, ped.placas, ped.metodo, ped.valor, acumulado, "Pago"];
+    return [i + 1, ped.id, ped.data, ped.hora, ped.passagens, ped.placas, ped.metodo, ped.valor, acumulado, "Pago"];
   });
 
   const wsPed = XLSX.utils.aoa_to_sheet([

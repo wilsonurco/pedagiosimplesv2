@@ -54,16 +54,16 @@ interface PedidoPago {
 
 // Primeiros 10 pedidos com quantidade variada de placas (1–4)
 const _primeirosDez: PedidoPago[] = [
-  { id: "p0001", passagens: 3, data: "21/03/2026", hora: "06:53", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "p0002", passagens: 2, data: "01/03/2026", hora: "00:10", placas: 2, metodo: "PIX", valor: 10.80 },
-  { id: "p0003", passagens: 4, data: "30/03/2026", hora: "23:57", placas: 4, metodo: "PIX", valor: 21.60 },
-  { id: "p0004", passagens: 1, data: "30/03/2026", hora: "22:56", placas: 1, metodo: "PIX", valor:  5.40 },
-  { id: "p0005", passagens: 3, data: "30/03/2026", hora: "22:38", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "p0006", passagens: 2, data: "30/03/2026", hora: "23:58", placas: 2, metodo: "PIX", valor: 10.80 },
-  { id: "p0007", passagens: 4, data: "30/03/2026", hora: "22:36", placas: 4, metodo: "PIX", valor: 21.60 },
-  { id: "p0008", passagens: 1, data: "30/03/2026", hora: "22:45", placas: 1, metodo: "PIX", valor:  5.40 },
-  { id: "p0009", passagens: 3, data: "30/03/2026", hora: "21:39", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "p0010", passagens: 2, data: "30/03/2026", hora: "21:21", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00001", passagens: 3, data: "21/03/2026", hora: "06:53", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00002", passagens: 2, data: "01/03/2026", hora: "00:10", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00003", passagens: 4, data: "30/03/2026", hora: "23:57", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "00004", passagens: 1, data: "30/03/2026", hora: "22:56", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "00005", passagens: 3, data: "30/03/2026", hora: "22:38", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00006", passagens: 2, data: "30/03/2026", hora: "23:58", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00007", passagens: 4, data: "30/03/2026", hora: "22:36", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "00008", passagens: 1, data: "30/03/2026", hora: "22:45", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "00009", passagens: 3, data: "30/03/2026", hora: "21:39", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00010", passagens: 2, data: "30/03/2026", hora: "21:21", placas: 2, metodo: "PIX", valor: 10.80 },
 ];
 
 const _datas = [
@@ -82,7 +82,7 @@ const _restante: PedidoPago[] = Array.from({ length: 443 }, (_, i) => {
   const hh     = String((idx * 3 + 8) % 24).padStart(2, "0");
   const mm     = String((idx * 17 + 5) % 60).padStart(2, "0");
   return {
-    id: `p${String(idx + 1).padStart(4, "0")}`,
+    id: `${String(idx + 1).padStart(5, "0")}`,
     passagens: placas,
     data:  _datas[idx % _datas.length],
     hora:  `${hh}:${mm}`,
@@ -221,7 +221,7 @@ function gerarDadosComprovante(pedido: PedidoPago): {
   protocolo: string;
   passagens: PassagemDetalhe[];
 } {
-  const idNum = parseInt(pedido.id.replace("p", ""), 10);
+  const idNum = parseInt(pedido.id, 10);
   const protocolo = `FP${pedido.data.split("/").reverse().join("").slice(2)}${String(idNum).padStart(4, "0")}`;
 
   // Converte hora base em minutos totais para poder somar por passagem
@@ -302,7 +302,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   // Protocolo de exibição (ID legível do pedido)
   function protocolo(pedido: PedidoPago) {
-    const idNum = parseInt(pedido.id.replace("p", ""), 10);
+    const idNum = parseInt(pedido.id, 10);
     return `FP${pedido.data.split("/").reverse().join("").slice(2)}${String(idNum).padStart(4, "0")}`;
   }
 
