@@ -339,6 +339,16 @@ function gerarPdfDetalhado(p: ExportParams) {
     const subPassagens = pedidosDoDia.reduce((a, x) => a + x.placas.length, 0);
     const subValor     = pedidosDoDia.reduce((a, x) => a + x.valorTotal, 0);
 
+    // Linha de cabeçalho do título (dia) — aparece ANTES das passagens do grupo
+    linhas.push([
+      `${_SUBTOTAL_MARKER}${tituloSeq++}`,
+      data,
+      `${pedidosDoDia.length} pedido(s) · ${subPassagens} passagem(ns)`,
+      "", "", "", "", "", "", "",
+      formatBRL(subValor),
+      "",
+    ]);
+
     for (const ped of pedidosDoDia) {
       for (const pl of ped.placas) {
         linhas.push([
@@ -357,21 +367,12 @@ function gerarPdfDetalhado(p: ExportParams) {
         ]);
       }
     }
-    // Subtotal do título (dia) — marcador codifica o número sequencial
-    linhas.push([
-      `${_SUBTOTAL_MARKER}${tituloSeq++}`,
-      data,
-      `${pedidosDoDia.length} pedido(s) · ${subPassagens} passagem(ns)`,
-      "", "", "", "", "", "", "",
-      formatBRL(subValor),
-      "",
-    ]);
   }
 
   let y = pdfHeader(
     doc,
     `Relatório Detalhado — ${p.mesLabel}`,
-    "Pedidos agrupados por dia (título) · cada dia = 1 título · subtotal por título ao final do grupo",
+    "Pedidos agrupados por dia (título) · cabeçalho do título no topo de cada grupo",
     true,
   );
 
@@ -591,6 +592,19 @@ function gerarExcelDetalhado(p: ExportParams) {
     const subPassagens = pedidosDoDia.reduce((a, x) => a + x.placas.length, 0);
     const subValor     = pedidosDoDia.reduce((a, x) => a + x.valorTotal, 0);
 
+    // Cabeçalho do título (dia) — aparece ANTES das passagens do grupo
+    rowsPass.push([
+      `Título ${tituloExcel}`,
+      data,
+      `${pedidosDoDia.length} pedido(s) · ${subPassagens} passagem(ns)`,
+      "",
+      "",
+      "", "", "", "", "", "",
+      "",
+      subValor,
+      "",
+    ]);
+
     for (const ped of pedidosDoDia) {
       for (const pl of ped.placas) {
         rowsPass.push([
@@ -611,18 +625,6 @@ function gerarExcelDetalhado(p: ExportParams) {
         ]);
       }
     }
-    // Linha de subtotal por título (dia)
-    rowsPass.push([
-      `Título ${tituloExcel}`,
-      data,
-      `SUBTOTAL — ${pedidosDoDia.length} pedido(s)`,
-      "",
-      `${subPassagens} passagem(ns)`,
-      "", "", "", "", "", "",
-      "",
-      subValor,
-      "",
-    ]);
     tituloExcel++;
   }
 
