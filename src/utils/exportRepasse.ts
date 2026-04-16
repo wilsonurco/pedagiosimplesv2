@@ -397,6 +397,7 @@ function gerarPdfDetalhado(p: ExportParams) {
     body: linhas,
     foot: [["", `${totalTitulos} títulos / ${p.pedidos.length} pedidos`, `${totalPassagens} passagens`,
       "", "", "", "", "", "", "", formatBRL(totalValor), ""]],
+    showFoot: "lastPage",
     margin: { left: 10, right: 10 },
     styles: { fontSize: 6.8, cellPadding: 2.4, textColor: PRETO },
     headStyles: { fillColor: AZUL, textColor: BRANCO, fontStyle: "bold", fontSize: 7.2 },
