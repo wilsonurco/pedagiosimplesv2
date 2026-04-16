@@ -307,40 +307,63 @@ function gerarPdfConsolidado(p: ExportParams) {
 // ══════════════════════════════════════════════════════════════════════════════
 const _SUBTOTAL_MARKER = "__SUB__";
 
+// Agrupa pedidos por data (1 título = 1 dia), ordenado cronologicamente
+function agruparPedidosPorDia(pedidos: PedidoExport[]) {
+  const mapa = new Map<string, PedidoExport[]>();
+  for (const ped of pedidos) {
+    const list = mapa.get(ped.data) ?? [];
+    list.push(ped);
+    mapa.set(ped.data, list);
+  }
+  const parse = (s: string) => {
+    const [d, m, y] = s.split("/");
+    return new Date(+y, +m - 1, +d).getTime();
+  };
+  return [...mapa.entries()].sort(([a], [b]) => parse(a) - parse(b));
+}
+
 function gerarPdfDetalhado(p: ExportParams) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
 
   const totalPassagens = p.pedidos.reduce((a, x) => a + x.placas.length, 0);
   const totalValor     = p.pedidos.reduce((a, x) => a + x.valorTotal, 0);
+  const titulosPorDia  = agruparPedidosPorDia(p.pedidos);
+  const totalTitulos   = titulosPorDia.length;
 
-  // Monta linhas com subtotal após cada grupo de passagens do mesmo pedido
+  // Monta linhas agrupadas por dia (título), com subtotal ao final de cada dia
   const linhas: (string | number)[][] = [];
   let seq = 1;
   let tituloSeq = 1;
-  for (const ped of p.pedidos) {
-    for (const pl of ped.placas) {
-      linhas.push([
-        seq++,
-        ped.id.toUpperCase(),
-        pl.placa,
-        pl.idPassagem,
-        pl.data,
-        pl.hora,
-        pl.praca,
-        `km ${pl.km}`,
-        pl.rodovia,
-        ped.metodo,
-        formatBRL(pl.valor),
-        "Aprovado",
-      ]);
+
+  for (const [data, pedidosDoDia] of titulosPorDia) {
+    const subPassagens = pedidosDoDia.reduce((a, x) => a + x.placas.length, 0);
+    const subValor     = pedidosDoDia.reduce((a, x) => a + x.valorTotal, 0);
+
+    for (const ped of pedidosDoDia) {
+      for (const pl of ped.placas) {
+        linhas.push([
+          seq++,
+          ped.id.toUpperCase(),
+          pl.placa,
+          pl.idPassagem,
+          pl.data,
+          pl.hora,
+          pl.praca,
+          `km ${pl.km}`,
+          pl.rodovia,
+          ped.metodo,
+          formatBRL(pl.valor),
+          "Aprovado",
+        ]);
+      }
     }
-    // Linha de subtotal — codifica o nº do título no marcador
+    // Subtotal do título (dia) — marcador codifica o número sequencial
     linhas.push([
       `${_SUBTOTAL_MARKER}${tituloSeq++}`,
-      ped.id.toUpperCase(),
-      `${ped.placas.length} passagem(ns)`,
+      data,
+      `${pedidosDoDia.length} pedido(s) · ${subPassagens} passagem(ns)`,
       "", "", "", "", "", "", "",
-      formatBRL(ped.valorTotal),
+      formatBRL(subValor),
       "",
     ]);
   }
@@ -348,26 +371,30 @@ function gerarPdfDetalhado(p: ExportParams) {
   let y = pdfHeader(
     doc,
     `Relatório Detalhado — ${p.mesLabel}`,
-    "Passagens agrupadas por pedido com subtotal · placa, praça, quilômetro, rodovia, data e hora",
+    "Pedidos agrupados por dia (título) · cada dia = 1 título · subtotal por título ao final do grupo",
     true,
   );
 
   y = pdfInfoBox(doc, [
     { label: "Mês de referência",           value: p.mesLabel },
+    { label: "Total de títulos",            value: String(totalTitulos) },
     { label: "Total de pedidos",            value: String(p.pedidos.length) },
-    { label: "Total de títulos",            value: String(p.pedidos.length) },
     { label: "Total de passagens / placas", value: String(totalPassagens) },
     { label: "Valor total",                 value: formatBRL(totalValor) },
     { label: "Método de pagamento",         value: "PIX" },
   ], y);
 
-  y = pdfSectionTitle(doc, `Passagens por Pedido — ${totalPassagens} registros · ${p.pedidos.length} títulos`, y);
+  y = pdfSectionTitle(
+    doc,
+    `Passagens por Título (Dia) — ${totalPassagens} passagens · ${p.pedidos.length} pedidos · ${totalTitulos} títulos`,
+    y,
+  );
 
   autoTable(doc, {
     startY: y,
-    head: [["#", "ID Pedido", "Placa", "ID Passagem", "Data", "Hora", "Praça", "Km", "Rodovia", "Método", "Valor", "Status"]],
+    head: [["#", "ID Pedido", "Placa / Descrição", "ID Passagem", "Data", "Hora", "Praça", "Km", "Rodovia", "Método", "Valor", "Status"]],
     body: linhas,
-    foot: [["", `${p.pedidos.length} títulos`, `${totalPassagens} passagens`,
+    foot: [["", `${totalTitulos} títulos / ${p.pedidos.length} pedidos`, `${totalPassagens} passagens`,
       "", "", "", "", "", "", "", formatBRL(totalValor), ""]],
     margin: { left: 10, right: 10 },
     styles: { fontSize: 6.8, cellPadding: 2.4, textColor: PRETO },
@@ -387,7 +414,6 @@ function gerarPdfDetalhado(p: ExportParams) {
       10: { halign: "right", cellWidth: 24 },
       11: { halign: "center", cellWidth: 16 },
     },
-    // Desliga zebra alternada globalmente — vamos controlar manualmente
     alternateRowStyles: { fillColor: [255, 255, 255] },
     didParseCell: (data) => {
       if (data.section !== "body") return;
@@ -397,27 +423,22 @@ function gerarPdfDetalhado(p: ExportParams) {
 
       if (isSub) {
         const tituloNum = marker.slice(_SUBTOTAL_MARKER.length);
-        // Estilo da linha de subtotal
         data.cell.styles.fillColor = AZUL_CLARO;
         data.cell.styles.textColor = AZUL;
         data.cell.styles.fontStyle = "bold";
         data.cell.styles.fontSize  = 7.2;
-        // Col 0: exibe "Tít. N" em vez do marcador
         if (data.column.index === 0) {
           data.cell.text             = [`Tít. ${tituloNum}`];
           data.cell.styles.halign    = "center";
           data.cell.styles.textColor = AZUL_MED;
           data.cell.styles.fontSize  = 6.5;
         }
-        // Col 2: descrição do subtotal (passa-se o texto direto)
         if (data.column.index === 2) {
           data.cell.styles.textColor = CINZA;
           data.cell.styles.fontStyle = "normal";
         }
-        // Col 10: valor alinhado à direita
         if (data.column.index === 10) data.cell.styles.halign = "right";
       } else {
-        // Zebra manual apenas nas linhas de passagem
         if (data.row.index % 2 === 0) {
           data.cell.styles.fillColor = [248, 249, 250];
         }
@@ -496,6 +517,8 @@ function gerarExcelDetalhado(p: ExportParams) {
   const totalPedidos   = p.pedidos.length;
   const totalPassagens = p.pedidos.reduce((a, x) => a + x.placas.length, 0);
   const totalValor     = p.pedidos.reduce((a, x) => a + x.valorTotal, 0);
+  const titulosPorDia  = agruparPedidosPorDia(p.pedidos);
+  const totalTitulos   = titulosPorDia.length;
 
   // ── Aba 1: Resumo ──────────────────────────────────────────────────────────
   const wsResumo = XLSX.utils.aoa_to_sheet([
@@ -504,8 +527,8 @@ function gerarExcelDetalhado(p: ExportParams) {
     [],
     ["RESUMO EXECUTIVO"],
     ["Mês de referência",           p.mesLabel],
+    ["Total de títulos",            totalTitulos],
     ["Total de pedidos",            totalPedidos],
-    ["Total de títulos",            totalPedidos],
     ["Total de passagens / placas", totalPassagens],
     ["Valor total repassado (R$)",  totalValor],
     ["Método de pagamento",         "PIX"],
@@ -516,37 +539,45 @@ function gerarExcelDetalhado(p: ExportParams) {
   XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
 
   // ── Aba 2: Pedidos ─────────────────────────────────────────────────────────
-  const headerPed = ["ID Pedido", "Data", "Hora", "Passagens", "Nº Placas", "Método", "Valor Total (R$)", "Status"];
-  const rowsPed   = p.pedidos.map((ped) => [
-    ped.id.toUpperCase(),
-    ped.data,
-    ped.hora,
-    ped.passagens,
-    ped.placas.length,
-    ped.metodo,
-    ped.valorTotal,
-    "Pago",
-  ]);
+  const headerPed = ["Título Nº", "ID Pedido", "Data", "Hora", "Passagens", "Nº Placas", "Método", "Valor Total (R$)", "Status"];
+  const rowsPed: (string | number)[][] = [];
+  let tituloNoPed = 1;
+  for (const [, pedidosDoDia] of titulosPorDia) {
+    for (const ped of pedidosDoDia) {
+      rowsPed.push([
+        tituloNoPed,
+        ped.id.toUpperCase(),
+        ped.data,
+        ped.hora,
+        ped.passagens,
+        ped.placas.length,
+        ped.metodo,
+        ped.valorTotal,
+        "Pago",
+      ]);
+    }
+    tituloNoPed++;
+  }
 
   const wsPed = XLSX.utils.aoa_to_sheet([
     [`Pedidos — ${p.mesLabel}`],
-    [`Gerado em: ${hoje()}`],
+    [`Gerado em: ${hoje()} · ${totalPedidos} pedidos · ${totalTitulos} títulos`],
     [],
     headerPed,
     ...rowsPed,
     [],
-    ["TOTAL", "", "", p.pedidos.reduce((a, x) => a + x.passagens, 0), totalPassagens, "", totalValor, ""],
+    ["TOTAL", "", "", "", p.pedidos.reduce((a, x) => a + x.passagens, 0), totalPassagens, "", totalValor, ""],
   ]);
   wsPed["!cols"] = [
-    { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 12 },
-    { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 10 },
+    { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 10 },
+    { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 10 },
   ];
-  wsPed["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+  wsPed["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }];
   XLSX.utils.book_append_sheet(wb, wsPed, "Pedidos");
 
-  // ── Aba 3: Passagens agrupadas por pedido com subtotal e nº do título ──────
+  // ── Aba 3: Passagens agrupadas por dia (título) com subtotal ───────────────
   const headerPass = [
-    "Título Nº", "ID Pedido", "Data Pedido", "Hora Pedido",
+    "Título Nº", "Data do Título", "ID Pedido", "Hora Pedido",
     "Placa", "ID da Passagem",
     "Data da Passagem", "Hora da Passagem",
     "Praça", "Quilômetro", "Rodovia",
@@ -555,51 +586,57 @@ function gerarExcelDetalhado(p: ExportParams) {
 
   const rowsPass: (string | number)[][] = [];
   let tituloExcel = 1;
-  for (const ped of p.pedidos) {
-    for (const pl of ped.placas) {
-      rowsPass.push([
-        tituloExcel,            // Título Nº
-        ped.id.toUpperCase(),
-        ped.data,
-        ped.hora,
-        pl.placa,
-        pl.idPassagem,
-        pl.data,
-        pl.hora,
-        pl.praca,
-        `km ${pl.km}`,
-        pl.rodovia,
-        ped.metodo,
-        pl.valor,
-        "Aprovado",
-      ]);
+
+  for (const [data, pedidosDoDia] of titulosPorDia) {
+    const subPassagens = pedidosDoDia.reduce((a, x) => a + x.placas.length, 0);
+    const subValor     = pedidosDoDia.reduce((a, x) => a + x.valorTotal, 0);
+
+    for (const ped of pedidosDoDia) {
+      for (const pl of ped.placas) {
+        rowsPass.push([
+          tituloExcel,
+          data,
+          ped.id.toUpperCase(),
+          ped.hora,
+          pl.placa,
+          pl.idPassagem,
+          pl.data,
+          pl.hora,
+          pl.praca,
+          `km ${pl.km}`,
+          pl.rodovia,
+          ped.metodo,
+          pl.valor,
+          "Aprovado",
+        ]);
+      }
     }
-    // Linha de subtotal com nº do título em destaque
+    // Linha de subtotal por título (dia)
     rowsPass.push([
       `Título ${tituloExcel}`,
-      `SUBTOTAL — ${ped.id.toUpperCase()}`,
-      ped.data,
+      data,
+      `SUBTOTAL — ${pedidosDoDia.length} pedido(s)`,
       "",
-      `${ped.placas.length} passagem(ns)`,
+      `${subPassagens} passagem(ns)`,
       "", "", "", "", "", "",
       "",
-      ped.valorTotal,
+      subValor,
       "",
     ]);
     tituloExcel++;
   }
 
   const wsPass = XLSX.utils.aoa_to_sheet([
-    [`Passagens Detalhadas por Pedido — ${p.mesLabel}`],
-    [`Gerado em: ${hoje()} · ${totalPassagens} passagens · ${totalPedidos} títulos`],
+    [`Passagens Detalhadas por Título (Dia) — ${p.mesLabel}`],
+    [`Gerado em: ${hoje()} · ${totalPassagens} passagens · ${totalPedidos} pedidos · ${totalTitulos} títulos`],
     [],
     headerPass,
     ...rowsPass,
     [],
-    ["", "TOTAL GERAL", "", "", `${totalPassagens} passagens`, "", "", "", "", "", "", "", totalValor, ""],
+    ["TOTAL GERAL", "", `${totalPedidos} pedidos`, "", `${totalPassagens} passagens`, "", "", "", "", "", "", "", totalValor, ""],
   ]);
   wsPass["!cols"] = [
-    { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 12 },
+    { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 12 },
     { wch: 18 }, { wch: 20 },
     { wch: 18 }, { wch: 16 },
     { wch: 12 }, { wch: 12 }, { wch: 26 },
