@@ -355,12 +355,13 @@ function gerarPdfDetalhado(p: ExportParams) {
   y = pdfInfoBox(doc, [
     { label: "Mês de referência",           value: p.mesLabel },
     { label: "Total de pedidos",            value: String(p.pedidos.length) },
+    { label: "Total de títulos",            value: String(p.pedidos.length) },
     { label: "Total de passagens / placas", value: String(totalPassagens) },
     { label: "Valor total",                 value: formatBRL(totalValor) },
     { label: "Método de pagamento",         value: "PIX" },
   ], y);
 
-  y = pdfSectionTitle(doc, `Passagens por Pedido — ${totalPassagens} registros · ${p.pedidos.length} pedidos`, y);
+  y = pdfSectionTitle(doc, `Passagens por Pedido — ${totalPassagens} registros · ${p.pedidos.length} títulos`, y);
 
   autoTable(doc, {
     startY: y,
@@ -504,6 +505,7 @@ function gerarExcelDetalhado(p: ExportParams) {
     ["RESUMO EXECUTIVO"],
     ["Mês de referência",           p.mesLabel],
     ["Total de pedidos",            totalPedidos],
+    ["Total de títulos",            totalPedidos],
     ["Total de passagens / placas", totalPassagens],
     ["Valor total repassado (R$)",  totalValor],
     ["Método de pagamento",         "PIX"],
