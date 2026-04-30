@@ -584,7 +584,7 @@ export default function App() {
                       value={captchaValue}
                       onChange={(e) => { setCaptchaValue(e.target.value); setCaptchaError(''); }}
                       placeholder="Digite o código"
-                      className={`flex-1 h-12 sm:h-14 px-3 sm:px-4 text-sm focus:outline-none focus:bg-[#F8F9FA] transition-colors ${
+                      className={`flex-1 min-w-0 h-12 sm:h-14 px-3 sm:px-4 text-sm focus:outline-none focus:bg-[#F8F9FA] transition-colors ${
                         captchaError ? 'text-red-600 bg-red-50' : 'text-[#000000]'
                       }`}
                     />

@@ -15,23 +15,21 @@ const concessionarias = [
   { name: "Intervias",          sigla: "ITV",  cor: "#E07B00" },
 ];
 
-function LogoItem({ name, sigla, cor }: { name: string; sigla: string; cor: string }) {
+function LogoItem({ name, sigla }: { name: string; sigla: string; cor: string }) {
   return (
-    <div className="flex items-center gap-3 mx-10 flex-shrink-0 select-none">
+    <div className="flex items-center gap-3 mx-10 flex-shrink-0 select-none grayscale">
       {/* Ícone da sigla */}
       <div
-        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: `${cor}22` }}
+        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10"
       >
         <span
-          className="text-[10px] font-bold tracking-wide"
-          style={{ color: cor }}
+          className="text-[10px] font-bold tracking-wide text-white/60"
         >
           {sigla}
         </span>
       </div>
       {/* Nome */}
-      <span className="text-sm font-semibold text-white/70 whitespace-nowrap">
+      <span className="text-sm font-semibold text-white/60 whitespace-nowrap">
         {name}
       </span>
     </div>

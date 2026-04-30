@@ -187,7 +187,7 @@ export const AnimatedHero = ({
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="xl:col-span-6 flex flex-col text-white order-2 lg:order-1"
+                className="xl:col-span-6 flex flex-col text-white order-2 lg:order-1 min-w-0"
               >
                 <motion.h1
                   variants={itemVariants}
@@ -225,7 +225,7 @@ export const AnimatedHero = ({
                 initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
-                className="xl:col-span-5 xl:col-start-8 order-1 lg:order-2 flex justify-center lg:justify-end"
+                className="xl:col-span-5 xl:col-start-8 order-1 lg:order-2 flex justify-center lg:justify-end min-w-0"
               >
                 {rightContent}
               </motion.div>

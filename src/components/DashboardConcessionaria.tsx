@@ -264,6 +264,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   const [graficoTipo, setGraficoTipo] = useState<GraficoTipo>("colunas");
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [modalPedido, setModalPedido] = useState<PedidoPago | null>(null);
+  const [mostrarAlertaSemTitulo, setMostrarAlertaSemTitulo] = useState(false);
 
   // Modal exportar repasse
   const [modalExportar, setModalExportar] = useState(false);
@@ -337,7 +338,10 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   }, []);
 
   const abrirDetalhe = (periodo: string) => {
-    if (!detalhesPorPeriodo[periodo]) return;
+    if (!detalhesPorPeriodo[periodo]) {
+      setMostrarAlertaSemTitulo(true);
+      return;
+    }
     setPeriodoSelecionado(periodo);
     setPaginaAtual(1);
     setDetalheView("tabela");
@@ -454,7 +458,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   key={row.periodo}
                   onClick={() => abrirDetalhe(row.periodo)}
                   className={`group flex items-center px-6 py-3.5 border-b border-gray-50 transition-colors ${
-                    hasDetail ? "cursor-pointer hover:bg-[#F0F4F9]" : "cursor-default"
+                    row.valor > 0 && hasDetail ? "cursor-pointer hover:bg-[#F0F4F9]" : "cursor-pointer hover:bg-[#F0F4F9]"
                   }`}
                 >
                   <span className="flex-1 text-sm text-[#333333]">{row.periodo}</span>
@@ -1353,6 +1357,47 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
           </div>
         );
       })()}
+
+      {/* ── MODAL ALERTA SEM TÍTULO ── */}
+      {mostrarAlertaSemTitulo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          onClick={() => setMostrarAlertaSemTitulo(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-[#003566]">Aviso</h2>
+              <button
+                onClick={() => setMostrarAlertaSemTitulo(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-6">
+              <p className="text-center text-gray-700 text-sm">
+                Nenhum título encontrado
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+              <button
+                onClick={() => setMostrarAlertaSemTitulo(false)}
+                className="px-6 py-2.5 rounded-lg bg-[#003566] hover:bg-[#002a52] text-white text-sm font-semibold transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
