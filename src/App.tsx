@@ -706,7 +706,7 @@ export default function App() {
     <>
       <Toaster />
       <AnimatedHero
-        backgroundVideoUrl="https://videos.pexels.com/video-files/26631222/26631222-hd_1920_1080_25fps.mp4"
+        backgroundVideoUrl="/hero.mp4"
         logo={
           <div className="w-44 h-10 brightness-0 invert">
             <LogoCinza />
