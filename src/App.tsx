@@ -20,6 +20,7 @@ import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "./utils/placa
 import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
+import { PartnerCarousel } from "./components/PartnerCarousel";
 
 type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
 
@@ -758,6 +759,7 @@ export default function App() {
           </div>
         }
       />
+      <PartnerCarousel />
       <Footer onNavigateToFAQ={() => setTelaAtual('faq')} />
     </>
   );
