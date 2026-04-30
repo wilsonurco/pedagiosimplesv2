@@ -34,6 +34,7 @@
     "clsx": "*",
     "cmdk": "^1.1.1",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.38.0",
     "input-otp": "^1.4.2",
     "jspdf": "*",
     "jspdf-autotable": "^5.0.7",
@@ -59,7 +60,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "tailwindcss": "4.1.12",
     "typescript": "^6.0.2",
-    "vite": "6.3.5"
+    "vite": "^6.3.5"
   },
   "scripts": {
     "dev": "vite",

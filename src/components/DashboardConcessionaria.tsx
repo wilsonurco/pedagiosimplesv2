@@ -426,6 +426,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
               </div>
               <button
                 onClick={() => setModalExportar(true)}
+                aria-label="Exportar relatório de repasse"
                 className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
               >
                 <Download className="h-5 w-5 text-white" />
@@ -751,6 +752,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => setDropdownPedidos((v) => !v)}
+                  aria-label="Exportar pedidos pagos"
                   className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors"
                 >
                   <Download className="h-5 w-5 text-white" />
@@ -814,15 +816,16 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                     <p className="text-xs text-[#6C757D]">Selecione o período e filtros</p>
                   </div>
                 </div>
-                <button className="w-8 h-8 bg-[#EEF2F7] hover:bg-[#003566] text-[#003566] hover:text-white rounded-lg flex items-center justify-center transition-colors">
+                <button aria-label="Pesquisar" className="w-8 h-8 bg-[#EEF2F7] hover:bg-[#003566] text-[#003566] hover:text-white rounded-lg flex items-center justify-center transition-colors">
                   <Search className="h-4 w-4" />
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
+                  <label htmlFor="filtro-mes" className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
                   <div className="relative">
                     <select
+                      id="filtro-mes"
                       value={filtroMes}
                       onChange={(e) => handleFiltroMes(e.target.value)}
                       className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
@@ -835,9 +838,10 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Dia</label>
+                  <label htmlFor="filtro-dia" className="block text-xs font-medium text-[#6C757D] mb-1.5">Dia</label>
                   <div className="relative flex items-center">
                     <input
+                      id="filtro-dia"
                       type="date"
                       value={filtroData}
                       min={minDate}
@@ -869,9 +873,10 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Forma de pagamento</label>
+                  <label htmlFor="filtro-metodo" className="block text-xs font-medium text-[#6C757D] mb-1.5">Forma de pagamento</label>
                   <div className="relative">
                     <select
+                      id="filtro-metodo"
                       value={filtroMetodo}
                       onChange={(e) => { setFiltroMetodo(e.target.value); setPaginaPedidos(1); }}
                       className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
@@ -1018,7 +1023,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 <p className="text-sm font-bold text-[#003566]">Exportar Relatório de Repasse</p>
                 <p className="text-xs text-[#6C757D] mt-0.5">Selecione o mês e as opções para gerar o relatório.</p>
               </div>
-              <button onClick={() => setModalExportar(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => setModalExportar(false)} aria-label="Fechar" className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -1027,9 +1032,10 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
               {/* Mês */}
               <div>
-                <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
+                <label htmlFor="export-mes" className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
                 <div className="relative">
                   <select
+                    id="export-mes"
                     value={exportMes}
                     onChange={(e) => setExportMes(e.target.value)}
                     className="w-full appearance-none border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
@@ -1178,6 +1184,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
                 <button
                   onClick={() => setModalPedido(null)}
+                  aria-label="Fechar"
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="h-4 w-4" />
