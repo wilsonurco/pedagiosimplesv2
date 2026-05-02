@@ -1361,40 +1361,28 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
       {/* ── MODAL ALERTA SEM TÍTULO ── */}
       {mostrarAlertaSemTitulo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
           onClick={() => setMostrarAlertaSemTitulo(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm"
+            className="bg-white rounded-2xl shadow-xl w-full max-w-[280px] p-6 text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-[#003566]">Aviso</h2>
-              <button
-                onClick={() => setMostrarAlertaSemTitulo(false)}
-                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="h-5 w-5 text-gray-400" />
-              </button>
+            <div className="w-12 h-12 bg-[#F8F9FA] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-5 w-5 text-[#6C757D]" />
             </div>
-
-            {/* Body */}
-            <div className="px-6 py-6">
-              <p className="text-center text-gray-700 text-sm">
-                Nenhum título encontrado
-              </p>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-              <button
-                onClick={() => setMostrarAlertaSemTitulo(false)}
-                className="px-6 py-2.5 rounded-lg bg-[#003566] hover:bg-[#002a52] text-white text-sm font-semibold transition-colors"
-              >
-                OK
-              </button>
-            </div>
+            <h3 className="text-[#003566] font-semibold text-base mb-1.5">
+              Nenhum título encontrado
+            </h3>
+            <p className="text-[#6C757D] text-sm mb-6">
+              Não há valores repassados neste período.
+            </p>
+            <button
+              onClick={() => setMostrarAlertaSemTitulo(false)}
+              className="w-full py-2.5 rounded-xl bg-[#F8F9FA] hover:bg-[#EEF2F7] text-[#003566] text-sm font-semibold transition-colors"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}
