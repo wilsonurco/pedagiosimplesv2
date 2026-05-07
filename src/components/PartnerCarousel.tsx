@@ -18,7 +18,7 @@ const concessionarias = [
 
 function LogoItem({ name, sigla }: { name: string; sigla: string }) {
   return (
-    <div className="flex items-center gap-2 mx-10 flex-shrink-0 select-none text-white group">
+    <div className="flex items-center gap-2 mx-10 flex-shrink-0 select-none text-[#333333] group">
       {name !== sigla ? (
         <>
           <span className="text-xl font-bold tracking-tighter opacity-80 group-hover:opacity-100 transition-opacity">
@@ -42,7 +42,7 @@ export function PartnerCarousel() {
   const doubled = [...concessionarias, ...concessionarias];
 
   return (
-    <section className="relative bg-zinc-800/60 backdrop-blur-md border-t border-b border-white/10 py-6 overflow-hidden">
+    <section className="relative bg-[#D4D4D4] border-t border-b border-white/10 py-6 overflow-hidden">
       
       <div className="relative z-10 w-full">
         {/* Track com animação CSS e máscara de fade nas bordas (suporta fundos transparentes) */}

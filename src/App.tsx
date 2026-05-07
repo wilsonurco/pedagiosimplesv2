@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "./components/ui/button";
 import { Card, CardContent } from "./components/ui/card";
 import { AnimatedHero } from "./components/ui/animated-hero-section-1";
-import { CheckCircle, Car, X, RefreshCw, AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
+import { CheckCircle, Car, X, AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
+import { Turnstile } from '@marsidev/react-turnstile';
 import { ConsultaDebitos } from "./components/ConsultaDebitos";
 import { ResultadosDebitos } from "./components/ResultadosDebitos";
 import { CadastroUsuario } from "./components/CadastroUsuario";
@@ -30,7 +31,6 @@ export default function App() {
   const [dadosUsuario, setDadosUsuario] = useState<any>(null);
   const [dadosPagamento, setDadosPagamento] = useState<any>(null);
   const [usuarioLogado, setUsuarioLogado] = useState<boolean>(false);
-  const [menuMobileAberto, setMenuMobileAberto] = useState<boolean>(false);
   const [debitosSelecionados, setDebitosSelecionados] = useState<any[]>([]);
   const [valorTotalSelecionado, setValorTotalSelecionado] = useState<number>(0);
   const [placaConsultada, setPlacaConsultada] = useState<string>(''); // Placa que foi consultada para passar ao cadastro
@@ -39,32 +39,10 @@ export default function App() {
   // Estados do formulário da landing page
   const [placaValue, setPlacaValue] = useState('');
   const [placaError, setPlacaError] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const [captchaValue, setCaptchaValue] = useState('');
-  const [captchaCode, setCaptchaCode] = useState('');
-  const [captchaError, setCaptchaError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [mostrandoResultados, setMostrandoResultados] = useState(false);
   const [carregandoConsulta, setCarregandoConsulta] = useState(false);
-
-  // Função para gerar código captcha aleatório
-  const generateCaptcha = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setCaptchaCode(result);
-    setCaptchaValue('');
-    setCaptchaError('');
-  };
-
-  // Gerar captcha inicial ao carregar a página
-  useEffect(() => {
-    if (!captchaCode) {
-      generateCaptcha();
-    }
-  }, [captchaCode]);
 
   const handleConsultar = (dados: any) => {
     setDadosVeiculo(dados);
@@ -247,55 +225,37 @@ export default function App() {
     // Resetar formulário da landing
     setPlacaValue('');
     setPlacaError('');
-    setTermsAccepted(false);
-    setPrivacyAccepted(false);
-    setCaptchaValue('');
-    setCaptchaError('');
-    setCaptchaCode(''); // Isso vai triggerar o useEffect para gerar novo código
+    setTurnstileToken(null);
+    setTurnstileKey(k => k + 1);
   };
 
-  // Validação do captcha
-  const isCaptchaValid = captchaValue.toLowerCase() === captchaCode.toLowerCase();
-  
   // Validação da placa
   const placaValida = isPlacaCompleta(placaValue);
-  
+
   // Lógica do formulário da landing page
-  const isFormValid = placaValida && isCaptchaValid && captchaCode;
-  
+  const isFormValid = placaValida && !!turnstileToken;
+
   const handleBuscarDebitos = () => {
-    // Validar captcha primeiro
-    if (!isCaptchaValid) {
-      setCaptchaError('Código de verificação incorreto. Tente novamente.');
-      setCaptchaCode(''); // Isso vai triggerar o useEffect para gerar novo código
-      return;
-    }
+    if (!isFormValid) return;
 
-    // Limpar erro do captcha se válido
-    setCaptchaError('');
+    setCarregandoConsulta(true);
 
-    if (isFormValid) {
-      setCarregandoConsulta(true);
-      
-      // Simular dados do veículo com base na placa digitada
-      const dadosSimulados = {
-        placa: placaValue,
-        renavam: '12345678901',
-        chassis: 'ABC1234567890DEFG',
-        modelo: 'CIVIC SEDAN 2.0',
-        marca: 'HONDA',
-        ano: '2023/2024',
-        cor: 'BRANCO'
-      };
-      
-      // Simular delay da consulta
-      setTimeout(() => {
-        setDadosVeiculo(dadosSimulados);
-        setCarregandoConsulta(false);
-        setMostrandoResultados(true);
-        setPlacaConsultada(placaValue); // Guardar a placa consultada
-      }, 2000);
-    }
+    const dadosSimulados = {
+      placa: placaValue,
+      renavam: '12345678901',
+      chassis: 'ABC1234567890DEFG',
+      modelo: 'CIVIC SEDAN 2.0',
+      marca: 'HONDA',
+      ano: '2023/2024',
+      cor: 'BRANCO'
+    };
+
+    setTimeout(() => {
+      setDadosVeiculo(dadosSimulados);
+      setCarregandoConsulta(false);
+      setMostrandoResultados(true);
+      setPlacaConsultada(placaValue);
+    }, 2000);
   };
 
   const handleNovaConsulta = () => {
@@ -303,11 +263,8 @@ export default function App() {
     setDadosVeiculo(null);
     setPlacaValue('');
     setPlacaError('');
-    setTermsAccepted(false);
-    setPrivacyAccepted(false);
-    setCaptchaValue('');
-    setCaptchaError('');
-    setCaptchaCode(''); // Isso vai triggerar o useEffect para gerar novo código
+    setTurnstileToken(null);
+    setTurnstileKey(k => k + 1);
   };
 
   // Renderizar a tela baseada no estado atual
@@ -560,8 +517,8 @@ export default function App() {
                 )}
               </div>
 
-              <div className="space-y-4 mb-4 sm:mb-6 bg-[#F8F9FA] p-3 rounded-lg border border-[#E0E0E0]">
-                <div className="text-xs sm:text-sm text-[#000000] leading-relaxed">
+              <div className="mb-4 sm:mb-5">
+                <div className="text-xs sm:text-sm text-[#6C757D] leading-relaxed text-center">
                   Ao consultar, você concorda com os{' '}
                   <a href="#" className="text-[#003566] underline font-medium hover:text-[#002a52] transition-colors">Termos de Uso</a>
                   {' '}e o{' '}
@@ -569,40 +526,15 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="mb-4 sm:mb-6">
-                <label htmlFor="hero-captcha" className="block text-xs sm:text-sm font-medium text-[#003566] uppercase tracking-wide mb-2 text-center">
-                  Verificação de Segurança
-                </label>
-                <div className="bg-white border-2 border-[#E0E0E0] rounded-xl shadow-sm overflow-hidden">
-                  <div className="flex items-center">
-                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-center border-r-2 border-[#E0E0E0]">
-                      <span className="text-base sm:text-lg font-bold text-[#003566] tracking-widest whitespace-nowrap">{captchaCode}</span>
-                    </div>
-                    <input
-                      id="hero-captcha"
-                      type="text"
-                      value={captchaValue}
-                      onChange={(e) => { setCaptchaValue(e.target.value); setCaptchaError(''); }}
-                      placeholder="Digite o código"
-                      className={`flex-1 min-w-0 h-12 sm:h-14 px-3 sm:px-4 text-sm focus:outline-none focus:bg-[#F8F9FA] transition-colors ${
-                        captchaError ? 'text-red-600 bg-red-50' : 'text-[#000000]'
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setCaptchaCode('')}
-                      title="Gerar novo código"
-                      className="w-12 sm:w-14 h-12 sm:h-14 bg-white border-l-2 border-[#E0E0E0] flex items-center justify-center text-[#003566] hover:bg-[#F8F9FA] transition-colors flex-shrink-0"
-                    >
-                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                  </div>
-                </div>
-                {captchaError && (
-                  <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center gap-1">
-                    <X className="w-4 h-4" />{captchaError}
-                  </p>
-                )}
+              <div className="mb-4 sm:mb-6 flex justify-center">
+                <Turnstile
+                  key={turnstileKey}
+                  siteKey="1x00000000000000000000AA"
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken(null)}
+                  onError={() => setTurnstileToken(null)}
+                  options={{ theme: 'light', language: 'pt-BR' }}
+                />
               </div>
 
               <div className="space-y-3 sm:space-y-4">
