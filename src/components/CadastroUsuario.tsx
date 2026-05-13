@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Progress } from "./ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { ArrowLeft, User, Mail, Phone, MapPin, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "../utils/placaValidation";
 
@@ -23,12 +23,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     email: '',
     telefone: '',
     cpf: '',
-    cep: '',
-    endereco: '',
-    numero: '',
-    bairro: '',
-    cidade: '',
-    estado: '',
+    dataNascimento: '',
     senha: '',
     confirmarSenha: '',
     placa: '',
@@ -38,9 +33,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [consultandoCEP, setConsultandoCEP] = useState(false);
-  const [cepNaoEncontrado, setCepNaoEncontrado] = useState(false);
-  const [preenchimentoManual, setPreenchimentoManual] = useState(false);
+  const [cpfBuscando, setCpfBuscando] = useState(false);
+  const [cpfAutoPreenchido, setCpfAutoPreenchido] = useState<string[]>([]);
   const [emailValidando, setEmailValidando] = useState(false);
   const [emailValido, setEmailValido] = useState<boolean | null>(null);
   const [emailTimeout, setEmailTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -72,15 +66,48 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpar erro do campo quando usuário começar a digitar
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    if (cpfAutoPreenchido.includes(field)) {
+      setCpfAutoPreenchido(prev => prev.filter(f => f !== field));
     }
   };
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
+  const formatDate = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+  };
+
+  const buscarDadosCPF = async (cpf: string) => {
+    setCpfBuscando(true);
+    // Simulates Receita Federal CPF lookup (~1.5s delay)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const mockDados = {
+      nome: 'João da Silva Santos',
+      dataNascimento: '15/03/1990',
+      email: 'joao.silva@gmail.com',
+      telefone: '(11) 98765-4321',
+    };
+    setFormData(prev => ({
+      ...prev,
+      nome: mockDados.nome,
+      dataNascimento: mockDados.dataNascimento,
+      email: mockDados.email,
+      telefone: mockDados.telefone,
+    }));
+    // Mark email as pre-validated via CPF lookup
+    setEmailValido(true);
+    setErrors(prev => ({ ...prev, email: '', nome: '', dataNascimento: '', telefone: '' }));
+    setCpfAutoPreenchido(['nome', 'dataNascimento', 'email', 'telefone']);
+    setCpfBuscando(false);
   };
 
   const validateCPF = (cpf: string) => {
@@ -150,80 +177,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
     }
     return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-  };
-
-  const formatCEP = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers.replace(/(\d{5})(\d{3})/, '$1-$2');
-  };
-
-  const consultarCEP = async (cep: string) => {
-    const cepNumeros = cep.replace(/\D/g, '');
-    
-    if (cepNumeros.length !== 8) return;
-
-    setConsultandoCEP(true);
-    setErrors(prev => ({ ...prev, cep: '' }));
-    setCepNaoEncontrado(false);
-
-    try {
-      // Simulação de falha da API - CEPs que começam com "99999" sempre falham
-      if (cepNumeros.startsWith('99999')) {
-        throw new Error('Simulação de erro da API');
-      }
-
-      // Add timeout to prevent hanging
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-      const response = await fetch(`https://viacep.com.br/ws/${cepNumeros}/json/`, {
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      
-      const data = await response.json();
-
-      if (data.erro) {
-        setCepNaoEncontrado(true);
-        setErrors(prev => ({ ...prev, cep: 'CEP não encontrado' }));
-        return;
-      }
-
-      // Preencher automaticamente os campos de endereço
-      setFormData(prev => ({
-        ...prev,
-        endereco: data.logradouro || '',
-        bairro: data.bairro || '',
-        cidade: data.localidade || '',
-        estado: data.uf || ''
-      }));
-
-      // Limpar erros dos campos preenchidos automaticamente
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        if (data.logradouro) delete newErrors.endereco;
-        if (data.bairro) delete newErrors.bairro;
-        if (data.localidade) delete newErrors.cidade;
-        if (data.uf) delete newErrors.estado;
-        return newErrors;
-      });
-
-    } catch (error) {
-      setCepNaoEncontrado(true);
-      if (error.name === 'AbortError') {
-        setErrors(prev => ({ ...prev, cep: 'Tempo de consulta esgotado' }));
-      } else {
-        setErrors(prev => ({ ...prev, cep: 'Erro ao consultar CEP' }));
-      }
-    } finally {
-      setConsultandoCEP(false);
-    }
-  };
-
-  const habilitarPreenchimentoManual = () => {
-    setPreenchimentoManual(true);
-    setCepNaoEncontrado(false);
-    setErrors(prev => ({ ...prev, cep: '' }));
   };
 
   const validarEmail = async (email: string) => {
@@ -344,7 +297,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     
     // Simular envio por email
     setTimeout(() => {
-      console.log(`Código enviado para ${formData.email}: ${codigo}`); // Para desenvolvimento
       setEmailValidando(false);
       setCodigoEnviado(true);
       setModalCodigoAberto(true); // Abrir modal
@@ -401,8 +353,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     setCodigoValidacao(''); // Limpar campo
     setErrors(prev => ({ ...prev, codigoValidacao: '' })); // Limpar erros
     
-    console.log(`Novo código enviado para ${formData.email}: ${novoCodigo}`);
-    
     // Reiniciar contagem regressiva
     setTempoReenvio(60);
     const interval = setInterval(() => {
@@ -458,34 +408,21 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     }
   };
 
-  // Função que verifica se a etapa atual é válida sem alterar o estado
   const isCurrentStepValid = () => {
     if (etapaAtual === 1) {
-      // Dados pessoais - verificação mais clara
       const camposObrigatoriosPreenchidos = (
         formData.nome.trim() &&
         formData.email.trim() &&
         formData.telefone.trim() &&
         formData.cpf.trim() &&
+        formData.dataNascimento.trim() &&
         formData.aceitaTermos
       );
-      
       const cpfValido_check = cpfValido === true;
-      
       const emailValido_check = (!codigoEnviado && emailValido === true) || (codigoEnviado && codigoValido === true);
-      
       return camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check;
     } else if (etapaAtual === 2) {
-      // Endereço
-      if (!formData.cep.trim()) return false;
-      if (formData.cep.replace(/\D/g, '').length !== 8) return false;
-      if (!formData.endereco.trim()) return false;
-      if (!formData.numero.trim()) return false;
-      if (!formData.bairro.trim()) return false;
-      if (!formData.cidade.trim()) return false;
-      if (!formData.estado.trim()) return false;
-    } else if (etapaAtual === 3) {
-      // Senha - pure check without setting state
+      // Senha
       if (!formData.senha) return false;
       const req = {
         tamanho: formData.senha.length >= 8,
@@ -496,7 +433,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       };
       if (!Object.values(req).every(Boolean)) return false;
       if (formData.senha !== formData.confirmarSenha) return false;
-    } else if (etapaAtual === 4) {
+    } else if (etapaAtual === 3) {
       // Placa
       if (!formData.placa.trim()) return false;
       const placaValidacao = validarPlaca(formData.placa);
@@ -509,30 +446,19 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     const newErrors: Record<string, string> = {};
 
     if (etapaAtual === 1) {
-      // Dados pessoais
       if (!formData.nome.trim()) newErrors.nome = 'Nome é obrigatório';
+      if (!formData.dataNascimento.trim()) newErrors.dataNascimento = 'Data de nascimento é obrigatória';
+      else if (formData.dataNascimento.replace(/\D/g, '').length !== 8) newErrors.dataNascimento = 'Data inválida — use DD/MM/AAAA';
       if (!formData.email.trim()) newErrors.email = 'Email é obrigatório';
       else if (!codigoEnviado && emailValido === false) newErrors.email = 'Email inválido ou não verificado';
       else if (!codigoEnviado && emailValido === null && formData.email.trim()) newErrors.email = 'Aguarde a validação do e-mail';
       else if (codigoEnviado && emailValido !== true) newErrors.email = 'Código de validação deve ser confirmado';
-      
       if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
       if (!formData.cpf.trim()) newErrors.cpf = 'CPF é obrigatório';
       else if (cpfValido === false) newErrors.cpf = 'CPF inválido';
       else if (cpfValido === null && formData.cpf.trim()) newErrors.cpf = 'Aguarde a validação do CPF';
-      
       if (!formData.aceitaTermos) newErrors.aceitaTermos = 'Você deve aceitar os termos de uso';
     } else if (etapaAtual === 2) {
-      // Endereço
-      if (!formData.cep.trim()) newErrors.cep = 'CEP é obrigatório';
-      else if (formData.cep.replace(/\D/g, '').length !== 8) newErrors.cep = 'CEP deve ter 8 dígitos';
-      
-      if (!formData.endereco.trim()) newErrors.endereco = 'Endereço é obrigatório';
-      if (!formData.numero.trim()) newErrors.numero = 'Número é obrigatório';
-      if (!formData.bairro.trim()) newErrors.bairro = 'Bairro é obrigatório';
-      if (!formData.cidade.trim()) newErrors.cidade = 'Cidade é obrigatória';
-      if (!formData.estado.trim()) newErrors.estado = 'Estado é obrigatório';
-    } else if (etapaAtual === 3) {
       // Senha
       if (!formData.senha) {
         newErrors.senha = 'Senha é obrigatória';
@@ -542,11 +468,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           newErrors.senha = 'Senha não atende aos critérios de segurança';
         }
       }
-      
       if (formData.senha !== formData.confirmarSenha) {
         newErrors.confirmarSenha = 'Senhas não coincidem';
       }
-    } else if (etapaAtual === 4) {
+    } else if (etapaAtual === 3) {
       // Placa
       if (!formData.placa.trim()) {
         newErrors.placa = 'Placa é obrigatória';
@@ -562,79 +487,47 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     return Object.keys(newErrors).length === 0;
   };
 
-  // Calcular o progresso dinâmico (0% a 100%) usando useMemo
   const progressoCalculado = useMemo(() => {
     let progress = 0;
-    
+
     if (etapaAtual === 1) {
-      // Etapa 1: 0% a 25% baseado nos campos preenchidos
+      // Etapa 1: 0% a 33%
       let fieldsCompleted = 0;
-      const totalFields = 5; // nome, email, telefone, cpf, aceitar termos
-      
+      const totalFields = 6;
+      if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
+      if (formData.dataNascimento.trim() && formData.dataNascimento.replace(/\D/g, '').length === 8) fieldsCompleted++;
       if (formData.nome.trim()) fieldsCompleted++;
       if (formData.email.trim() && emailValido === true) fieldsCompleted++;
       if (formData.telefone.trim()) fieldsCompleted++;
-      if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
       if (formData.aceitaTermos) fieldsCompleted++;
-      
-      progress = (fieldsCompleted / totalFields) * 25;
-      
+      progress = (fieldsCompleted / totalFields) * 33;
+
     } else if (etapaAtual === 2) {
-      // Etapa 2: 25% a 50% baseado nos campos preenchidos
-      // Primeiro, adiciona os 25% da etapa anterior (completa)
-      progress = 25;
-      
+      // Etapa 2: 33% a 66% (Senha)
+      progress = 33;
+      const calcularReq = (senha: string) => ({
+        tamanho: senha.length >= 8,
+        maiuscula: /[A-Z]/.test(senha),
+        minuscula: /[a-z]/.test(senha),
+        numero: /\d/.test(senha),
+        especial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)
+      });
       let fieldsCompleted = 0;
-      const totalFields = 6; // cep, endereco, numero, bairro, cidade, estado
-      
-      if (formData.cep.trim() && formData.cep.replace(/\D/g, '').length === 8) fieldsCompleted++;
-      if (formData.endereco.trim()) fieldsCompleted++;
-      if (formData.numero.trim()) fieldsCompleted++;
-      if (formData.bairro.trim()) fieldsCompleted++;
-      if (formData.cidade.trim()) fieldsCompleted++;
-      if (formData.estado.trim()) fieldsCompleted++;
-      
-      progress += (fieldsCompleted / totalFields) * 25;
-      
-    } else if (etapaAtual === 3) {
-      // Etapa 3: 50% a 75% baseado nos campos preenchidos
-      // Primeiro, adiciona os 50% das etapas anteriores (completas)
-      progress = 50;
-      
-      let fieldsCompleted = 0;
-      const totalFields = 2; // senha válida, confirmação de senha
-      
-      // Usar a função auxiliar pura para calcular requisitos
-      const calcularRequisitosSenha = (senha: string) => {
-        return {
-          tamanho: senha.length >= 8,
-          maiuscula: /[A-Z]/.test(senha),
-          minuscula: /[a-z]/.test(senha),
-          numero: /\d/.test(senha),
-          especial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)
-        };
-      };
-      
-      if (formData.senha && Object.values(calcularRequisitosSenha(formData.senha)).every(Boolean)) fieldsCompleted++;
+      if (formData.senha && Object.values(calcularReq(formData.senha)).every(Boolean)) fieldsCompleted++;
       if (formData.senha && formData.confirmarSenha && formData.senha === formData.confirmarSenha) fieldsCompleted++;
-      
-      progress += (fieldsCompleted / totalFields) * 25;
-    } else if (etapaAtual === 4) {
-      // Etapa 4: 75% a 100% baseado na placa
-      progress = 75;
-      
+      progress += (fieldsCompleted / 2) * 33;
+
+    } else if (etapaAtual === 3) {
+      // Etapa 3: 66% a 100% (Placa)
+      progress = 66;
       if (formData.placa.trim()) {
         const placaValidacaoLocal = validarPlaca(formData.placa);
-        if (placaValidacaoLocal.isValid) {
-          progress = 100;
-        } else {
-          progress = 87.5; // Meio caminho
-        }
+        progress = placaValidacaoLocal.isValid ? 100 : 83;
       }
     }
-    
-    return Math.max(0, Math.min(100, progress)); // Garantir que fique entre 0 e 100
-  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.cep, formData.endereco, formData.numero, formData.bairro, formData.cidade, formData.estado, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido]);
+
+    return Math.max(0, Math.min(100, progress));
+  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido, formData.dataNascimento]);
 
   const handleNextStep = () => {
     // Aguardar validação do email se ainda estiver em progresso
@@ -679,44 +572,42 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   const getStepTitle = () => {
     switch (etapaAtual) {
       case 1: return 'Dados pessoais';
-      case 2: return 'Endereço';
-      case 3: return 'Senha e confirmação';
-      case 4: return 'Confirmar veículo';
+      case 2: return 'Senha e confirmação';
+      case 3: return 'Confirmar veículo';
       default: return '';
     }
   };
 
   const getStepIcon = () => {
     switch (etapaAtual) {
-      case 1: return <User className="h-6 w-6 text-[#003566]" />;
-      case 2: return <MapPin className="h-6 w-6 text-[#003566]" />;
-      case 3: return <Lock className="h-6 w-6 text-[#003566]" />;
-      case 4: return <Car className="h-6 w-6 text-[#003566]" />;
+      case 1: return <User className="h-6 w-6 text-[#5B2E8C]" />;
+      case 2: return <Lock className="h-6 w-6 text-[#5B2E8C]" />;
+      case 3: return <Car className="h-6 w-6 text-[#5B2E8C]" />;
       default: return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F5FB] to-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#F8F9FA] sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-[#F7F5FB] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={etapaAtual === 1 ? onBack : handlePreviousStep}
-              className="flex items-center gap-2 text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]"
+              className="flex items-center gap-2 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#003566] rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
               <User className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-[#003566]">Pedágio Simples</span>
+            <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
           </div>
         </div>
       </header>
@@ -725,12 +616,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         <div className="max-w-lg mx-auto">
           {/* Título da seção */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#F8F9FA] text-[#00B4D8] rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#F7F5FB] text-[#8B5FFF] rounded-full px-4 py-2 mb-6">
               <Shield className="h-4 w-4" />
               <span className="text-sm font-semibold">CADASTRO SEGURO</span>
             </div>
 
-            <p className="text-lg text-[#6C757D]">
+            <p className="text-lg text-[#8A8B95]">
               Para prosseguir com o pagamento, precisamos de algumas informações
             </p>
           </div>
@@ -738,10 +629,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           {/* Indicador de Progresso */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-[#000000]">
-                Etapa {etapaAtual} de 4
+              <span className="text-sm font-medium text-[#1A1B23]">
+                Etapa {etapaAtual} de 3
               </span>
-              <span className="text-sm text-[#6C757D]">
+              <span className="text-sm text-[#8A8B95]">
                 {Math.round(progressoCalculado)}% concluído
               </span>
             </div>
@@ -749,26 +640,26 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           </div>
 
           {/* Formulário */}
-          <Card className="shadow-lg border border-[#F8F9FA] rounded-lg">
+          <Card className="shadow-lg border border-[#F7F5FB] rounded-lg">
             <CardHeader className="text-center pb-1 pt-4">
-              <CardTitle className="text-xl text-[#000000] flex items-center justify-center gap-3">
+              <CardTitle className="text-xl text-[#1A1B23] flex items-center justify-center gap-3">
                 {getStepIcon()}
                 {getStepTitle()}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={etapaAtual === 4 ? handleSubmit : (e) => { e.preventDefault(); handleNextStep(); }} className="space-y-6">
+              <form onSubmit={etapaAtual === 3 ? handleSubmit : (e) => { e.preventDefault(); handleNextStep(); }} className="space-y-6">
                 
                 {/* Etapa 1: Dados Pessoais */}
                 {etapaAtual === 1 && (
                   <div className="space-y-6">
                     {/* CPF */}
                     <div className="space-y-2">
-                      <Label htmlFor="cpf" className="text-[#000000]">CPF</Label>
+                      <Label htmlFor="cpf" className="text-[#1A1B23]">CPF</Label>
                       <div className="relative">
                         <Input
                           id="cpf"
-                          placeholder="000.000.000-00"
+                          placeholder="Digite seu CPF"
                           value={formData.cpf}
                           onChange={(e) => {
                             const cpfFormatado = formatCPF(e.target.value);
@@ -779,86 +670,140 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                             
                             // Validar automaticamente quando CPF estiver completo
                             if (cpfFormatado.replace(/\D/g, '').length === 11) {
-                              validateCPF(cpfFormatado);
+                              const valido = validateCPF(cpfFormatado);
+                              if (valido) buscarDadosCPF(cpfFormatado);
                             } else if (cpfFormatado.replace(/\D/g, '').length > 0) {
                               setErrors(prev => ({ ...prev, cpf: '' }));
                             }
                           }}
-                          className={`text-lg py-3 pr-12 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${
-                            errors.cpf ? 'border-red-500' : 
-                            cpfValido === true ? 'border-green-500' : 
-                            cpfValido === false ? 'border-red-500' : ''
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.cpf ? 'border-[#C8324A]' : 
+                            cpfValido === true ? 'border-[#0E8B5A]' : 
+                            cpfValido === false ? 'border-[#C8324A]' : ''
                           }`}
                           maxLength={14}
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          {cpfValido === true && (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          {cpfBuscando && (
+                            <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
                           )}
-                          {cpfValido === false && (
-                            <XCircle className="h-5 w-5 text-red-500" />
+                          {!cpfBuscando && cpfValido === true && (
+                            <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
+                          )}
+                          {!cpfBuscando && cpfValido === false && (
+                            <XCircle className="h-5 w-5 text-[#C8324A]" />
                           )}
                         </div>
                       </div>
-                      {errors.cpf && <p className="text-sm text-red-600">{errors.cpf}</p>}
-                      {cpfValido === true && !errors.cpf && (
-                        <p className="text-sm text-green-600 flex items-center gap-1">
+                      {errors.cpf && <p className="text-sm text-[#C8324A]">{errors.cpf}</p>}
+                      {cpfBuscando && (
+                        <p className="text-sm text-[#5B2E8C] flex items-center gap-1">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Buscando seus dados...
+                        </p>
+                      )}
+                      {cpfValido === true && !errors.cpf && !cpfBuscando && (
+                        <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                           <CheckCircle className="h-4 w-4" />
                           CPF válido
                         </p>
                       )}
                     </div>
 
+                    {/* Data de nascimento */}
+                    <div className="space-y-2">
+                      <Label htmlFor="dataNascimento" className="text-[#1A1B23] flex items-center justify-between">
+                        Data de nascimento
+                        {cpfAutoPreenchido.includes('dataNascimento') && (
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Preenchido via CPF
+                          </span>
+                        )}
+                      </Label>
+                      <Input
+                        id="dataNascimento"
+                        placeholder="Sua data de nascimento"
+                        value={formData.dataNascimento}
+                        onChange={(e) => handleInputChange('dataNascimento', formatDate(e.target.value))}
+                        className={`text-lg py-3 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                          errors.dataNascimento ? 'border-[#C8324A]' :
+                          cpfAutoPreenchido.includes('dataNascimento') ? 'border-[#8B5FFF]/60' : ''
+                        }`}
+                        maxLength={10}
+                      />
+                      {errors.dataNascimento && <p className="text-sm text-[#C8324A]">{errors.dataNascimento}</p>}
+                    </div>
+
                     {/* Nome completo */}
                     <div className="space-y-2">
-                      <Label htmlFor="nome" className="text-[#000000]">Nome completo</Label>
+                      <Label htmlFor="nome" className="text-[#1A1B23] flex items-center justify-between">
+                        Nome completo
+                        {cpfAutoPreenchido.includes('nome') && (
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Preenchido via CPF
+                          </span>
+                        )}
+                      </Label>
                       <Input
                         id="nome"
-                        placeholder="Seu nome completo"
+                        placeholder="Digite seu nome completo"
                         value={formData.nome}
                         onChange={(e) => handleInputChange('nome', e.target.value)}
-                        className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.nome ? 'border-red-500' : ''}`}
+                        className={`text-lg py-3 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                          errors.nome ? 'border-[#C8324A]' :
+                          cpfAutoPreenchido.includes('nome') ? 'border-[#8B5FFF]/60' : ''
+                        }`}
                       />
-                      {errors.nome && <p className="text-sm text-red-600">{errors.nome}</p>}
+                      {errors.nome && <p className="text-sm text-[#C8324A]">{errors.nome}</p>}
                     </div>
 
                     {/* Email */}
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-[#000000]">Email</Label>
+                      <Label htmlFor="email" className="text-[#1A1B23] flex items-center justify-between">
+                        Email
+                        {cpfAutoPreenchido.includes('email') && (
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Preenchido via CPF
+                          </span>
+                        )}
+                      </Label>
                       <div className="relative">
                         <Input
                           id="email"
                           type="email"
-                          placeholder="seu@email.com"
+                          placeholder="Digite seu e-mail"
                           value={formData.email}
                           onChange={(e) => handleEmailChange(e.target.value)}
-                          className={`text-lg py-3 pr-12 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${
-                            errors.email ? 'border-red-500' : 
-                            emailValido === true ? 'border-green-500' : 
-                            emailValido === false ? 'border-red-500' : ''
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.email ? 'border-[#C8324A]' : 
+                            emailValido === true ? 'border-[#0E8B5A]' : 
+                            emailValido === false ? 'border-[#C8324A]' : ''
                           }`}
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                           {emailValidando && (
-                            <Loader2 className="h-5 w-5 animate-spin text-[#003566]" />
+                            <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
                           )}
                           {!emailValidando && emailValido === true && (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
+                            <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                           )}
                           {!emailValidando && emailValido === false && (
-                            <XCircle className="h-5 w-5 text-red-500" />
+                            <XCircle className="h-5 w-5 text-[#C8324A]" />
                           )}
                         </div>
                       </div>
-                      {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                      {errors.email && <p className="text-sm text-[#C8324A]">{errors.email}</p>}
                       {(emailValido === true || (codigoEnviado && codigoValido === true)) && !errors.email && (
-                        <p className="text-sm text-green-600 flex items-center gap-1">
+                        <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                           <CheckCircle className="h-4 w-4" />
                           {codigoValido === true ? 'E-mail validado com código' : 'E-mail válido'}
                         </p>
                       )}
                       {emailValidando && (
-                        <p className="text-sm text-[#6C757D] flex items-center gap-1">
+                        <p className="text-sm text-[#8A8B95] flex items-center gap-1">
                           <Loader2 className="h-4 w-4 animate-spin" />
                           Verificando e-mail...
                         </p>
@@ -869,16 +814,24 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Telefone */}
                     <div className="space-y-2">
-                      <Label htmlFor="telefone" className="text-[#000000]">Telefone</Label>
+                      <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center justify-between">
+                        Telefone
+                        {cpfAutoPreenchido.includes('telefone') && (
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Preenchido via CPF
+                          </span>
+                        )}
+                      </Label>
                       <Input
                         id="telefone"
-                        placeholder="(11) 99999-9999"
+                        placeholder="Seu telefone com DDD"
                         value={formData.telefone}
                         onChange={(e) => handleInputChange('telefone', formatPhone(e.target.value))}
-                        className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.telefone ? 'border-red-500' : ''}`}
+                        className={`text-lg py-3 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${errors.telefone ? 'border-[#C8324A]' : ''}`}
                         maxLength={15}
                       />
-                      {errors.telefone && <p className="text-sm text-red-600">{errors.telefone}</p>}
+                      {errors.telefone && <p className="text-sm text-[#C8324A]">{errors.telefone}</p>}
                     </div>
 
                     {/* Checkbox de Termos */}
@@ -888,13 +841,13 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           id="aceitaTermos"
                           checked={formData.aceitaTermos}
                           onCheckedChange={(checked) => handleInputChange('aceitaTermos', checked)}
-                          className={errors.aceitaTermos ? 'border-red-500' : ''}
+                          className={errors.aceitaTermos ? 'border-[#C8324A]' : ''}
                         />
                         <div className="space-y-2 text-left">
-                          <Label htmlFor="aceitaTermos" className="text-sm cursor-pointer text-[#000000] leading-relaxed">
-                            Aceito os <a href="#" className="text-[#003566] hover:underline">Termos e condições</a> e o <a href="#" className="text-[#003566] hover:underline">Aviso de privacidade</a>
+                          <Label htmlFor="aceitaTermos" className="text-sm cursor-pointer text-[#1A1B23] leading-relaxed">
+                            Aceito os <a href="#" className="text-[#5B2E8C] hover:underline">Termos e condições</a> e o <a href="#" className="text-[#5B2E8C] hover:underline">Aviso de privacidade</a>
                           </Label>
-                          {errors.aceitaTermos && <p className="text-sm text-red-600">{errors.aceitaTermos}</p>}
+                          {errors.aceitaTermos && <p className="text-sm text-[#C8324A]">{errors.aceitaTermos}</p>}
                         </div>
                       </div>
                     </div>
@@ -902,168 +855,13 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                   </div>
                 )}
 
-                {/* Etapa 2: Endereço */}
+                {/* Etapa 2: Senha */}
                 {etapaAtual === 2 && (
-                  <div className="space-y-6">
-                    {/* CEP */}
-                    <div className="space-y-2">
-                      <Label htmlFor="cep" className="text-[#000000]">CEP</Label>
-                      <div className="relative">
-                        <Input
-                          id="cep"
-                          placeholder="00000-000"
-                          value={formData.cep}
-                          onChange={(e) => {
-                            const cepFormatado = formatCEP(e.target.value);
-                            handleInputChange('cep', cepFormatado);
-                            
-                            // Resetar estados quando usuário modificar o CEP
-                            setCepNaoEncontrado(false);
-                            setPreenchimentoManual(false);
-                            
-                            // Consultar automaticamente quando CEP estiver completo
-                            if (cepFormatado.replace(/\D/g, '').length === 8) {
-                              consultarCEP(cepFormatado);
-                            }
-                          }}
-                          className={`text-lg py-3 pr-10 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.cep ? 'border-red-500' : ''}`}
-                          maxLength={9}
-                        />
-                        {consultandoCEP && (
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <Loader2 className="h-5 w-5 animate-spin text-[#003566]" />
-                          </div>
-                        )}
-                      </div>
-                      {errors.cep && <p className="text-sm text-red-600">{errors.cep}</p>}
-                      
-                      {/* Aviso de CEP não encontrado com opção de preenchimento manual */}
-                      {cepNaoEncontrado && !preenchimentoManual && (
-                        <div className="mt-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                          <div className="flex items-start gap-3">
-                            <XCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <p className="text-sm text-yellow-800 font-medium mb-2">
-                                Não foi possível buscar o endereço automaticamente
-                              </p>
-                              <p className="text-sm text-yellow-700 mb-3">
-                                O serviço dos Correios pode estar indisponível no momento. Você pode preencher o endereço manualmente para continuar.
-                              </p>
-                              <Button
-                                type="button"
-                                onClick={habilitarPreenchimentoManual}
-                                className="bg-[#003566] hover:bg-[#002a52] text-white text-sm py-2 px-4"
-                              >
-                                <MapPin className="h-4 w-4 mr-2" />
-                                Preencher endereço manualmente
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {preenchimentoManual && (
-                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <p className="text-sm text-blue-800 flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4" />
-                            Modo de preenchimento manual ativado
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="mt-2">
-                        <a 
-                          href="https://buscacepinter.correios.com.br/app/endereco/index.php"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-[#003566] hover:text-[#002a52] underline transition-colors"
-                        >
-                          Não sei o CEP
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* Endereço e Número */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2 col-span-2">
-                        <Label htmlFor="endereco" className="text-[#000000]">Endereço</Label>
-                        <Input
-                          id="endereco"
-                          placeholder="Rua, Avenida, Travessa"
-                          value={formData.endereco}
-                          onChange={(e) => handleInputChange('endereco', e.target.value)}
-                          disabled={!preenchimentoManual}
-                          className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.endereco ? 'border-red-500' : ''} disabled:bg-[#F8F9FA] disabled:cursor-not-allowed disabled:opacity-60`}
-                        />
-                        {errors.endereco && <p className="text-sm text-red-600">{errors.endereco}</p>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="numero" className="text-[#000000]">Número</Label>
-                        <Input
-                          id="numero"
-                          placeholder="123"
-                          value={formData.numero}
-                          onChange={(e) => handleInputChange('numero', e.target.value)}
-                          className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.numero ? 'border-red-500' : ''}`}
-                        />
-                        {errors.numero && <p className="text-sm text-red-600">{errors.numero}</p>}
-                      </div>
-                    </div>
-
-                    {/* Bairro */}
-                    <div className="space-y-2">
-                      <Label htmlFor="bairro" className="text-[#000000]">Bairro</Label>
-                      <Input
-                        id="bairro"
-                        placeholder="Nome do bairro"
-                        value={formData.bairro}
-                        onChange={(e) => handleInputChange('bairro', e.target.value)}
-                        disabled={!preenchimentoManual}
-                        className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.bairro ? 'border-red-500' : ''} disabled:bg-[#F8F9FA] disabled:cursor-not-allowed disabled:opacity-60`}
-                      />
-                      {errors.bairro && <p className="text-sm text-red-600">{errors.bairro}</p>}
-                    </div>
-
-                    {/* Cidade e Estado */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2 col-span-2">
-                        <Label htmlFor="cidade" className="text-[#000000]">Cidade</Label>
-                        <Input
-                          id="cidade"
-                          placeholder="Nome da cidade"
-                          value={formData.cidade}
-                          onChange={(e) => handleInputChange('cidade', e.target.value)}
-                          disabled={!preenchimentoManual}
-                          className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.cidade ? 'border-red-500' : ''} disabled:bg-[#F8F9FA] disabled:cursor-not-allowed disabled:opacity-60`}
-                        />
-                        {errors.cidade && <p className="text-sm text-red-600">{errors.cidade}</p>}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="estado" className="text-[#000000]">Estado</Label>
-                        <Input
-                          id="estado"
-                          placeholder="SP"
-                          value={formData.estado}
-                          onChange={(e) => handleInputChange('estado', e.target.value.toUpperCase())}
-                          disabled={!preenchimentoManual}
-                          className={`text-lg py-3 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${errors.estado ? 'border-red-500' : ''} disabled:bg-[#F8F9FA] disabled:cursor-not-allowed disabled:opacity-60`}
-                          maxLength={2}
-                        />
-                        {errors.estado && <p className="text-sm text-red-600">{errors.estado}</p>}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Etapa 3: Senha */}
-                {etapaAtual === 3 && (
                   <div className="space-y-6">
                     {/* Campo de Senha */}
                     <div className="space-y-3">
-                      <Label htmlFor="senha" className="text-[#000000] flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-[#003566]" />
+                      <Label htmlFor="senha" className="text-[#1A1B23] flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-[#5B2E8C]" />
                         Senha
                       </Label>
                       <div className="relative">
@@ -1073,17 +871,17 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           placeholder="Crie uma senha segura"
                           value={formData.senha}
                           onChange={(e) => handleSenhaChange(e.target.value)}
-                          className={`text-lg py-3 pr-12 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${
-                            errors.senha ? 'border-red-500' : 
-                            forcaSenha === 'forte' ? 'border-green-500' :
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.senha ? 'border-[#C8324A]' : 
+                            forcaSenha === 'forte' ? 'border-[#0E8B5A]' :
                             forcaSenha === 'media' ? 'border-yellow-500' :
-                            forcaSenha === 'fraca' ? 'border-red-500' : ''
+                            forcaSenha === 'fraca' ? 'border-[#C8324A]' : ''
                           }`}
                         />
                         <button
                           type="button"
                           onClick={() => setMostrarSenha(!mostrarSenha)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6C757D] hover:text-[#003566] transition-colors"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
                         >
                           {mostrarSenha ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
@@ -1093,7 +891,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       {formData.senha && (
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-[#000000]">Força da senha:</span>
+                            <span className="text-sm font-medium text-[#1A1B23]">Força da senha:</span>
                             <div className="flex-1 relative">
                               <Progress 
                                 value={
@@ -1102,16 +900,16 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                                   forcaSenha === 'forte' ? 100 : 0
                                 }
                                 className={`h-2 ${
-                                  forcaSenha === 'forte' ? '[&>div]:bg-green-500' :
-                                  forcaSenha === 'media' ? '[&>div]:bg-yellow-500' :
-                                  '[&>div]:bg-red-500'
+                                  forcaSenha === 'forte' ? '[&>div]:bg-[#0E8B5A]' :
+                                  forcaSenha === 'media' ? '[&>div]:bg-[#C77700]' :
+                                  '[&>div]:bg-[#C8324A]'
                                 }`}
                               />
                             </div>
                             <span className={`text-sm font-semibold ${
-                              forcaSenha === 'forte' ? 'text-green-600' :
-                              forcaSenha === 'media' ? 'text-yellow-600' :
-                              'text-red-600'
+                              forcaSenha === 'forte' ? 'text-[#0E8B5A]' :
+                              forcaSenha === 'media' ? 'text-[#C77700]' :
+                              'text-[#C8324A]'
                             }`}>
                               {forcaSenha === 'forte' ? 'Forte' :
                                forcaSenha === 'media' ? 'Média' :
@@ -1120,11 +918,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           </div>
 
                           {/* Lista de Requisitos */}
-                          <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-4">
-                            <h4 className="text-sm font-semibold text-[#003566] mb-3">Requisitos de segurança:</h4>
+                          <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
+                            <h4 className="text-sm font-semibold text-[#5B2E8C] mb-3">Requisitos de segurança:</h4>
                             <div className="grid grid-cols-1 gap-2">
                               <div className={`flex items-center gap-2 text-sm ${
-                                requisitosSenha.tamanho ? 'text-green-600' : 'text-[#6C757D]'
+                                requisitosSenha.tamanho ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
                                 {requisitosSenha.tamanho ? (
                                   <CheckCircle className="h-4 w-4" />
@@ -1135,7 +933,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               </div>
                               
                               <div className={`flex items-center gap-2 text-sm ${
-                                requisitosSenha.maiuscula ? 'text-green-600' : 'text-[#6C757D]'
+                                requisitosSenha.maiuscula ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
                                 {requisitosSenha.maiuscula ? (
                                   <CheckCircle className="h-4 w-4" />
@@ -1146,7 +944,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               </div>
                               
                               <div className={`flex items-center gap-2 text-sm ${
-                                requisitosSenha.minuscula ? 'text-green-600' : 'text-[#6C757D]'
+                                requisitosSenha.minuscula ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
                                 {requisitosSenha.minuscula ? (
                                   <CheckCircle className="h-4 w-4" />
@@ -1157,7 +955,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               </div>
                               
                               <div className={`flex items-center gap-2 text-sm ${
-                                requisitosSenha.numero ? 'text-green-600' : 'text-[#6C757D]'
+                                requisitosSenha.numero ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
                                 {requisitosSenha.numero ? (
                                   <CheckCircle className="h-4 w-4" />
@@ -1168,7 +966,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               </div>
                               
                               <div className={`flex items-center gap-2 text-sm ${
-                                requisitosSenha.especial ? 'text-green-600' : 'text-[#6C757D]'
+                                requisitosSenha.especial ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
                                 {requisitosSenha.especial ? (
                                   <CheckCircle className="h-4 w-4" />
@@ -1182,7 +980,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </div>
                       )}
 
-                      {errors.senha && <p className="text-sm text-red-600 flex items-center gap-1">
+                      {errors.senha && <p className="text-sm text-[#C8324A] flex items-center gap-1">
                         <XCircle className="h-4 w-4" />
                         {errors.senha}
                       </p>}
@@ -1190,8 +988,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Campo de Confirmar Senha */}
                     <div className="space-y-2">
-                      <Label htmlFor="confirmarSenha" className="text-[#000000] flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-[#003566]" />
+                      <Label htmlFor="confirmarSenha" className="text-[#1A1B23] flex items-center gap-2">
+                        <Lock className="h-4 w-4 text-[#5B2E8C]" />
                         Confirmar senha
                       </Label>
                       <div className="relative">
@@ -1201,15 +999,15 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           placeholder="Digite a senha novamente"
                           value={formData.confirmarSenha}
                           onChange={(e) => handleInputChange('confirmarSenha', e.target.value)}
-                          className={`text-lg py-3 pr-12 border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${
-                            errors.confirmarSenha ? 'border-red-500' : 
-                            formData.confirmarSenha && formData.senha === formData.confirmarSenha ? 'border-green-500' : ''
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.confirmarSenha ? 'border-[#C8324A]' : 
+                            formData.confirmarSenha && formData.senha === formData.confirmarSenha ? 'border-[#0E8B5A]' : ''
                           }`}
                         />
                         <button
                           type="button"
                           onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6C757D] hover:text-[#003566] transition-colors"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
                         >
                           {mostrarConfirmarSenha ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
@@ -1219,12 +1017,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       {formData.confirmarSenha && formData.senha && (
                         <div className="flex items-center gap-2">
                           {formData.senha === formData.confirmarSenha ? (
-                            <p className="text-sm text-green-600 flex items-center gap-1">
+                            <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                               <CheckCircle className="h-4 w-4" />
                               Senhas coincidem
                             </p>
                           ) : (
-                            <p className="text-sm text-red-600 flex items-center gap-1">
+                            <p className="text-sm text-[#C8324A] flex items-center gap-1">
                               <XCircle className="h-4 w-4" />
                               Senhas não coincidem
                             </p>
@@ -1232,7 +1030,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </div>
                       )}
                       
-                      {errors.confirmarSenha && <p className="text-sm text-red-600 flex items-center gap-1">
+                      {errors.confirmarSenha && <p className="text-sm text-[#C8324A] flex items-center gap-1">
                         <XCircle className="h-4 w-4" />
                         {errors.confirmarSenha}
                       </p>}
@@ -1241,20 +1039,20 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                   </div>
                 )}
 
-                {/* Etapa 4: Confirmação da Placa */}
-                {etapaAtual === 4 && (
+                {/* Etapa 3: Confirmação da Placa */}
+                {etapaAtual === 3 && (
                   <div className="space-y-6">
                     {/* Mensagem explicativa */}
-                    <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-lg p-4">
+                    <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5">
-                          <Car className="h-5 w-5 text-[#003566]" />
+                          <Car className="h-5 w-5 text-[#5B2E8C]" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-semibold text-[#003566] mb-1">
+                          <h4 className="text-sm font-semibold text-[#5B2E8C] mb-1">
                             Veículo consultado
                           </h4>
-                          <p className="text-sm text-[#6C757D]">
+                          <p className="text-sm text-[#8A8B95]">
                             Confirme o cadastro do veículo que você consultou para visualizar seus débitos no dashboard.
                           </p>
                         </div>
@@ -1263,8 +1061,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Campo de Placa */}
                     <div className="space-y-2">
-                      <Label htmlFor="placa" className="text-[#000000] flex items-center gap-2">
-                        <Car className="h-4 w-4 text-[#003566]" />
+                      <Label htmlFor="placa" className="text-[#1A1B23] flex items-center gap-2">
+                        <Car className="h-4 w-4 text-[#5B2E8C]" />
                         Placa do veículo
                       </Label>
                       <Input
@@ -1275,9 +1073,9 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           const placaFormatada = formatarPlacaInput(e.target.value);
                           handleInputChange('placa', placaFormatada);
                         }}
-                        className={`text-lg py-3 text-center font-semibold tracking-wider border-[#F8F9FA] focus:border-[#003566] focus:ring-[#003566] ${
-                          errors.placa ? 'border-red-500' : 
-                          formData.placa && validarPlaca(formData.placa).isValid ? 'border-green-500' : ''
+                        className={`text-lg py-3 text-center font-mono font-semibold tracking-[0.05em] uppercase border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                          errors.placa ? 'border-[#C8324A]' : 
+                          formData.placa && validarPlaca(formData.placa).isValid ? 'border-[#0E8B5A]' : ''
                         }`}
                         maxLength={8}
                         disabled={!!placaConsultada}
@@ -1285,20 +1083,20 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       {formData.placa && (() => {
                         const placaValidacao = validarPlaca(formData.placa);
                         return placaValidacao.isValid ? (
-                          <p className="text-sm text-green-600 flex items-center justify-center gap-1">
+                          <p className="text-sm text-[#0E8B5A] flex items-center justify-center gap-1">
                             <CheckCircle className="h-4 w-4" />
                             {placaValidacao.type === 'antiga' ? 'Placa antiga válida' : 'Placa Mercosul válida'}
                           </p>
                         ) : null;
                       })()}
                       {errors.placa && (
-                        <p className="text-sm text-red-600 flex items-center justify-center gap-1">
+                        <p className="text-sm text-[#C8324A] flex items-center justify-center gap-1">
                           <XCircle className="h-4 w-4" />
                           {errors.placa}
                         </p>
                       )}
                       {placaConsultada && (
-                        <p className="text-xs text-[#6C757D] text-center mt-2">
+                        <p className="text-xs text-[#8A8B95] text-center mt-2">
                           Esta é a placa que você consultou na página inicial
                         </p>
                       )}
@@ -1309,18 +1107,19 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                 {/* Botões de navegação */}
                 <div className="pt-6">
-                  {etapaAtual < 4 ? (
+                  {etapaAtual < 3 ? (
                     <Button 
                       type="submit"
                       size="lg" 
                       disabled={
-                        etapaAtual === 1 
+                        etapaAtual === 1
                           ? (
                               // Campos obrigatórios não preenchidos
-                              !formData.nome.trim() || 
-                              !formData.email.trim() || 
-                              !formData.telefone.trim() || 
-                              !formData.cpf.trim() || 
+                              !formData.nome.trim() ||
+                              !formData.dataNascimento.trim() ||
+                              !formData.email.trim() ||
+                              !formData.telefone.trim() ||
+                              !formData.cpf.trim() ||
                               !formData.aceitaTermos ||
                               // CPF inválido
                               cpfValido !== true ||
@@ -1342,21 +1141,22 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       className={`w-full py-4 text-lg rounded-lg font-medium transition-colors ${
                         etapaAtual === 1
                           ? (
-                              formData.nome.trim() && 
-                              formData.email.trim() && 
-                              formData.telefone.trim() && 
-                              formData.cpf.trim() && 
-                              formData.aceitaTermos && 
+                              formData.nome.trim() &&
+                              formData.dataNascimento.trim() &&
+                              formData.email.trim() &&
+                              formData.telefone.trim() &&
+                              formData.cpf.trim() &&
+                              formData.aceitaTermos &&
                               cpfValido === true &&
-                              !emailValidando && 
+                              !emailValidando &&
                               !validandoCodigo &&
                               ((!codigoEnviado && emailValido === true) || (codigoEnviado && codigoValido === true))
                             )
-                            ? 'bg-[#003566] hover:bg-[#002a52] text-white'
-                            : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
+                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                           : isCurrentStepValid()
-                            ? 'bg-[#003566] hover:bg-[#002a52] text-white'
-                            : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
+                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                       }`}
                     >
                       {etapaAtual === 1 && emailValido === true && !codigoEnviado 
@@ -1382,7 +1182,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                     <Button 
                       type="submit" 
                       size="lg" 
-                      className="w-full bg-[#003566] hover:bg-[#002a52] text-white py-4 text-lg rounded-lg font-medium transition-colors"
+                      className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
                       disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
                     >
                       {loading ? (
@@ -1410,7 +1210,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                     <button 
                       type="button"
                       onClick={onLogin}
-                      className="w-full py-3 text-lg text-[#003566] hover:text-[#002a52] font-medium transition-colors text-center"
+                      className="w-full py-3 text-lg text-[#5B2E8C] hover:text-[#8B5FFF] font-medium transition-colors text-center"
                     >
                       Já tenho cadastro
                     </button>
@@ -1426,11 +1226,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       <Dialog open={modalCodigoAberto} onOpenChange={setModalCodigoAberto}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl text-[#003566] flex items-center justify-center gap-2">
+            <DialogTitle className="text-center text-xl text-[#5B2E8C] flex items-center justify-center gap-2">
               <Mail className="h-6 w-6" />
               Validar E-mail
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#6C757D]">
+            <DialogDescription className="text-center text-sm text-[#8A8B95]">
               Digite o código de 6 dígitos que enviamos para o seu e-mail para confirmar seu endereço eletrônico.
             </DialogDescription>
           </DialogHeader>
@@ -1438,17 +1238,17 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           <div className="space-y-6 pt-4">
             {/* Informação do e-mail */}
             <div className="text-center space-y-2">
-              <p className="text-sm text-[#6C757D]">
+              <p className="text-sm text-[#8A8B95]">
                 Enviamos um código de 6 dígitos para
               </p>
-              <p className="text-base font-medium text-[#003566]">
+              <p className="text-base font-medium text-[#5B2E8C]">
                 {formData.email}
               </p>
             </div>
 
             {/* Campo do código */}
             <div className="space-y-3">
-              <Label htmlFor="codigoModal" className="text-[#000000] text-center block">
+              <Label htmlFor="codigoModal" className="text-[#1A1B23] text-center block">
                 Digite o código de verificação
               </Label>
               <div className="relative">
@@ -1458,7 +1258,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                   inputMode="numeric"
                   pattern="[0-9]*"
                   autoComplete="one-time-code"
-                  placeholder="000000"
+                  placeholder="Digite o código"
                   value={codigoValidacao}
                   onChange={(e) => {
                     const valor = e.target.value.replace(/\D/g, '').slice(0, 6);
@@ -1497,44 +1297,44 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       return () => clearTimeout(timer);
                     }
                   }}
-                  className={`text-xl py-4 text-center tracking-[0.5rem] font-mono border-2 focus:border-[#003566] focus:ring-[#003566] ${
-                    errors.codigoValidacao ? 'border-red-500' : 
-                    codigoValido === true ? 'border-green-500' : 
-                    codigoValido === false ? 'border-red-500' : 'border-[#E0E0E0]'
+                  className={`text-xl py-4 text-center tracking-[0.5rem] font-mono border-2 focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                    errors.codigoValidacao ? 'border-[#C8324A]' : 
+                    codigoValido === true ? 'border-[#0E8B5A]' : 
+                    codigoValido === false ? 'border-[#C8324A]' : 'border-[#DCDDE3]'
                   }`}
                   maxLength={6}
                   autoFocus
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   {validandoCodigo && (
-                    <Loader2 className="h-5 w-5 animate-spin text-[#003566]" />
+                    <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
                   )}
                   {!validandoCodigo && codigoValido === true && (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                   )}
                   {!validandoCodigo && codigoValido === false && (
-                    <XCircle className="h-5 w-5 text-red-500" />
+                    <XCircle className="h-5 w-5 text-[#C8324A]" />
                   )}
                 </div>
               </div>
               
               {/* Feedback do código */}
               {errors.codigoValidacao && (
-                <p className="text-sm text-red-600 text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#C8324A] text-center flex items-center justify-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.codigoValidacao}
                 </p>
               )}
               
               {codigoValido === true && !errors.codigoValidacao && (
-                <p className="text-sm text-green-600 text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#0E8B5A] text-center flex items-center justify-center gap-1">
                   <CheckCircle className="h-4 w-4" />
                   Código validado com sucesso!
                 </p>
               )}
               
               {validandoCodigo && (
-                <p className="text-sm text-[#6C757D] text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#8A8B95] text-center flex items-center justify-center gap-1">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Validando código...
                 </p>
@@ -1543,7 +1343,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
             {/* Botão de reenvio */}
             <div className="text-center">
-              <p className="text-sm text-[#6C757D] mb-3">
+              <p className="text-sm text-[#8A8B95] mb-3">
                 Não recebeu o código?
               </p>
               <Button
@@ -1551,7 +1351,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                 variant="outline"
                 onClick={reenviarCodigoDoModal}
                 disabled={tempoReenvio > 0}
-                className={`border-[#003566] text-[#003566] hover:bg-[#003566] hover:text-white ${
+                className={`border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white ${
                   tempoReenvio > 0 ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -1561,10 +1361,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
             {/* Botão de fechar - só aparece se o código foi validado */}
             {codigoValido === true && (
-              <div className="pt-4 border-t border-[#F8F9FA]">
+              <div className="pt-4 border-t border-[#F7F5FB]">
                 <Button
                   onClick={() => setModalCodigoAberto(false)}
-                  className="w-full bg-[#003566] hover:bg-[#002a52] text-white py-3"
+                  className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-3"
                 >
                   <CheckCircle className="h-5 w-5 mr-2" />
                   Continuar

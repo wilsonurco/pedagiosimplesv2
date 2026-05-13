@@ -54,16 +54,16 @@ interface PedidoPago {
 
 // Primeiros 10 pedidos com quantidade variada de placas (1–4)
 const _primeirosDez: PedidoPago[] = [
-  { id: "00001", passagens: 3, data: "21/03/2026", hora: "06:53", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "00002", passagens: 2, data: "01/03/2026", hora: "00:10", placas: 2, metodo: "PIX", valor: 10.80 },
-  { id: "00003", passagens: 4, data: "30/03/2026", hora: "23:57", placas: 4, metodo: "PIX", valor: 21.60 },
-  { id: "00004", passagens: 1, data: "30/03/2026", hora: "22:56", placas: 1, metodo: "PIX", valor:  5.40 },
-  { id: "00005", passagens: 3, data: "30/03/2026", hora: "22:38", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "00006", passagens: 2, data: "30/03/2026", hora: "23:58", placas: 2, metodo: "PIX", valor: 10.80 },
-  { id: "00007", passagens: 4, data: "30/03/2026", hora: "22:36", placas: 4, metodo: "PIX", valor: 21.60 },
-  { id: "00008", passagens: 1, data: "30/03/2026", hora: "22:45", placas: 1, metodo: "PIX", valor:  5.40 },
-  { id: "00009", passagens: 3, data: "30/03/2026", hora: "21:39", placas: 3, metodo: "PIX", valor: 16.20 },
-  { id: "00010", passagens: 2, data: "30/03/2026", hora: "21:21", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00001", passagens: 3, data: "21/03/2026", hora: "06:53:00", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00002", passagens: 2, data: "01/03/2026", hora: "00:10:00", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00003", passagens: 4, data: "30/03/2026", hora: "23:57:00", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "00004", passagens: 1, data: "30/03/2026", hora: "22:56:00", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "00005", passagens: 3, data: "30/03/2026", hora: "22:38:00", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00006", passagens: 2, data: "30/03/2026", hora: "23:58:00", placas: 2, metodo: "PIX", valor: 10.80 },
+  { id: "00007", passagens: 4, data: "30/03/2026", hora: "22:36:00", placas: 4, metodo: "PIX", valor: 21.60 },
+  { id: "00008", passagens: 1, data: "30/03/2026", hora: "22:45:00", placas: 1, metodo: "PIX", valor:  5.40 },
+  { id: "00009", passagens: 3, data: "30/03/2026", hora: "21:39:00", placas: 3, metodo: "PIX", valor: 16.20 },
+  { id: "00010", passagens: 2, data: "30/03/2026", hora: "21:21:00", placas: 2, metodo: "PIX", valor: 10.80 },
 ];
 
 const _datas = [
@@ -188,11 +188,11 @@ function parseDate(str: string): Date {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-md px-3 py-2 text-xs">
-      <p className="font-semibold text-[#003566] mb-1">{label}</p>
-      <p className="text-[#6C757D]">
+    <div className="bg-white border border-[#DCDDE3] rounded-lg shadow-md px-3 py-2 text-xs">
+      <p className="font-semibold text-[#5B2E8C] mb-1">{label}</p>
+      <p className="text-[#8A8B95]">
         Valor Acumulado:{" "}
-        <span className="font-semibold text-[#003566]">
+        <span className="font-semibold text-[#5B2E8C]">
           {formatBRL(payload[0]?.value ?? 0)}
         </span>
       </p>
@@ -372,16 +372,16 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   }, [detalhes]);
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5]">
+    <div className="min-h-screen bg-[#F7F5FB]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white border-b border-[#DCDDE3]">
         <div className="flex items-center justify-between px-6 py-3">
           <div className="w-44 h-10">
             <LogoCinza />
           </div>
           <button
             onClick={onLogout}
-            className="flex items-center gap-1.5 text-sm text-[#6C757D] hover:text-[#003566] transition-colors"
+            className="flex items-center gap-1.5 text-sm text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Sair
@@ -390,12 +390,12 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200 px-6">
+      <div className="bg-white border-b border-[#DCDDE3] px-6">
         <div className="flex gap-2 py-3">
           <button
             onClick={() => { setTabAtiva("repasse"); setPeriodoSelecionado(null); }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tabAtiva === "repasse" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:text-[#003566]"
+              tabAtiva === "repasse" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:text-[#5B2E8C]"
             }`}
           >
             <DollarSign className="h-4 w-4" />
@@ -404,7 +404,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
           <button
             onClick={() => { setTabAtiva("pedidos-pagos"); setPeriodoSelecionado(null); }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tabAtiva === "pedidos-pagos" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:text-[#003566]"
+              tabAtiva === "pedidos-pagos" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:text-[#5B2E8C]"
             }`}
           >
             <FileText className="h-4 w-4" />
@@ -417,39 +417,39 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
         {/* ── LISTA DE REPASSE ── */}
         {tabAtiva === "repasse" && !periodoSelecionado && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-[#F7F5FB]">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#003566] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-[#5B2E8C] rounded-xl flex items-center justify-center flex-shrink-0">
                   <DollarSign className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-[#003566]">Repasse de Saldo</h1>
-                  <p className="text-sm text-[#6C757D]">Relatório de rebatimento de saldo por período</p>
+                  <h1 className="text-lg font-bold text-[#5B2E8C]">Repasse de Saldo</h1>
+                  <p className="text-sm text-[#8A8B95]">Relatório de rebatimento de saldo por período</p>
                 </div>
               </div>
               <button
                 onClick={() => setModalExportar(true)}
                 aria-label="Exportar relatório de repasse"
-                className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+                className="w-10 h-10 bg-[#5B2E8C] hover:bg-[#8B5FFF] rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
               >
                 <Download className="h-5 w-5 text-white" />
               </button>
             </div>
-            <div className="px-6 py-5 border-b border-gray-100">
-              <div className="border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between">
+            <div className="px-6 py-5 border-b border-[#F7F5FB]">
+              <div className="border border-[#DCDDE3] rounded-xl px-5 py-4 flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-[#6C757D] mb-1">Total Repassado</p>
-                  <p className="text-2xl font-bold text-[#003566]">{formatBRL(totalRepassado)}</p>
+                  <p className="text-xs text-[#8A8B95] mb-1">Total Repassado</p>
+                  <p className="text-2xl font-bold text-[#5B2E8C]">{formatBRL(totalRepassado)}</p>
                 </div>
-                <div className="bg-[#E8F0F9] text-[#003566] text-sm font-semibold px-4 py-1.5 rounded-full">
+                <div className="bg-[#F4EFFB] text-[#5B2E8C] text-sm font-semibold px-4 py-1.5 rounded-full">
                   {repassePorPeriodo.length} meses
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 px-6 py-3 bg-[#F8F9FA] border-b border-gray-100">
-              <span className="text-xs font-semibold text-[#6C757D] uppercase tracking-wide">Período</span>
-              <span className="text-xs font-semibold text-[#6C757D] uppercase tracking-wide text-right">Valor Repassado</span>
+            <div className="grid grid-cols-2 px-6 py-3 bg-[#F7F5FB] border-b border-[#F7F5FB]">
+              <span className="text-xs font-semibold text-[#8A8B95] uppercase tracking-wide">Período</span>
+              <span className="text-xs font-semibold text-[#8A8B95] uppercase tracking-wide text-right">Valor Repassado</span>
             </div>
             {repassePorPeriodo.map((row) => {
               const hasDetail = !!detalhesPorPeriodo[row.periodo];
@@ -457,56 +457,56 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 <div
                   key={row.periodo}
                   onClick={() => abrirDetalhe(row.periodo)}
-                  className={`group flex items-center px-6 py-3.5 border-b border-gray-50 transition-colors ${
-                    row.valor > 0 && hasDetail ? "cursor-pointer hover:bg-[#F0F4F9]" : "cursor-pointer hover:bg-[#F0F4F9]"
+                  className={`group flex items-center px-6 py-3.5 border-b border-[#F7F5FB] transition-colors ${
+                    row.valor > 0 && hasDetail ? "cursor-pointer hover:bg-[#F7F5FB]" : "cursor-pointer hover:bg-[#F7F5FB]"
                   }`}
                 >
-                  <span className="flex-1 text-sm text-[#333333]">{row.periodo}</span>
+                  <span className="flex-1 text-sm text-[#1A1B23]">{row.periodo}</span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm ${row.valor > 0 ? "text-[#003566] font-medium" : "text-[#333333]"}`}>
+                    <span className={`text-sm ${row.valor > 0 ? "text-[#5B2E8C] font-medium" : "text-[#1A1B23]"}`}>
                       {formatBRL(row.valor)}
                     </span>
                     <ChevronRight
                       className={`h-4 w-4 flex-shrink-0 transition-all duration-150 ${
                         hasDetail
-                          ? "text-[#003566] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5"
-                          : "text-gray-200 opacity-30"
+                          ? "text-[#5B2E8C] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5"
+                          : "text-[#C6C7CF] opacity-30"
                       }`}
                     />
                   </div>
                 </div>
               );
             })}
-            <div className="grid grid-cols-2 px-6 py-4 bg-[#F8F9FA]">
-              <span className="text-sm font-semibold text-[#333333]">Total</span>
-              <span className="text-sm font-bold text-[#003566] text-right">{formatBRL(totalRepassado)}</span>
+            <div className="grid grid-cols-2 px-6 py-4 bg-[#F7F5FB]">
+              <span className="text-sm font-semibold text-[#1A1B23]">Total</span>
+              <span className="text-sm font-bold text-[#5B2E8C] text-right">{formatBRL(totalRepassado)}</span>
             </div>
           </div>
         )}
 
         {/* ── DETALHE DO PERÍODO ── */}
         {tabAtiva === "repasse" && periodoSelecionado && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
 
             {/* Cabeçalho */}
-            <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100">
+            <div className="flex items-start justify-between px-6 py-5 border-b border-[#F7F5FB]">
               <div>
-                <h1 className="text-xl font-semibold text-[#003566]">
+                <h1 className="text-xl font-semibold text-[#5B2E8C]">
                   Detalhes do <span className="font-bold">Repasse</span>
                 </h1>
                 <div className="mt-2">
-                  <div className="inline-flex items-center gap-1.5 bg-[#EEF2F7] text-[#003566] text-xs font-medium px-3 py-1.5 rounded-lg">
+                  <div className="inline-flex items-center gap-1.5 bg-[#F7F5FB] text-[#5B2E8C] text-xs font-medium px-3 py-1.5 rounded-lg">
                     <Calendar className="h-3.5 w-3.5" />
                     {mesLabel}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
-                <div className="flex border border-gray-200 rounded-lg overflow-hidden text-xs font-medium">
+                <div className="flex border border-[#DCDDE3] rounded-lg overflow-hidden text-xs font-medium">
                   <button
                     onClick={() => setDetalheView("tabela")}
                     className={`flex items-center gap-1.5 px-3 py-2 transition-colors ${
-                      detalheView === "tabela" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:bg-gray-50"
+                      detalheView === "tabela" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:bg-[#F7F5FB]"
                     }`}
                   >
                     <AlignLeft className="h-3.5 w-3.5" />
@@ -514,8 +514,8 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </button>
                   <button
                     onClick={() => setDetalheView("grafico")}
-                    className={`flex items-center gap-1.5 px-3 py-2 transition-colors border-l border-gray-200 ${
-                      detalheView === "grafico" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:bg-gray-50"
+                    className={`flex items-center gap-1.5 px-3 py-2 transition-colors border-l border-[#DCDDE3] ${
+                      detalheView === "grafico" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:bg-[#F7F5FB]"
                     }`}
                   >
                     <BarChart2 className="h-3.5 w-3.5" />
@@ -524,7 +524,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
                 <button
                   onClick={voltarLista}
-                  className="flex items-center gap-1.5 border border-gray-300 text-[#6C757D] hover:border-[#003566] hover:text-[#003566] bg-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 border border-[#DCDDE3] text-[#8A8B95] hover:border-[#5B2E8C] hover:text-[#5B2E8C] bg-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar
@@ -534,21 +534,21 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
             {/* Seletor de tipo de gráfico — só aparece na aba Gráfico */}
             {detalheView === "grafico" && (
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5FB]">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <BarChart2 className="h-4 w-4 text-[#003566]" />
+                  <div className="w-8 h-8 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BarChart2 className="h-4 w-4 text-[#5B2E8C]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#003566]">Tipo de Gráfico</p>
-                    <p className="text-xs text-[#6C757D]">Selecione a visualização desejada</p>
+                    <p className="text-sm font-semibold text-[#5B2E8C]">Tipo de Gráfico</p>
+                    <p className="text-xs text-[#8A8B95]">Selecione a visualização desejada</p>
                   </div>
                 </div>
-                <div className="flex border border-gray-200 rounded-lg overflow-hidden text-xs font-medium">
+                <div className="flex border border-[#DCDDE3] rounded-lg overflow-hidden text-xs font-medium">
                   <button
                     onClick={() => setGraficoTipo("colunas")}
                     className={`flex items-center gap-1.5 px-4 py-2 transition-colors ${
-                      graficoTipo === "colunas" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:bg-gray-50"
+                      graficoTipo === "colunas" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:bg-[#F7F5FB]"
                     }`}
                   >
                     <BarChart2 className="h-3.5 w-3.5" />
@@ -556,8 +556,8 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </button>
                   <button
                     onClick={() => setGraficoTipo("linhas")}
-                    className={`flex items-center gap-1.5 px-4 py-2 transition-colors border-l border-gray-200 ${
-                      graficoTipo === "linhas" ? "bg-[#003566] text-white" : "text-[#6C757D] hover:bg-gray-50"
+                    className={`flex items-center gap-1.5 px-4 py-2 transition-colors border-l border-[#DCDDE3] ${
+                      graficoTipo === "linhas" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:bg-[#F7F5FB]"
                     }`}
                   >
                     <LineChartIcon className="h-3.5 w-3.5" />
@@ -568,32 +568,32 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             )}
 
             {/* Cards de métricas */}
-            <div className="grid grid-cols-3 gap-4 px-6 py-5 border-b border-gray-100">
-              <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3.5">
-                <div className="w-9 h-9 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <DollarSign className="h-4 w-4 text-[#003566]" />
+            <div className="grid grid-cols-3 gap-4 px-6 py-5 border-b border-[#F7F5FB]">
+              <div className="flex items-center gap-3 border border-[#DCDDE3] rounded-xl px-4 py-3.5">
+                <div className="w-9 h-9 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="h-4 w-4 text-[#5B2E8C]" />
                 </div>
                 <div>
-                  <p className="text-xs text-[#6C757D]">Valor Total</p>
-                  <p className="text-base font-bold text-[#003566]">{formatBRL(totalDetalhe)}</p>
+                  <p className="text-xs text-[#8A8B95]">Valor Total</p>
+                  <p className="text-base font-bold text-[#5B2E8C]">{formatBRL(totalDetalhe)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3.5">
-                <div className="w-9 h-9 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-4 w-4 text-[#003566]" />
+              <div className="flex items-center gap-3 border border-[#DCDDE3] rounded-xl px-4 py-3.5">
+                <div className="w-9 h-9 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-4 w-4 text-[#5B2E8C]" />
                 </div>
                 <div>
-                  <p className="text-xs text-[#6C757D]">Total de Títulos</p>
-                  <p className="text-base font-bold text-[#003566]">{detalhes.length} títulos</p>
+                  <p className="text-xs text-[#8A8B95]">Total de Títulos</p>
+                  <p className="text-base font-bold text-[#5B2E8C]">{detalhes.length} títulos</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3.5">
-                <div className="w-9 h-9 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="h-4 w-4 text-[#003566]" />
+              <div className="flex items-center gap-3 border border-[#DCDDE3] rounded-xl px-4 py-3.5">
+                <div className="w-9 h-9 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="h-4 w-4 text-[#5B2E8C]" />
                 </div>
                 <div>
-                  <p className="text-xs text-[#6C757D]">Valor Médio</p>
-                  <p className="text-base font-bold text-[#003566]">{formatBRL(valorMedio)}</p>
+                  <p className="text-xs text-[#8A8B95]">Valor Médio</p>
+                  <p className="text-base font-bold text-[#5B2E8C]">{formatBRL(valorMedio)}</p>
                 </div>
               </div>
             </div>
@@ -601,37 +601,37 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             {/* ── TABELA ── */}
             {detalheView === "tabela" && (
               <div>
-                <div className="grid grid-cols-2 px-6 py-3 bg-[#F8F9FA] border-b border-gray-100">
-                  <span className="text-xs font-semibold text-[#6C757D] uppercase tracking-wide">Data</span>
-                  <span className="text-xs font-semibold text-[#6C757D] uppercase tracking-wide text-right">Valor</span>
+                <div className="grid grid-cols-2 px-6 py-3 bg-[#F7F5FB] border-b border-[#F7F5FB]">
+                  <span className="text-xs font-semibold text-[#8A8B95] uppercase tracking-wide">Data</span>
+                  <span className="text-xs font-semibold text-[#8A8B95] uppercase tracking-wide text-right">Valor</span>
                 </div>
                 {itensPagina.map((item) => (
-                  <div key={item.data} className="grid grid-cols-2 px-6 py-3.5 border-b border-gray-50 hover:bg-[#F8F9FA] transition-colors">
-                    <span className="text-sm text-[#333333]">{item.data}</span>
-                    <span className="text-sm text-[#003566] font-medium text-right">{formatBRL(item.valor)}</span>
+                  <div key={item.data} className="grid grid-cols-2 px-6 py-3.5 border-b border-[#F7F5FB] hover:bg-[#F7F5FB] transition-colors">
+                    <span className="text-sm text-[#1A1B23]">{item.data}</span>
+                    <span className="text-sm text-[#5B2E8C] font-medium text-right">{formatBRL(item.valor)}</span>
                   </div>
                 ))}
-                <div className="grid grid-cols-2 px-6 py-4 bg-[#F8F9FA] border-t border-gray-100">
-                  <span className="text-sm font-semibold text-[#333333]">Total: {detalhes.length} pedidos</span>
-                  <span className="text-sm font-bold text-[#003566] text-right">{formatBRL(totalDetalhe)}</span>
+                <div className="grid grid-cols-2 px-6 py-4 bg-[#F7F5FB] border-t border-[#F7F5FB]">
+                  <span className="text-sm font-semibold text-[#1A1B23]">Total: {detalhes.length} pedidos</span>
+                  <span className="text-sm font-bold text-[#5B2E8C] text-right">{formatBRL(totalDetalhe)}</span>
                 </div>
                 {totalPaginas > 1 && (
-                  <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                    <span className="text-sm text-[#6C757D]">
+                  <div className="flex items-center justify-between px-6 py-4 border-t border-[#F7F5FB]">
+                    <span className="text-sm text-[#8A8B95]">
                       Mostrando {Math.min(paginaAtual * ITEMS_PER_PAGE, detalhes.length)} de {detalhes.length} pedidos
                     </span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => setPaginaAtual((p) => Math.max(1, p - 1))}
                         disabled={paginaAtual === 1}
-                        className="px-4 py-1.5 text-sm border border-gray-200 rounded-lg text-[#333333] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-1.5 text-sm border border-[#DCDDE3] rounded-lg text-[#1A1B23] hover:bg-[#F7F5FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         Anterior
                       </button>
                       <button
                         onClick={() => setPaginaAtual((p) => Math.min(totalPaginas, p + 1))}
                         disabled={paginaAtual === totalPaginas}
-                        className="px-4 py-1.5 text-sm border border-gray-200 rounded-lg text-[#333333] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-1.5 text-sm border border-[#DCDDE3] rounded-lg text-[#1A1B23] hover:bg-[#F7F5FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         Próximo
                       </button>
@@ -644,21 +644,21 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             {/* ── GRÁFICO ── */}
             {detalheView === "grafico" && (
               <div className="px-6 py-5">
-                <div className="border border-gray-200 rounded-xl p-5">
-                  <p className="text-sm font-semibold text-[#003566] mb-0.5">
+                <div className="border border-[#DCDDE3] rounded-xl p-5">
+                  <p className="text-sm font-semibold text-[#5B2E8C] mb-0.5">
                     {graficoTipo === "colunas" ? "Gráfico de Colunas" : "Gráfico de Linhas"}
                   </p>
-                  <p className="text-xs text-[#6C757D] mb-5">
+                  <p className="text-xs text-[#8A8B95] mb-5">
                     Progressão acumulativa dos valores repassados
                   </p>
 
                   <ResponsiveContainer width="100%" height={280}>
                     {graficoTipo === "colunas" ? (
                       <BarChart data={chartData} margin={{ top: 4, right: 4, left: 8, bottom: 4 }} barCategoryGap="20%">
-                        <CartesianGrid vertical={false} stroke="#F0F2F5" />
+                        <CartesianGrid vertical={false} stroke="#F7F5FB" />
                         <XAxis
                           dataKey="data"
-                          tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                          tick={{ fontSize: 10, fill: "#8A8B95" }}
                           axisLine={false}
                           tickLine={false}
                           interval={0}
@@ -668,27 +668,27 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                         />
                         <YAxis
                           tickFormatter={formatYAxis}
-                          tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                          tick={{ fontSize: 10, fill: "#8A8B95" }}
                           axisLine={false}
                           tickLine={false}
                           width={68}
                         />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#EEF2F7" }} />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#F7F5FB" }} />
                         <Legend
                           iconType="square"
                           iconSize={10}
                           formatter={() => (
-                            <span style={{ color: "#6C757D", fontSize: 11 }}>Valor Acumulado</span>
+                            <span style={{ color: "#8A8B95", fontSize: 11 }}>Valor Acumulado</span>
                           )}
                         />
-                        <Bar dataKey="acumulado" name="Valor Acumulado" fill="#003566" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="acumulado" name="Valor Acumulado" fill="#5B2E8C" radius={[3, 3, 0, 0]} />
                       </BarChart>
                     ) : (
                       <LineChart data={chartData} margin={{ top: 4, right: 4, left: 8, bottom: 4 }}>
-                        <CartesianGrid vertical={false} stroke="#F0F2F5" />
+                        <CartesianGrid vertical={false} stroke="#F7F5FB" />
                         <XAxis
                           dataKey="data"
-                          tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                          tick={{ fontSize: 10, fill: "#8A8B95" }}
                           axisLine={false}
                           tickLine={false}
                           interval={0}
@@ -698,7 +698,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                         />
                         <YAxis
                           tickFormatter={formatYAxis}
-                          tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                          tick={{ fontSize: 10, fill: "#8A8B95" }}
                           axisLine={false}
                           tickLine={false}
                           width={68}
@@ -708,17 +708,17 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                           iconType="square"
                           iconSize={10}
                           formatter={() => (
-                            <span style={{ color: "#6C757D", fontSize: 11 }}>Valor Acumulado</span>
+                            <span style={{ color: "#8A8B95", fontSize: 11 }}>Valor Acumulado</span>
                           )}
                         />
                         <Line
                           type="monotone"
                           dataKey="acumulado"
                           name="Valor Acumulado"
-                          stroke="#003566"
+                          stroke="#5B2E8C"
                           strokeWidth={2.5}
-                          dot={{ fill: "#003566", r: 3, strokeWidth: 0 }}
-                          activeDot={{ r: 5, fill: "#003566" }}
+                          dot={{ fill: "#5B2E8C", r: 3, strokeWidth: 0 }}
+                          activeDot={{ r: 5, fill: "#5B2E8C" }}
                         />
                       </LineChart>
                     )}
@@ -726,11 +726,11 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
 
                 {/* Rodapé do gráfico */}
-                <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100">
-                  <span className="text-sm font-semibold text-[#333333]">
-                    Total de pedidos: <span className="text-[#003566]">{detalhes.length}</span>
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#F7F5FB]">
+                  <span className="text-sm font-semibold text-[#1A1B23]">
+                    Total de pedidos: <span className="text-[#5B2E8C]">{detalhes.length}</span>
                   </span>
-                  <span className="text-sm font-bold text-[#003566]">{formatBRL(totalDetalhe)}</span>
+                  <span className="text-sm font-bold text-[#5B2E8C]">{formatBRL(totalDetalhe)}</span>
                 </div>
               </div>
             )}
@@ -744,12 +744,12 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             {/* Cabeçalho da página */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#003566] rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-[#5B2E8C] rounded-xl flex items-center justify-center flex-shrink-0">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-[#003566]">Pedidos pagos</h1>
-                  <p className="text-sm text-[#6C757D]">Acompanhe quais pedidos foram pagos</p>
+                  <h1 className="text-lg font-bold text-[#5B2E8C]">Pedidos pagos</h1>
+                  <p className="text-sm text-[#8A8B95]">Acompanhe quais pedidos foram pagos</p>
                 </div>
               </div>
               {/* Dropdown exportar pedidos */}
@@ -757,7 +757,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 <button
                   onClick={() => setDropdownPedidos((v) => !v)}
                   aria-label="Exportar pedidos pagos"
-                  className="w-10 h-10 bg-[#003566] hover:bg-[#002a52] rounded-xl flex items-center justify-center transition-colors"
+                  className="w-10 h-10 bg-[#5B2E8C] hover:bg-[#8B5FFF] rounded-xl flex items-center justify-center transition-colors"
                 >
                   <Download className="h-5 w-5 text-white" />
                 </button>
@@ -765,8 +765,8 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   <>
                     {/* overlay para fechar ao clicar fora */}
                     <div className="fixed inset-0 z-40" onClick={() => setDropdownPedidos(false)} />
-                    <div className="absolute right-0 top-12 z-50 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden w-44">
-                      <p className="px-4 py-2.5 text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wide border-b border-gray-100">
+                    <div className="absolute right-0 top-12 z-50 bg-white border border-[#DCDDE3] rounded-xl shadow-lg overflow-hidden w-44">
+                      <p className="px-4 py-2.5 text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide border-b border-[#F7F5FB]">
                         Exportar pedidos
                       </p>
                       {(["pdf", "excel"] as const).map((fmt) => (
@@ -796,9 +796,9 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                               console.error("[exportarPedidos]", err);
                             }
                           }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#333333] hover:bg-[#F0F4F9] transition-colors"
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1A1B23] hover:bg-[#F7F5FB] transition-colors"
                         >
-                          <FileText className="h-3.5 w-3.5 text-[#003566]" />
+                          <FileText className="h-3.5 w-3.5 text-[#5B2E8C]" />
                           Baixar {fmt === "pdf" ? "PDF" : "Excel"}
                         </button>
                       ))}
@@ -809,40 +809,40 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             </div>
 
             {/* Card de filtros */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-5">
+            <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] px-6 py-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Calendar className="h-3.5 w-3.5 text-[#003566]" />
+                  <div className="w-7 h-7 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar className="h-3.5 w-3.5 text-[#5B2E8C]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#003566]">Filtros</p>
-                    <p className="text-xs text-[#6C757D]">Selecione o período e filtros</p>
+                    <p className="text-sm font-semibold text-[#5B2E8C]">Filtros</p>
+                    <p className="text-xs text-[#8A8B95]">Selecione o período e filtros</p>
                   </div>
                 </div>
-                <button aria-label="Pesquisar" className="w-8 h-8 bg-[#EEF2F7] hover:bg-[#003566] text-[#003566] hover:text-white rounded-lg flex items-center justify-center transition-colors">
+                <button aria-label="Pesquisar" className="w-8 h-8 bg-[#F7F5FB] hover:bg-[#5B2E8C] text-[#5B2E8C] hover:text-white rounded-lg flex items-center justify-center transition-colors">
                   <Search className="h-4 w-4" />
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <label htmlFor="filtro-mes" className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
+                  <label htmlFor="filtro-mes" className="block text-xs font-medium text-[#8A8B95] mb-1.5">Mês</label>
                   <div className="relative">
                     <select
                       id="filtro-mes"
                       value={filtroMes}
                       onChange={(e) => handleFiltroMes(e.target.value)}
-                      className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
+                      className="w-full appearance-none border border-[#DCDDE3] rounded-lg px-3 py-2 text-sm text-[#1A1B23] bg-white focus:outline-none focus:border-[#5B2E8C] pr-8"
                     >
                       {Object.entries(MESES_LABEL).map(([val, label]) => (
                         <option key={val} value={val}>{label}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8A8B95] pointer-events-none" />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="filtro-dia" className="block text-xs font-medium text-[#6C757D] mb-1.5">Dia</label>
+                  <label htmlFor="filtro-dia" className="block text-xs font-medium text-[#8A8B95] mb-1.5">Dia</label>
                   <div className="relative flex items-center">
                     <input
                       id="filtro-dia"
@@ -852,12 +852,12 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       max={maxDate}
                       disabled={filtroMes !== "03/2026"}
                       onChange={(e) => { setFiltroData(e.target.value); setPaginaPedidos(1); }}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                      className="w-full border border-[#DCDDE3] rounded-lg px-3 py-2 text-sm text-[#1A1B23] bg-white focus:outline-none focus:border-[#5B2E8C] disabled:bg-[#F7F5FB] disabled:text-[#C6C7CF] disabled:cursor-not-allowed"
                     />
                     {filtroData && (
                       <button
                         onClick={() => { setFiltroData(""); setPaginaPedidos(1); }}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8A8B95] hover:text-[#5B2E8C]"
                         title="Limpar"
                       >
                         <X className="h-3.5 w-3.5" />
@@ -866,29 +866,29 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Passagens</label>
+                  <label className="block text-xs font-medium text-[#8A8B95] mb-1.5">Passagens</label>
                   <input
                     type="text"
                     placeholder="Buscar por placa"
                     value={filtroPlaca}
                     onChange={(e) => { setFiltroPlaca(e.target.value.toUpperCase()); setPaginaPedidos(1); }}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] placeholder-gray-400 focus:outline-none focus:border-[#003566]"
+                    className="w-full border border-[#DCDDE3] rounded-lg px-3 py-2 text-sm text-[#1A1B23] placeholder-[#C6C7CF] focus:outline-none focus:border-[#5B2E8C]"
                     maxLength={8}
                   />
                 </div>
                 <div>
-                  <label htmlFor="filtro-metodo" className="block text-xs font-medium text-[#6C757D] mb-1.5">Forma de pagamento</label>
+                  <label htmlFor="filtro-metodo" className="block text-xs font-medium text-[#8A8B95] mb-1.5">Forma de pagamento</label>
                   <div className="relative">
                     <select
                       id="filtro-metodo"
                       value={filtroMetodo}
                       onChange={(e) => { setFiltroMetodo(e.target.value); setPaginaPedidos(1); }}
-                      className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
+                      className="w-full appearance-none border border-[#DCDDE3] rounded-lg px-3 py-2 text-sm text-[#1A1B23] bg-white focus:outline-none focus:border-[#5B2E8C] pr-8"
                     >
                       <option value="todos">Todas as formas</option>
                       <option value="pix">PIX</option>
                     </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8A8B95] pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -896,66 +896,66 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
             {/* Resultados */}
             {pedidosFiltrados.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-16 text-center">
-                <p className="text-sm font-semibold text-[#333333] mb-1">Nenhum pedido encontrado</p>
-                <p className="text-sm text-[#6C757D]">
+              <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] px-6 py-16 text-center">
+                <p className="text-sm font-semibold text-[#1A1B23] mb-1">Nenhum pedido encontrado</p>
+                <p className="text-sm text-[#8A8B95]">
                   Não há pedidos pagos para {MESES_LABEL[filtroMes] ?? filtroMes}.
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
 
                 {/* Linha de resumo */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5FB]">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="h-4 w-4 text-[#003566]" />
+                    <div className="w-9 h-9 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-4 w-4 text-[#5B2E8C]" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#003566]">Pedidos Pagos</p>
-                      <p className="text-xs text-[#6C757D]">Lista completa de transações</p>
+                      <p className="text-sm font-bold text-[#5B2E8C]">Pedidos Pagos</p>
+                      <p className="text-xs text-[#8A8B95]">Lista completa de transações</p>
                     </div>
-                    <span className="ml-2 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                    <span className="ml-2 bg-[#D4F0E2] text-[#0A6B45] text-xs font-semibold px-3 py-1 rounded-full">
                       {pedidosFiltrados.length} pedidos
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 bg-[#EEF2F7] rounded-xl px-4 py-2.5">
-                    <div className="w-7 h-7 bg-[#003566] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center gap-2 bg-[#F7F5FB] rounded-xl px-4 py-2.5">
+                    <div className="w-7 h-7 bg-[#5B2E8C] rounded-lg flex items-center justify-center flex-shrink-0">
                       <DollarSign className="h-3.5 w-3.5 text-white" />
                     </div>
-                    <span className="text-base font-bold text-[#003566]">
+                    <span className="text-base font-bold text-[#5B2E8C]">
                       {formatBRL(totalValorFiltrado)}
                     </span>
                   </div>
                 </div>
 
                 {/* Lista de pedidos */}
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-[#F7F5FB]">
                   {itensPedidosPagina.map((pedido) => (
-                    <div key={pedido.id} className="flex items-center gap-4 px-6 py-4 hover:bg-[#F8F9FA] transition-colors">
+                    <div key={pedido.id} className="flex items-center gap-4 px-6 py-4 hover:bg-[#F7F5FB] transition-colors">
                       {/* Ícone */}
-                      <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <div className="w-9 h-9 bg-[#D4F0E2] rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="h-4 w-4 text-[#0E8B5A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#333333]">
+                        <p className="text-sm font-semibold text-[#1A1B23]">
                           {pedido.passagens} passagens quitadas
                         </p>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-xs text-[#6C757D]">
+                          <span className="text-xs text-[#8A8B95]">
                             {pedido.data} às {pedido.hora}
                           </span>
-                          <span className="text-xs text-[#6C757D]">·</span>
+                          <span className="text-xs text-[#8A8B95]">·</span>
                           {(placasPorPedido.get(pedido.id) ?? []).map((pl) => (
-                            <span key={pl} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#EEF2F7] text-[#003566]">
+                            <span key={pl} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#F7F5FB] text-[#5B2E8C]">
                               {pl}
                             </span>
                           ))}
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#D4F0E2] text-[#0A6B45]">
                             {pedido.metodo}
                           </span>
                         </div>
@@ -964,16 +964,16 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       {/* Valor e ação */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <div className="text-right">
-                          <span className="block text-sm font-semibold text-[#333333]">
+                          <span className="block text-sm font-semibold text-[#1A1B23]">
                             {formatBRL(pedido.valor)}
                           </span>
-                          <span className="text-[10px] text-[#9CA3AF] font-mono">
+                          <span className="text-[10px] text-[#8A8B95] font-mono">
                             #{protocolo(pedido)}
                           </span>
                         </div>
                         <button
                           onClick={() => setModalPedido(pedido)}
-                          className="flex items-center gap-1.5 text-xs border border-[#90CAF9] text-[#42A5F5] hover:bg-[#E3F2FD] px-4 py-2 rounded-[8px] transition-colors whitespace-nowrap font-medium"
+                          className="flex items-center gap-1.5 text-xs border border-[#C9AEEA] text-[#5B2E8C] hover:bg-[#F4EFFB] px-4 py-2 rounded-[8px] transition-colors whitespace-nowrap font-medium"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           Ver Comprovante
@@ -984,22 +984,22 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
 
                 {/* Paginação */}
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                  <span className="text-sm text-[#6C757D]">
+                <div className="flex items-center justify-between px-6 py-4 border-t border-[#F7F5FB]">
+                  <span className="text-sm text-[#8A8B95]">
                     Mostrando {Math.min(paginaPedidos * ITEMS_PER_PAGE_PEDIDOS, pedidosFiltrados.length)} de {pedidosFiltrados.length} pedidos
                   </span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setPaginaPedidos((p) => Math.max(1, p - 1))}
                       disabled={paginaPedidos === 1}
-                      className="px-4 py-1.5 text-sm border border-gray-200 rounded-lg text-[#333333] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-1.5 text-sm border border-[#DCDDE3] rounded-lg text-[#1A1B23] hover:bg-[#F7F5FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       Anterior
                     </button>
                     <button
                       onClick={() => setPaginaPedidos((p) => Math.min(totalPaginasPedidos, p + 1))}
                       disabled={paginaPedidos === totalPaginasPedidos}
-                      className="px-4 py-1.5 text-sm border border-gray-200 rounded-lg text-[#333333] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-1.5 text-sm border border-[#DCDDE3] rounded-lg text-[#1A1B23] hover:bg-[#F7F5FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       Próximo
                     </button>
@@ -1022,12 +1022,12 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5FB]">
               <div>
-                <p className="text-sm font-bold text-[#003566]">Exportar Relatório de Repasse</p>
-                <p className="text-xs text-[#6C757D] mt-0.5">Selecione o mês e as opções para gerar o relatório.</p>
+                <p className="text-sm font-bold text-[#5B2E8C]">Exportar Relatório de Repasse</p>
+                <p className="text-xs text-[#8A8B95] mt-0.5">Selecione o mês e as opções para gerar o relatório.</p>
               </div>
-              <button onClick={() => setModalExportar(false)} aria-label="Fechar" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => setModalExportar(false)} aria-label="Fechar" className="text-[#8A8B95] hover:text-[#5B2E8C] transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -1036,34 +1036,34 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
               {/* Mês */}
               <div>
-                <label htmlFor="export-mes" className="block text-xs font-medium text-[#6C757D] mb-1.5">Mês</label>
+                <label htmlFor="export-mes" className="block text-xs font-medium text-[#8A8B95] mb-1.5">Mês</label>
                 <div className="relative">
                   <select
                     id="export-mes"
                     value={exportMes}
                     onChange={(e) => setExportMes(e.target.value)}
-                    className="w-full appearance-none border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm text-[#333333] bg-white focus:outline-none focus:border-[#003566] pr-8"
+                    className="w-full appearance-none border border-[#DCDDE3] rounded-[8px] px-3 py-2.5 text-sm text-[#1A1B23] bg-white focus:outline-none focus:border-[#5B2E8C] pr-8"
                   >
                     {Object.entries(MESES_LABEL).map(([val, label]) => (
                       <option key={val} value={val}>{label}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#6C757D] pointer-events-none" />
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8A8B95] pointer-events-none" />
                 </div>
               </div>
 
               {/* Formato — segmented control compacto */}
               <div>
-                <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Formato de exportação</label>
-                <div className="flex bg-[#F0F2F5] rounded-[8px] p-1 gap-1">
+                <label className="block text-xs font-medium text-[#8A8B95] mb-1.5">Formato de exportação</label>
+                <div className="flex bg-[#F7F5FB] rounded-[8px] p-1 gap-1">
                   {(["pdf", "excel"] as const).map((fmt) => (
                     <button
                       key={fmt}
                       onClick={() => setExportFormato(fmt)}
                       className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all ${
                         exportFormato === fmt
-                          ? "bg-white text-[#003566] shadow-sm"
-                          : "text-[#6C757D] hover:text-[#333333]"
+                          ? "bg-white text-[#5B2E8C] shadow-sm"
+                          : "text-[#8A8B95] hover:text-[#1A1B23]"
                       }`}
                     >
                       <FileText className="h-3 w-3" />
@@ -1075,7 +1075,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
               {/* Tipo — cards com radio visual */}
               <div>
-                <label className="block text-xs font-medium text-[#6C757D] mb-1.5">Tipo de extrato</label>
+                <label className="block text-xs font-medium text-[#8A8B95] mb-1.5">Tipo de extrato</label>
                 <div className="flex flex-col gap-2">
                   {(["consolidado", "detalhado"] as const).map((tipo) => {
                     const ativo = exportTipo === tipo;
@@ -1085,21 +1085,21 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                         onClick={() => setExportTipo(tipo)}
                         className={`flex items-start gap-3 px-4 py-3 rounded-[8px] border text-left transition-all ${
                           ativo
-                            ? "border-[#003566] bg-[#EEF2F7]"
-                            : "border-gray-200 bg-white hover:border-gray-300"
+                            ? "border-[#5B2E8C] bg-[#F7F5FB]"
+                            : "border-[#DCDDE3] bg-white hover:border-[#DCDDE3]"
                         }`}
                       >
                         {/* Radio dot */}
                         <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                          ativo ? "border-[#003566]" : "border-gray-300"
+                          ativo ? "border-[#5B2E8C]" : "border-[#DCDDE3]"
                         }`}>
-                          {ativo && <span className="w-2 h-2 rounded-full bg-[#003566]" />}
+                          {ativo && <span className="w-2 h-2 rounded-full bg-[#5B2E8C]" />}
                         </span>
                         <div>
-                          <p className={`text-xs font-semibold ${ativo ? "text-[#003566]" : "text-[#333333]"}`}>
+                          <p className={`text-xs font-semibold ${ativo ? "text-[#5B2E8C]" : "text-[#1A1B23]"}`}>
                             {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
                           </p>
-                          <p className="text-[10px] text-[#9CA3AF] mt-0.5">
+                          <p className="text-[10px] text-[#8A8B95] mt-0.5">
                             {tipo === "consolidado"
                               ? "Resumo com totais por período, sem detalhamento por título."
                               : "Inclui cada título individualmente com data, valor e status."}
@@ -1116,7 +1116,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             <div className="flex gap-3 px-6 pb-6">
               <button
                 onClick={() => setModalExportar(false)}
-                className="flex-1 py-2.5 rounded-[8px] border border-gray-200 text-sm font-semibold text-[#6C757D] hover:border-gray-300 hover:text-[#333333] transition-colors"
+                className="flex-1 py-2.5 rounded-[8px] border border-[#DCDDE3] text-sm font-semibold text-[#8A8B95] hover:border-[#DCDDE3] hover:text-[#1A1B23] transition-colors"
               >
                 Cancelar
               </button>
@@ -1155,7 +1155,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                     console.error("[exportarRepasse] erro:", err);
                   }
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[8px] bg-[#003566] hover:bg-[#002a52] text-white text-sm font-semibold transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[8px] bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-sm font-semibold transition-colors"
               >
                 <Download className="h-3.5 w-3.5" />
                 Exportar {exportFormato === "pdf" ? "PDF" : "Excel"}
@@ -1179,17 +1179,17 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header — fixo */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5FB] flex-shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 bg-[#EEF2F7] rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FileText className="h-4 w-4 text-[#003566]" />
+                  <div className="w-8 h-8 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FileText className="h-4 w-4 text-[#5B2E8C]" />
                   </div>
-                  <span className="text-sm font-bold text-[#003566]">Comprovante de Pagamento</span>
+                  <span className="text-sm font-bold text-[#5B2E8C]">Comprovante de Pagamento</span>
                 </div>
                 <button
                   onClick={() => setModalPedido(null)}
                   aria-label="Fechar"
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1199,35 +1199,35 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
               <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
 
                 {/* Sucesso */}
-                <div className="bg-green-50 rounded-xl py-5 flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-7 w-7 text-green-600" />
+                <div className="bg-[#D4F0E2] rounded-xl py-5 flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 bg-[#D4F0E2] rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-7 w-7 text-[#0E8B5A]" />
                   </div>
-                  <p className="text-sm font-bold text-green-700">Pagamento Aprovado</p>
-                  <p className="text-xs text-green-600">Pendências quitadas com sucesso</p>
+                  <p className="text-sm font-bold text-[#0A6B45]">Pagamento Aprovado</p>
+                  <p className="text-xs text-[#0E8B5A]">Pendências quitadas com sucesso</p>
                 </div>
 
                 {/* Detalhes gerais */}
                 <div>
-                  <p className="text-xs font-bold text-[#333333] mb-3 uppercase tracking-wide">
+                  <p className="text-xs font-bold text-[#1A1B23] mb-3 uppercase tracking-wide">
                     Detalhes da Transação
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-3.5">
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Pedido</p>
-                      <p className="text-xs font-semibold text-[#333333]">{protocolo}</p>
+                      <p className="text-xs text-[#8A8B95] mb-0.5">Pedido</p>
+                      <p className="text-xs font-semibold text-[#1A1B23]">{protocolo}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Data e Hora</p>
-                      <p className="text-xs font-semibold text-[#333333]">{modalPedido.data} às {modalPedido.hora}</p>
+                      <p className="text-xs text-[#8A8B95] mb-0.5">Data e Hora</p>
+                      <p className="text-xs font-semibold text-[#1A1B23]">{modalPedido.data} às {modalPedido.hora}</p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-xs text-[#9CA3AF] mb-1">Placas dos Veículos</p>
+                      <p className="text-xs text-[#8A8B95] mb-1">Placas dos Veículos</p>
                       <div className="flex flex-wrap gap-1.5">
                         {passagens.map((p) => (
                           <span
                             key={p.idPassagem}
-                            className="inline-flex items-center gap-1 bg-[#EEF2F7] text-[#003566] text-xs font-semibold px-2 py-0.5 rounded-md"
+                            className="inline-flex items-center gap-1 bg-[#F7F5FB] text-[#5B2E8C] text-xs font-semibold px-2 py-0.5 rounded-md"
                           >
                             <svg className="h-3 w-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
@@ -1238,14 +1238,14 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Forma de Pagamento</p>
-                      <span className="inline-block text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      <p className="text-xs text-[#8A8B95] mb-0.5">Forma de Pagamento</p>
+                      <span className="inline-block text-xs font-semibold bg-[#D4F0E2] text-[#0A6B45] px-2 py-0.5 rounded-full">
                         {modalPedido.metodo}
                       </span>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-0.5">Status</p>
-                      <span className="inline-block text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      <p className="text-xs text-[#8A8B95] mb-0.5">Status</p>
+                      <span className="inline-block text-xs font-semibold bg-[#D4F0E2] text-[#0A6B45] px-2 py-0.5 rounded-full">
                         Aprovado
                       </span>
                     </div>
@@ -1255,57 +1255,57 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 {/* Passagens individuais */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-[#333333] uppercase tracking-wide">
+                    <p className="text-xs font-bold text-[#1A1B23] uppercase tracking-wide">
                       Passagens ({passagens.length})
                     </p>
                   </div>
                   <div className="space-y-2.5">
                     {passagens.map((p) => (
-                      <div key={p.idPassagem} className="border border-gray-100 rounded-xl px-4 py-3 bg-[#F8F9FA]">
-                        <div className="mb-3 pb-2.5 border-b border-gray-200 flex items-start justify-between gap-2">
+                      <div key={p.idPassagem} className="border border-[#F7F5FB] rounded-xl px-4 py-3 bg-[#F7F5FB]">
+                        <div className="mb-3 pb-2.5 border-b border-[#DCDDE3] flex items-start justify-between gap-2">
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] uppercase tracking-wide mb-0.5">Número da Placa</p>
-                            <p className="text-sm font-bold text-[#003566]">{p.placa}</p>
+                            <p className="text-[10px] text-[#8A8B95] uppercase tracking-wide mb-0.5">Número da Placa</p>
+                            <p className="text-sm font-bold text-[#5B2E8C]">{p.placa}</p>
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <p className="text-[10px] text-[#9CA3AF] uppercase tracking-wide mb-0.5">Valor</p>
-                            <p className="text-sm font-bold text-[#003566]">{formatBRL(p.valor)}</p>
+                            <p className="text-[10px] text-[#8A8B95] uppercase tracking-wide mb-0.5">Valor</p>
+                            <p className="text-sm font-bold text-[#5B2E8C]">{formatBRL(p.valor)}</p>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Data</p>
-                            <p className="text-xs font-semibold text-[#333333]">{p.data}</p>
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Data</p>
+                            <p className="text-xs font-semibold text-[#1A1B23]">{p.data}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Horário</p>
-                            <p className="text-xs font-semibold text-[#333333]">{p.hora}</p>
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Horário</p>
+                            <p className="text-xs font-semibold text-[#1A1B23]">{p.hora}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">ID da Passagem</p>
-                            <p className="text-xs font-semibold text-[#333333]">{p.idPassagem}</p>
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">ID da Passagem</p>
+                            <p className="text-xs font-semibold text-[#1A1B23]">{p.idPassagem}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Placa do Veículo</p>
-                            <p className="text-xs font-semibold text-[#333333]">{p.placa}</p>
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Placa do Veículo</p>
+                            <p className="text-xs font-semibold text-[#1A1B23]">{p.placa}</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Praça</p>
-                            <p className="text-xs font-semibold text-[#333333] flex items-center gap-1">
-                              <MapPin className="h-3 w-3 text-[#003566]" />
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Praça</p>
+                            <p className="text-xs font-semibold text-[#1A1B23] flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-[#5B2E8C]" />
                               {p.praca}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Quilômetro</p>
-                            <p className="text-xs font-semibold text-[#333333] flex items-center gap-1">
-                              <Hash className="h-3 w-3 text-[#003566]" />
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Quilômetro</p>
+                            <p className="text-xs font-semibold text-[#1A1B23] flex items-center gap-1">
+                              <Hash className="h-3 w-3 text-[#5B2E8C]" />
                               km {p.km}
                             </p>
                           </div>
                           <div className="col-span-2">
-                            <p className="text-[10px] text-[#9CA3AF] mb-0.5">Rodovia</p>
-                            <p className="text-xs font-semibold text-[#333333]">{p.rodovia}</p>
+                            <p className="text-[10px] text-[#8A8B95] mb-0.5">Rodovia</p>
+                            <p className="text-xs font-semibold text-[#1A1B23]">{p.rodovia}</p>
                           </div>
                         </div>
                       </div>
@@ -1314,41 +1314,41 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                 </div>
 
                 {/* Aviso */}
-                <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-                  <p className="text-xs font-bold text-[#003566] mb-1.5">Avisos Importantes:</p>
+                <div className="bg-[#F4EFFB] border border-blue-100 rounded-xl px-4 py-3">
+                  <p className="text-xs font-bold text-[#5B2E8C] mb-1.5">Avisos Importantes:</p>
                   <ul className="space-y-1">
-                    <li className="text-xs text-[#4B5563]">· Este comprovante confirma o pagamento da passagem de pedágio.</li>
-                    <li className="text-xs text-[#4B5563]">· O pagamento não exclui multas por infrações de trânsito.</li>
-                    <li className="text-xs text-[#4B5563]">· Guarde este comprovante para seus registros.</li>
+                    <li className="text-xs text-[#5B5C68]">· Este comprovante confirma o pagamento da passagem de pedágio.</li>
+                    <li className="text-xs text-[#5B5C68]">· O pagamento não exclui multas por infrações de trânsito.</li>
+                    <li className="text-xs text-[#5B5C68]">· Guarde este comprovante para seus registros.</li>
                   </ul>
                 </div>
               </div>
 
               {/* Valor total — fixo acima dos botões */}
-              <div className="flex items-center justify-between px-6 py-3.5 border-t border-gray-200 bg-[#F8F9FA] flex-shrink-0">
-                <p className="text-sm font-bold text-[#333333]">Valor Total Pago</p>
-                <p className="text-base font-bold text-[#003566]">{formatBRL(modalPedido.valor)}</p>
+              <div className="flex items-center justify-between px-6 py-3.5 border-t border-[#DCDDE3] bg-[#F7F5FB] flex-shrink-0">
+                <p className="text-sm font-bold text-[#1A1B23]">Valor Total Pago</p>
+                <p className="text-base font-bold text-[#5B2E8C]">{formatBRL(modalPedido.valor)}</p>
               </div>
 
               {/* Botões — fixos no rodapé */}
               <div className="px-6 pb-5 pt-4 flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => exportarComprovante({ protocolo, data: modalPedido.data, hora: modalPedido.hora, metodo: modalPedido.metodo, status: "Aprovado",valorTotal: modalPedido.valor, passagens }, "pdf")}
-                  className="flex-1 flex items-center justify-center gap-1.5 bg-[#003566] hover:bg-[#002a52] text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" />
                   PDF
                 </button>
                 <button
                   onClick={() => exportarComprovante({ protocolo, data: modalPedido.data, hora: modalPedido.hora, metodo: modalPedido.metodo, status: "Aprovado",valorTotal: modalPedido.valor, passagens }, "excel")}
-                  className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-[#0E8B5A] hover:bg-[#0A6B45] text-white text-xs font-semibold py-2.5 rounded-[8px] transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Excel
                 </button>
                 <button
                   onClick={() => setModalPedido(null)}
-                  className="flex-1 text-xs font-semibold text-[#6C757D] hover:text-[#333333] py-2.5 rounded-[8px] border border-gray-200 hover:border-gray-300 transition-colors"
+                  className="flex-1 text-xs font-semibold text-[#8A8B95] hover:text-[#1A1B23] py-2.5 rounded-[8px] border border-[#DCDDE3] hover:border-[#DCDDE3] transition-colors"
                 >
                   Fechar
                 </button>
@@ -1368,18 +1368,18 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             className="bg-white rounded-2xl shadow-xl w-full max-w-[280px] p-6 text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-12 bg-[#F8F9FA] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="h-5 w-5 text-[#6C757D]" />
+            <div className="w-12 h-12 bg-[#F7F5FB] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-5 w-5 text-[#8A8B95]" />
             </div>
-            <h3 className="text-[#003566] font-semibold text-base mb-1.5">
+            <h3 className="text-[#5B2E8C] font-semibold text-base mb-1.5">
               Nenhum título encontrado
             </h3>
-            <p className="text-[#6C757D] text-sm mb-6">
+            <p className="text-[#8A8B95] text-sm mb-6">
               Não há valores repassados neste período.
             </p>
             <button
               onClick={() => setMostrarAlertaSemTitulo(false)}
-              className="w-full py-2.5 rounded-xl bg-[#F8F9FA] hover:bg-[#EEF2F7] text-[#003566] text-sm font-semibold transition-colors"
+              className="w-full py-2.5 rounded-xl bg-[#F7F5FB] hover:bg-[#F7F5FB] text-[#5B2E8C] text-sm font-semibold transition-colors"
             >
               Fechar
             </button>

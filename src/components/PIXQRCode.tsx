@@ -101,21 +101,21 @@ export function PIXQRCode({
     switch (statusPagamento) {
       case 'aguardando':
         return (
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+          <Badge variant="secondary" className="bg-[#FBE8C5] text-[#7A4800] border-yellow-300">
             <Clock className="h-3 w-3 mr-1" />
             Aguardando pagamento
           </Badge>
         );
       case 'processando':
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300">
-            <div className="animate-spin rounded-full h-3 w-3 border border-blue-600 border-t-transparent mr-1"></div>
+          <Badge variant="secondary" className="bg-[#E5D8F5] text-[#5B2E8C] border-blue-300">
+            <div className="animate-spin rounded-full h-3 w-3 border border-[#5B2E8C] border-t-transparent mr-1"></div>
             Processando
           </Badge>
         );
       case 'confirmado':
         return (
-          <Badge variant="default" className="bg-green-100 text-green-800 border-green-300">
+          <Badge variant="default" className="bg-[#D4F0E2] text-[#0A6B45] border-green-300">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Pagamento confirmado
           </Badge>
@@ -124,9 +124,9 @@ export function PIXQRCode({
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[#F7F5FB]">
       {/* Header */}
-      <div className="bg-white border-b border-[#E0E0E0] sticky top-0 z-50">
+      <div className="bg-white border-b border-[#DCDDE3] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -134,14 +134,14 @@ export function PIXQRCode({
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className="hover:bg-[#F8F9FA] p-2"
+                className="hover:bg-[#F7F5FB] p-2"
                 disabled={statusPagamento === 'confirmado'}
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="text-xl font-semibold text-[#003566]">Pagamento PIX</h1>
-                <p className="text-sm text-[#6C757D]">Escaneie o QR Code ou copie o código</p>
+                <h1 className="text-xl font-semibold text-[#5B2E8C]">Pagamento PIX</h1>
+                <p className="text-sm text-[#8A8B95]">Escaneie o QR Code ou copie o código</p>
               </div>
             </div>
             {renderStatusBadge()}
@@ -152,17 +152,17 @@ export function PIXQRCode({
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="space-y-6">
           {/* Timer e Valor */}
-          <Card className="border-l-4 border-l-[#00B4D8]">
+          <Card className="border-l-4 border-l-[#8B5FFF]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#6C757D] mb-1">Valor total a pagar</p>
-                  <p className="text-3xl font-bold text-[#003566]">{formatCurrency(valorTotal)}</p>
+                  <p className="text-sm text-[#8A8B95] mb-1">Valor total a pagar</p>
+                  <p className="text-3xl font-bold text-[#5B2E8C]">{formatCurrency(valorTotal)}</p>
                 </div>
                 {statusPagamento === 'aguardando' && (
                   <div className="text-right">
-                    <p className="text-sm text-[#6C757D] mb-1">Tempo restante</p>
-                    <p className={`text-2xl font-bold ${tempoRestante < 120 ? 'text-red-600' : 'text-[#003566]'}`}>
+                    <p className="text-sm text-[#8A8B95] mb-1">Tempo restante</p>
+                    <p className={`text-2xl font-bold ${tempoRestante < 120 ? 'text-[#C8324A]' : 'text-[#5B2E8C]'}`}>
                       {formatTime(tempoRestante)}
                     </p>
                   </div>
@@ -174,23 +174,23 @@ export function PIXQRCode({
           {/* QR Code */}
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-2 text-[#003566]">
+              <CardTitle className="flex items-center justify-center gap-2 text-[#5B2E8C]">
                 <QrCode className="h-5 w-5" />
                 QR Code PIX
               </CardTitle>
-              <p className="text-sm text-[#6C757D]">
+              <p className="text-sm text-[#8A8B95]">
                 Abra o app do seu banco e escaneie o código
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* QR Code Placeholder */}
               <div className="flex justify-center">
-                <div className="w-64 h-64 bg-white border-2 border-[#E0E0E0] rounded-lg flex items-center justify-center shadow-inner">
-                  <div className="w-56 h-56 bg-[#F8F9FA] border border-[#CCCCCC] rounded-lg flex items-center justify-center">
+                <div className="w-64 h-64 bg-white border-2 border-[#DCDDE3] rounded-lg flex items-center justify-center shadow-inner">
+                  <div className="w-56 h-56 bg-[#F7F5FB] border border-[#C6C7CF] rounded-lg flex items-center justify-center">
                     <div className="text-center space-y-3">
-                      <QrCode className="h-40 w-40 text-[#003566] mx-auto" />
-                      <p className="text-sm text-[#6C757D]">QR Code PIX</p>
-                      <p className="text-sm text-[#003566] font-medium">
+                      <QrCode className="h-40 w-40 text-[#5B2E8C] mx-auto" />
+                      <p className="text-sm text-[#8A8B95]">QR Code PIX</p>
+                      <p className="text-sm text-[#5B2E8C] font-medium">
                         {formatCurrency(valorTotal)}
                       </p>
                     </div>
@@ -201,7 +201,7 @@ export function PIXQRCode({
               {/* Código PIX Copia e Cola */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-[#003566]">Código PIX Copia e Cola</h4>
+                  <h4 className="font-semibold text-[#5B2E8C]">Código PIX Copia e Cola</h4>
                   <Button
                     variant="outline"
                     size="sm"
@@ -211,7 +211,7 @@ export function PIXQRCode({
                   >
                     {copiado ? (
                       <>
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4 text-[#0E8B5A]" />
                         Copiado!
                       </>
                     ) : (
@@ -223,20 +223,20 @@ export function PIXQRCode({
                   </Button>
                 </div>
                 
-                <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-4">
-                  <p className="text-xs text-[#000000] break-all font-mono leading-relaxed">
+                <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
+                  <p className="text-xs text-[#1A1B23] break-all font-mono leading-relaxed">
                     {pixCode}
                   </p>
                 </div>
               </div>
 
               {/* Informações do PIX */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <Smartphone className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <Smartphone className="h-5 w-5 text-[#5B2E8C] mt-0.5" />
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-blue-900">Como pagar via PIX:</h4>
-                    <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                    <h4 className="font-semibold text-[#2E1547]">Como pagar via PIX:</h4>
+                    <ol className="text-sm text-[#5B2E8C] space-y-1 list-decimal list-inside">
                       <li>Abra o app do seu banco</li>
                       <li>Escolha a opção PIX</li>
                       <li>Escaneie o QR Code ou cole o código</li>
@@ -247,12 +247,12 @@ export function PIXQRCode({
               </div>
 
               {/* Informações de Segurança */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="bg-[#D4F0E2] border border-[#A3D9BE] rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-green-600 mt-0.5" />
+                  <Shield className="h-5 w-5 text-[#0E8B5A] mt-0.5" />
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-green-900">Segurança garantida</h4>
-                    <ul className="text-sm text-green-800 space-y-1">
+                    <h4 className="font-semibold text-[#085534]">Segurança garantida</h4>
+                    <ul className="text-sm text-[#0A6B45] space-y-1">
                       <li>• Transação protegida por criptografia</li>
                       <li>• Confirmação automática em tempo real</li>
                       <li>• Comprovante enviado por email</li>
@@ -262,36 +262,36 @@ export function PIXQRCode({
               </div>
 
               {/* Detalhes da Transação */}
-              <div className="border-t border-[#E0E0E0] pt-4 space-y-3">
-                <h4 className="font-semibold text-[#003566]">Detalhes da transação</h4>
+              <div className="border-t border-[#DCDDE3] pt-4 space-y-3">
+                <h4 className="font-semibold text-[#5B2E8C]">Detalhes da transação</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-[#6C757D]">Favorecido</p>
-                    <p className="font-medium text-[#000000]">Pedágio Online Soluções Digitais</p>
+                    <p className="text-[#8A8B95]">Favorecido</p>
+                    <p className="font-medium text-[#1A1B23]">Pedágio Online Soluções Digitais</p>
                   </div>
                   <div>
-                    <p className="text-[#6C757D]">Chave PIX</p>
-                    <p className="font-medium text-[#000000]">{pixKey}</p>
+                    <p className="text-[#8A8B95]">Chave PIX</p>
+                    <p className="font-medium text-[#1A1B23]">{pixKey}</p>
                   </div>
                   <div>
-                    <p className="text-[#6C757D]">Nº da Transação</p>
-                    <p className="font-medium text-[#000000]">{numeroTransacao}</p>
+                    <p className="text-[#8A8B95]">Nº da Transação</p>
+                    <p className="font-medium text-[#1A1B23]">{numeroTransacao}</p>
                   </div>
                   <div>
-                    <p className="text-[#6C757D]">Débitos</p>
-                    <p className="font-medium text-[#000000]">{debitosSelecionados.length} pendência(s)</p>
+                    <p className="text-[#8A8B95]">Débitos</p>
+                    <p className="font-medium text-[#1A1B23]">{debitosSelecionados.length} pendência(s)</p>
                   </div>
                 </div>
               </div>
 
               {/* Aviso de Tempo */}
               {statusPagamento === 'aguardando' && tempoRestante < 120 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="bg-[#FBE8C5] border border-[#F4C97A] rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-[#C77700] mt-0.5" />
                     <div>
                       <h4 className="font-semibold text-yellow-900">Atenção!</h4>
-                      <p className="text-sm text-yellow-800">
+                      <p className="text-sm text-[#7A4800]">
                         Este PIX expira em menos de 2 minutos. Complete o pagamento rapidamente.
                       </p>
                     </div>
@@ -301,12 +301,12 @@ export function PIXQRCode({
 
               {/* Status de Processamento */}
               {statusPagamento === 'processando' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-4">
                   <div className="flex items-center gap-3">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#5B2E8C] border-t-transparent"></div>
                     <div>
-                      <h4 className="font-semibold text-blue-900">Processando pagamento...</h4>
-                      <p className="text-sm text-blue-800">
+                      <h4 className="font-semibold text-[#2E1547]">Processando pagamento...</h4>
+                      <p className="text-sm text-[#5B2E8C]">
                         Recebemos seu pagamento e estamos processando. Aguarde um momento.
                       </p>
                     </div>
@@ -316,12 +316,12 @@ export function PIXQRCode({
 
               {/* Confirmação */}
               {statusPagamento === 'confirmado' && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="bg-[#D4F0E2] border border-[#A3D9BE] rounded-lg p-4">
                   <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <CheckCircle2 className="h-5 w-5 text-[#0E8B5A]" />
                     <div>
-                      <h4 className="font-semibold text-green-900">Pagamento confirmado!</h4>
-                      <p className="text-sm text-green-800">
+                      <h4 className="font-semibold text-[#085534]">Pagamento confirmado!</h4>
+                      <p className="text-sm text-[#0A6B45]">
                         Suas pendências foram quitadas com sucesso. Redirecionando...
                       </p>
                     </div>

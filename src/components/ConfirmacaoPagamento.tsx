@@ -176,10 +176,10 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
             <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-12 w-12 text-white" />
             </div>
-            <h1 className="text-4xl font-bold mb-4 text-gray-900">
+            <h1 className="text-4xl font-bold mb-4 text-[#1A1B23]">
               Pagamento confirmado!
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-[#8A8B95]">
               Suas pendências foram quitadas com sucesso
             </p>
           </div>
@@ -189,69 +189,69 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
             <CardContent className="p-8">
               <div className="space-y-6">
                 <div className="text-center border-b pb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-[#1A1B23] mb-2">
                     Comprovante de Pagamento
                   </h3>
-                  <p className="text-gray-600">Transação nº {numeroTransacao}</p>
+                  <p className="text-[#8A8B95]">Transação nº {numeroTransacao}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Detalhes do pagamento</h4>
+                    <h4 className="font-semibold text-[#1A1B23] mb-3">Detalhes do pagamento</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Data/Hora:</span>
+                        <span className="text-[#8A8B95]">Data/Hora:</span>
                         <span className="font-medium">{formatDate(agora)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Valor pago:</span>
-                        <span className="font-bold text-green-600">{formatCurrency(dadosPagamento?.valor || 28.10)}</span>
+                        <span className="text-[#8A8B95]">Valor pago:</span>
+                        <span className="font-bold text-[#0E8B5A]">{formatCurrency(dadosPagamento?.valor || 28.10)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Forma de pagamento:</span>
+                        <span className="text-[#8A8B95]">Forma de pagamento:</span>
                         <span className="font-medium flex items-center gap-1">
                           <QrCode className="h-4 w-4" />
                           PIX
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Status:</span>
-                        <span className="font-medium text-green-600">Aprovado</span>
+                        <span className="text-[#8A8B95]">Status:</span>
+                        <span className="font-medium text-[#0E8B5A]">Aprovado</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Pendências quitadas</h4>
+                    <h4 className="font-semibold text-[#1A1B23] mb-3">Pendências quitadas</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Via Dutra KM 142:</span>
+                        <span className="text-[#8A8B95]">Via Dutra KM 142:</span>
                         <span className="font-medium">R$ 8,90</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Fernão Dias KM 85:</span>
+                        <span className="text-[#8A8B95]">Fernão Dias KM 85:</span>
                         <span className="font-medium">R$ 12,50</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Anhanguera KM 23:</span>
+                        <span className="text-[#8A8B95]">Anhanguera KM 23:</span>
                         <span className="font-medium">R$ 6,70</span>
                       </div>
                       <div className="border-t pt-2 mt-2">
                         <div className="flex justify-between">
-                          <span className="text-gray-600 font-semibold">Total:</span>
-                          <span className="font-bold text-green-600">R$ 28,10</span>
+                          <span className="text-[#8A8B95] font-semibold">Total:</span>
+                          <span className="font-bold text-[#0E8B5A]">R$ 28,10</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="bg-[#D4F0E2] border border-[#A3D9BE] rounded-xl p-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-[#0E8B5A] mt-0.5" />
                     <div>
-                      <p className="font-semibold text-green-900 mb-1">✅ Situação regularizada!</p>
-                      <p className="text-sm text-green-800">
+                      <p className="font-semibold text-[#085534] mb-1">✅ Situação regularizada!</p>
+                      <p className="text-sm text-[#0A6B45]">
                         Todas as suas pendências foram quitadas!
                       </p>
                     </div>

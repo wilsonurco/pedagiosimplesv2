@@ -68,7 +68,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const [debitosSelecionadosResumo, setDebitosSelecionadosResumo] = useState<string[]>([]);
   const [filtroExpandido, setFiltroExpandido] = useState(false);
   const [modalConfirmacaoPlacaAberto, setModalConfirmacaoPlacaAberto] = useState(false);
-  const [placasUsuario, setPlacasUsuario] = useState<string[]>(['ECI-1548']); // Placa do usuário logado
+  const [placasUsuario, setPlacasUsuario] = useState<string[]>(['MOV-1234']); // Placa do usuário logado
   
   // Estados para notificações
   const [notificacoesAbertas, setNotificacoesAbertas] = useState(false);
@@ -77,21 +77,21 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       id: '1',
       tipo: 'pagamento',
       titulo: 'Pagamento processado com sucesso',
-      mensagem: 'Seu pagamento de R$ 21,40 foi processado. Placa ECI-1548.',
+      mensagem: 'Seu pagamento de R$ 21,40 foi processado. Placa MOV-1234.',
       data: '2 horas atrás',
       lida: false,
       icone: CheckCircle,
-      cor: 'text-green-600'
+      cor: 'text-[#0E8B5A]'
     },
     {
       id: '2',
       tipo: 'alerta',
       titulo: 'Nova pendência encontrada',
-      mensagem: 'Encontramos uma nova pendência para o veículo ECI-1548.',
+      mensagem: 'Encontramos uma nova pendência para o veículo MOV-1234.',
       data: '1 dia atrás',
       lida: false,
       icone: AlertTriangle,
-      cor: 'text-yellow-600'
+      cor: 'text-[#C77700]'
     },
     {
       id: '3',
@@ -111,43 +111,59 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       data: '3 dias atrás',
       lida: true,
       icone: Info,
-      cor: 'text-blue-600'
+      cor: 'text-[#5B2E8C]'
     }
   ]);
 
-  // Mock de pendências para a tela inicial
+  // Mock de pendências Free Flow
   const pendenciasAtivas: any[] = [
     {
       id: 'pend-1',
-      rodovia: 'Pedágio não identificado',
-      valor: 18.90,
-      data: '02/03/2026',
-      hora: '08:45',
-      placa: 'ECI-1548'
+      rodovia: 'Pórtico SP-330 — KM 45',
+      concessionaria: 'CCR AutoBan',
+      tipo: 'free-flow',
+      valor: 4.30,
+      data: '14/04/2026',
+      hora: '07:42:00:00',
+      prazoVencimento: '14/05/2026',
+      riscoDeMulta: true,
+      placa: 'MOV-1234'
     },
     {
       id: 'pend-2',
-      rodovia: 'Pedágio não identificado',
-      valor: 24.50,
-      data: '08/03/2026',
-      hora: '14:20',
-      placa: 'ECI-1548'
+      rodovia: 'Pórtico SP-021 — KM 18',
+      concessionaria: 'Ecovias',
+      tipo: 'free-flow',
+      valor: 6.80,
+      data: '20/04/2026',
+      hora: '14:15:00:00',
+      prazoVencimento: '20/05/2026',
+      riscoDeMulta: false,
+      placa: 'MOV-1234'
     },
     {
       id: 'pend-3',
-      rodovia: 'Pedágio não identificado',
-      valor: 12.70,
-      data: '14/03/2026',
-      hora: '10:10',
-      placa: 'ECI-1548'
+      rodovia: 'Pórtico SP-270 — KM 33',
+      concessionaria: 'Arteris',
+      tipo: 'free-flow',
+      valor: 5.10,
+      data: '28/04/2026',
+      hora: '18:50:00:00',
+      prazoVencimento: '28/05/2026',
+      riscoDeMulta: false,
+      placa: 'MOV-1234'
     },
     {
       id: 'pend-4',
-      rodovia: 'Pedágio não identificado',
-      valor: 31.40,
-      data: '19/03/2026',
-      hora: '17:55',
-      placa: 'ECI-1548'
+      rodovia: 'Pórtico BR-116 — KM 312',
+      concessionaria: 'Arteris',
+      tipo: 'free-flow',
+      valor: 9.20,
+      data: '02/05/2026',
+      hora: '10:05:00:00',
+      prazoVencimento: '01/06/2026',
+      riscoDeMulta: false,
+      placa: 'MOV-1234'
     }
   ];
 
@@ -157,6 +173,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const todosOsDebitos = pendenciasAtivas.map(p => ({
     id: p.id,
     praca: p.rodovia,
+    concessionaria: p.concessionaria,
+    prazoVencimento: p.prazoVencimento,
+    riscoDeMulta: p.riscoDeMulta,
     valor: p.valor,
     data: p.data,
     hora: p.hora,
@@ -315,30 +334,106 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     );
   };
 
+  // Métricas para os cards do dashboard
+  const totalEmAberto = pendenciasAtivas.reduce((s, p) => s + p.valor, 0);
+  const vencendoEmBreve = pendenciasAtivas.filter(p => p.riscoDeMulta).length;
+  const multasEvitadas = 482.68;
+  const veiculosMonitorados = [...new Set(pendenciasAtivas.map(p => p.placa))].length;
+
   // Configuração das abas para navegação
   const tabs = [
-    { id: 'home', label: 'Pendências', icon: Home, hasAlert: pendenciasAtivas.length > 0 },
+    { id: 'home', label: 'Início', icon: Home, hasAlert: vencendoEmBreve > 0 },
+    { id: 'historico', label: 'Histórico', icon: History },
     { id: 'total-pago', label: 'Total Pago', icon: CreditCard },
     { id: 'veiculos', label: 'Veículos', icon: Car },
     { id: 'conta', label: 'Conta', icon: User }
   ];
 
+  // Feed de atividade recente
+  const atividadeRecente = [
+    { tipo: 'novo-debito', texto: 'Nova passagem detectada — Pórtico BR-116 · KM 312', data: '02/05/2026', cor: 'text-[#C77700]', bg: 'bg-[#FBE8C5] border-[#F4C97A]' },
+    { tipo: 'alerta', texto: 'Prazo se aproximando — Pórtico SP-330 vence em 14/05', data: '07/05/2026', cor: 'text-[#C8324A]', bg: 'bg-[#F8D7DD] border-[#F0A8B5]' },
+    { tipo: 'pagamento', texto: 'Pagamento confirmado — 3 passagens quitadas via PIX', data: '15/04/2026', cor: 'text-[#0A6B45]', bg: 'bg-[#D4F0E2] border-[#A3D9BE]' },
+    { tipo: 'novo-debito', texto: 'Nova passagem detectada — Pórtico SP-270 · KM 33', data: '28/04/2026', cor: 'text-[#C77700]', bg: 'bg-[#FBE8C5] border-[#F4C97A]' },
+  ];
+
   const renderHomeContent = () => (
-    <div className="max-w-4xl mx-auto">
-      <Card className="border border-[#E0E0E0]">
+    <div className="max-w-4xl mx-auto space-y-5">
+
+      {/* Saudação */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#5B2E8C]">
+            Olá, {(usuario.nome || 'Usuário').split(' ')[0]} 👋
+          </h2>
+          <p className="text-sm text-[#8A8B95] mt-0.5">
+            {vencendoEmBreve > 0
+              ? `Você tem ${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
+              : `Tudo em dia por enquanto — ${pendenciasAtivas.length} passagens pendentes de pagamento`}
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-[#8A8B95] flex-shrink-0">
+          <Shield className="h-3.5 w-3.5 text-[#8B5FFF]" />
+          <span>{veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''} monitorado{veiculosMonitorados > 1 ? 's' : ''}</span>
+        </div>
+      </div>
+
+      {/* Cards de métricas */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Total em aberto */}
+        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#F8D7DD] border-[#F0A8B5]' : 'bg-white border-[#DCDDE3]'}`}>
+          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Em aberto</p>
+          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#A3203B]' : 'text-[#5B2E8C]'}`}>
+            {formatCurrency(totalEmAberto)}
+          </p>
+          <p className="text-xs text-[#8A8B95] mt-1">{pendenciasAtivas.length} passagem{pendenciasAtivas.length > 1 ? 'ns' : ''}</p>
+        </div>
+
+        {/* Vencendo em breve */}
+        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#FBE8C5] border-[#F4C97A]' : 'bg-white border-[#DCDDE3]'}`}>
+          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Vence em breve</p>
+          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#9A5B00]' : 'text-[#8A8B95]'}`}>
+            {vencendoEmBreve}
+          </p>
+          <p className="text-xs text-[#8A8B95] mt-1">
+            {vencendoEmBreve > 0 ? 'passagem próx. do prazo' : 'nenhuma urgente'}
+          </p>
+        </div>
+
+        {/* Multas evitadas */}
+        <div className="rounded-xl border-2 bg-[#D4F0E2] border-[#A3D9BE] p-3 sm:p-4">
+          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Multas evitadas</p>
+          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#0A6B45]">
+            {formatCurrency(multasEvitadas)}
+          </p>
+          <p className="text-xs text-[#8A8B95] mt-1">economia acumulada</p>
+        </div>
+
+        {/* Veículos */}
+        <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
+          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Veículos</p>
+          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#5B2E8C]">
+            {veiculosMonitorados}
+          </p>
+          <p className="text-xs text-[#8A8B95] mt-1">monitorado{veiculosMonitorados > 1 ? 's' : ''}</p>
+        </div>
+      </div>
+
+      {/* Card de pendências */}
+      <Card className="border border-[#DCDDE3]">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl text-[#000000] flex items-center gap-2">
-              <Car className="h-6 w-6 text-[#00B4D8]" />
-              Pendências Selecionadas
+            <CardTitle className="text-lg sm:text-xl text-[#1A1B23] flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-[#C77700]" />
+              Passagens a pagar
             </CardTitle>
-            <Button 
+            <Button
               onClick={handleProsseguir}
               disabled={debitosSelecionadosResumo.length === 0}
               className={`h-10 sm:h-8 text-xs sm:text-xs px-2 sm:px-3 rounded-md transition-all ${
                 debitosSelecionadosResumo.length > 0
-                  ? 'bg-[#00B4D8] hover:bg-[#0099c7] text-white'
-                  : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                  ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
+                  : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
               }`}
             >
               <ArrowRight className="h-3 w-3 mr-1 hidden sm:inline" />
@@ -346,22 +441,22 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <span className="sm:hidden">Pagar {formatCurrency(calcularValorTotal())}</span>
             </Button>
           </div>
-          <p className="text-[#6C757D] mt-2">
+          <p className="text-[#8A8B95] mt-2">
             Selecione quais débitos deseja pagar agora
           </p>
         </CardHeader>
         
         <CardContent className="space-y-6">
           {/* Adicionar Nova Placa */}
-          <div className="bg-gradient-to-r from-[#F0F9FF] to-[#E8F4FD] border border-[#00B4D8] rounded-lg p-2 sm:p-4">
+          <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-2 sm:p-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex w-6 h-6 sm:w-8 sm:h-8 bg-[#00B4D8] rounded-lg items-center justify-center flex-shrink-0">
+                <div className="hidden sm:flex w-6 h-6 sm:w-8 sm:h-8 bg-[#8B5FFF] rounded-lg items-center justify-center flex-shrink-0">
                   <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[#003566] text-xs sm:text-sm leading-tight">Consultar outra placa</h4>
-                  <p className="text-xs text-[#6C757D] leading-tight hidden sm:block">Adicione débitos de outro veículo ao pagamento</p>
+                  <h4 className="font-semibold text-[#5B2E8C] text-xs sm:text-sm leading-tight">Consultar outra placa</h4>
+                  <p className="text-xs text-[#8A8B95] leading-tight hidden sm:block">Adicione débitos de outro veículo ao pagamento</p>
                 </div>
               </div>
               {!mostrandoFormularioNovaPlaca && (
@@ -369,7 +464,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   variant="outline"
                   size="sm"
                   onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                  className="text-xs h-8 px-2 sm:px-3 border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white flex-shrink-0 w-full sm:w-auto"
+                  className="text-xs h-8 px-2 sm:px-3 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white flex-shrink-0 w-full sm:w-auto"
                 >
                   <Plus className="h-3 w-3 mr-1" />
                   <span className="sm:hidden">Adicionar</span>
@@ -379,7 +474,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </div>
             
             {mostrandoFormularioNovaPlaca && (
-              <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-[#00B4D8]/20">
+              <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-[#8B5FFF]/20">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <input
@@ -394,7 +489,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                         setNovaPlaca(value);
                       }}
                       placeholder="ABC-1234"
-                      className="w-full h-9 sm:h-10 px-3 bg-white border border-[#E0E0E0] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#6C757D] focus:outline-none focus:border-[#00B4D8] focus:ring-1 focus:ring-[#00B4D8]/20"
+                      className="w-full h-9 sm:h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
                       maxLength={8}
                     />
                   </div>
@@ -403,7 +498,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       onClick={buscarDebitosNovaPlaca}
                       disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
                       size="sm"
-                      className="flex-1 sm:flex-none h-9 sm:h-10 px-3 sm:px-4 bg-[#00B4D8] hover:bg-[#0099c7] text-white text-xs"
+                      className="flex-1 sm:flex-none h-9 sm:h-10 px-3 sm:px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
                     >
                       {consultandoNovaPlaca ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
@@ -421,7 +516,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                         setMostrandoFormularioNovaPlaca(false);
                         setNovaPlaca('');
                       }}
-                      className="h-9 sm:h-10 px-2 sm:px-3 border-[#E0E0E0] text-[#6C757D] hover:bg-[#F8F9FA] flex-shrink-0"
+                      className="h-9 sm:h-10 px-2 sm:px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB] flex-shrink-0"
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -429,24 +524,24 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 </div>
                 
                 {resultadoConsultaNovaPlaca && (
-                  <div className="bg-white border border-[#E0E0E0] rounded-lg p-2 sm:p-3">
+                  <div className="bg-white border border-[#DCDDE3] rounded-lg p-2 sm:p-3">
                     {resultadoConsultaNovaPlaca.success ? (
                       <div className="space-y-2">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                           <div className="flex items-center gap-2">
-                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm font-medium text-[#003566] leading-tight">
+                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#0E8B5A] flex-shrink-0" />
+                            <span className="text-xs sm:text-sm font-medium text-[#5B2E8C] leading-tight">
                               {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
                             </span>
                           </div>
-                          <span className="text-xs sm:text-sm font-semibold text-[#00B4D8] sm:text-right">
+                          <span className="text-xs sm:text-sm font-semibold text-[#8B5FFF] sm:text-right">
                             {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
                           </span>
                         </div>
                         <Button
                           onClick={adicionarDebitosNovaPlaca}
                           size="sm"
-                          className="w-full h-8 sm:h-8 bg-[#00B4D8] hover:bg-[#0099c7] text-white text-xs"
+                          className="w-full h-8 sm:h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
                         >
                           <Plus className="h-3 w-3 mr-1" />
                           Adicionar ao pagamento
@@ -454,8 +549,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#6C757D] flex-shrink-0" />
-                        <span className="text-xs sm:text-sm text-[#6C757D] leading-tight">
+                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#8A8B95] flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-[#8A8B95] leading-tight">
                           Nenhuma pendência encontrada para esta placa
                         </span>
                       </div>
@@ -468,11 +563,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
           {/* Filtro por Placa - apenas se houver múltiplas placas */}
           {placasUnicas.length > 1 && (
-            <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-2 sm:p-4">
+            <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-2 sm:p-4">
               <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-[#003566] flex-shrink-0" />
-                  <label className="text-xs sm:text-sm font-medium text-[#003566]">
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-[#5B2E8C] flex-shrink-0" />
+                  <label className="text-xs sm:text-sm font-medium text-[#5B2E8C]">
                     Filtrar por placa
                   </label>
                 </div>
@@ -480,7 +575,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   variant="outline"
                   size="sm"
                   onClick={() => setFiltroExpandido(!filtroExpandido)}
-                  className="h-7 sm:h-8 px-2 sm:px-3 border-[#E0E0E0] text-[#6C757D] hover:bg-white hover:border-[#00B4D8] hover:text-[#00B4D8] transition-all duration-200"
+                  className="h-7 sm:h-8 px-2 sm:px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-white hover:border-[#8B5FFF] hover:text-[#8B5FFF] transition-all duration-200"
                 >
                   {filtroExpandido ? (
                     <>
@@ -499,7 +594,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
                 filtroExpandido ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                <div className="bg-white border border-[#E0E0E0] rounded-lg p-2 sm:p-3 max-h-32 sm:max-h-40 overflow-y-auto">
+                <div className="bg-white border border-[#DCDDE3] rounded-lg p-2 sm:p-3 max-h-32 sm:max-h-40 overflow-y-auto">
                   <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4">
                     <div className="flex items-center space-x-2">
                       <Checkbox 
@@ -555,10 +650,10 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[#003566] text-sm uppercase tracking-wide leading-tight">
+                  <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide leading-tight">
                     {debitosFiltrados.length} Pendência{debitosFiltrados.length > 1 ? 's' : ''} {filtroPlaca.includes('todas') ? 'Disponív' : 'Filtrada'}{debitosFiltrados.length > 1 ? 'eis' : 'el'}
                     {!filtroPlaca.includes('todas') && (
-                      <span className="text-[#00B4D8] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
+                      <span className="text-[#8B5FFF] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
                     )}
                   </h4>
                 </div>
@@ -568,7 +663,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                     variant="outline"
                     size="sm"
                     onClick={todosSelecionados ? desselecionarTodos : selecionarTodos}
-                    className="text-xs h-9 sm:h-8 px-3 border-[#003566] text-[#003566] hover:bg-[#003566] hover:text-white flex-shrink-0"
+                    className="text-xs h-9 sm:h-8 px-3 border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white flex-shrink-0"
                   >
                     {todosSelecionados ? (
                       <>
@@ -595,8 +690,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       key={debito.id} 
                       className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all select-none ${
                         isSelected 
-                          ? 'bg-[#E8F4FD] border-[#00B4D8]' 
-                          : 'bg-[#F8F9FA] border-[#E0E0E0] hover:border-[#00B4D8]'
+                          ? 'bg-[#F4EFFB] border-[#8B5FFF]' 
+                          : 'bg-[#F7F5FB] border-[#DCDDE3] hover:border-[#8B5FFF]'
                       }`}
                     >
                       <Checkbox
@@ -605,39 +700,52 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                         className="mt-1 transition-all duration-200 hover:scale-110 flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-3 mb-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-3 mb-2">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <MapPin className={`h-4 w-4 flex-shrink-0 transition-colors ${
-                              isSelected ? 'text-[#003566]' : 'text-[#00B4D8]'
+                              isSelected ? 'text-[#5B2E8C]' : 'text-[#8B5FFF]'
                             }`} />
                             <h3 className={`font-semibold text-sm sm:text-base leading-tight transition-colors truncate ${
-                              isSelected ? 'text-[#003566]' : 'text-[#000000]'
+                              isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                             }`}>
                               {debito.praca}
                             </h3>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className={`font-bold text-base sm:text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
-                              isSelected ? 'text-[#003566] hover:text-[#002a52]' : 'text-[#00B4D8] hover:text-[#0099c7]'
+                              isSelected ? 'text-[#5B2E8C] hover:text-[#8B5FFF]' : 'text-[#8B5FFF] hover:text-[#7142B8]'
                             }`}>
                               {formatCurrency(debito.valor)}
                             </span>
-                            <Badge className="bg-orange-100 text-orange-800 text-xs flex-shrink-0">
-                              Pendente
-                            </Badge>
+                            {debito.riscoDeMulta ? (
+                              <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Vence em breve</Badge>
+                            ) : (
+                              <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs flex-shrink-0">Pendente</Badge>
+                            )}
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                          <div className="flex items-center gap-2 text-xs sm:text-sm text-[#6C757D]">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                          <div className="flex items-center gap-2 text-xs text-[#8A8B95]">
                             <Calendar className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">
-                              <span className="sm:hidden">{debito.data}</span>
-                              <span className="hidden sm:inline">Data: {debito.data} • Hora: {debito.hora || '14:30'}</span>
-                            </span>
+                            <span>{debito.data} às {debito.hora || '14:30:00'}</span>
+                            {debito.concessionaria && (
+                              <>
+                                <span className="text-[#DCDDE3]">·</span>
+                                <span>{debito.concessionaria}</span>
+                              </>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2 text-xs sm:text-sm text-[#6C757D] flex-shrink-0">
-                            <Car className="h-3 w-3" />
-                            <span>Placa: {debito.placa}</span>
+                          <div className="flex items-center gap-3 text-xs flex-shrink-0">
+                            {debito.prazoVencimento && (
+                              <span className={`flex items-center gap-1 ${debito.riscoDeMulta ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
+                                <Shield className="h-3 w-3" />
+                                Vence: {debito.prazoVencimento}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1 text-[#8A8B95]">
+                              <Car className="h-3 w-3" />
+                              {debito.placa}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -647,16 +755,16 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               </div>
 
               {debitosSelecionadosResumo.length === 0 && (
-                <div className="bg-[#FFF3CD] border border-[#FFEAA7] rounded-lg p-3 sm:p-4 text-center">
-                  <p className="text-xs sm:text-sm text-[#856404] font-medium leading-tight">
+                <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-3 sm:p-4 text-center">
+                  <p className="text-xs sm:text-sm text-[#9A5B00] font-medium leading-tight">
                     Selecione pelo menos uma pendência para continuar
                   </p>
                 </div>
               )}
             </div>
           ) : todosOsDebitos.length > 0 ? (
-            <div className="bg-[#FFF3CD] border border-[#FFEAA7] rounded-lg p-4 text-center">
-              <p className="text-sm text-[#856404] font-medium">
+            <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
+              <p className="text-sm text-[#9A5B00] font-medium">
                 Nenhuma pendência encontrada para {filtroPlaca.includes('todas') ? 'os filtros selecionados' : `a(s) placa(s) "${filtroPlaca.join(', ')}"`}
               </p>
               <Button
@@ -669,23 +777,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               </Button>
             </div>
           ) : (
-            <div className="bg-gradient-to-r from-[#F0F9FF] to-[#E8F4FD] border-2 border-[#00B4D8] rounded-lg p-6">
+            <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border-2 border-[#8B5FFF] rounded-lg p-6">
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-[#00B4D8] rounded-full flex items-center justify-center mx-auto">
+                <div className="w-16 h-16 bg-[#8B5FFF] rounded-full flex items-center justify-center mx-auto">
                   <Car className="h-8 w-8 text-white" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-[#003566]">
+                  <h3 className="text-xl font-bold text-[#5B2E8C]">
                     Nenhum veículo cadastrado
                   </h3>
-                  <p className="text-sm text-[#6C757D] max-w-md mx-auto leading-relaxed">
+                  <p className="text-sm text-[#8A8B95] max-w-md mx-auto leading-relaxed">
                     Para consultar e pagar pendências, você precisa primeiro cadastrar um veículo. 
-                    Vá para a aba <strong className="text-[#003566]">Veículos</strong> e adicione as placas dos seus veículos.
+                    Vá para a aba <strong className="text-[#5B2E8C]">Veículos</strong> e adicione as placas dos seus veículos.
                   </p>
                 </div>
                 <Button
                   onClick={() => setAbaSelecionada('veiculos')}
-                  className="bg-[#00B4D8] hover:bg-[#0099c7] text-white h-12 px-6 font-semibold"
+                  className="bg-[#8B5FFF] hover:bg-[#7142B8] text-white h-12 px-6 font-semibold"
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   Cadastrar meu primeiro veículo
@@ -695,8 +803,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           )}
 
           {/* Total */}
-          <div className="border-t-2 border-[#E0E0E0] pt-6">
-            <div className="bg-[#003566] text-white rounded-lg p-3 sm:p-6">
+          <div className="border-t-2 border-[#DCDDE3] pt-6">
+            <div className="bg-[#5B2E8C] text-white rounded-lg p-3 sm:p-6">
               <div className="flex justify-between items-center mb-1 sm:mb-2">
                 <span className="text-sm sm:text-xl font-semibold">Total a Pagar</span>
                 <span className="text-lg sm:text-3xl font-bold">
@@ -704,7 +812,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 </span>
               </div>
               {todosOsDebitos.length > 0 && (
-                <p className="text-xs sm:text-sm text-[#F8F9FA] opacity-90">
+                <p className="text-xs sm:text-sm text-[#F7F5FB] opacity-90">
                   {debitosSelecionadosResumo.length} de {todosOsDebitos.length} pendência{todosOsDebitos.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
                 </p>
               )}
@@ -718,8 +826,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               disabled={debitosSelecionadosResumo.length === 0}
               className={`w-full h-12 sm:h-14 text-sm sm:text-lg font-semibold rounded-lg transition-all ${
                 debitosSelecionadosResumo.length > 0
-                  ? 'bg-[#00B4D8] hover:bg-[#0099c7] text-white'
-                  : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                  ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
+                  : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
               }`}
             >
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
@@ -728,30 +836,47 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </Button>
           </div>
 
-          {/* Selo de Segurança */}
-          <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-6 mt-6">
-            <div className="flex items-start gap-4">
-              <Shield className="h-6 w-6 text-[#003566] mt-1 flex-shrink-0" />
-              <div>
-                <h4 className="font-semibold text-[#000000] mb-2">
-                  Sua transação está protegida
-                </h4>
-                <ul className="space-y-1 text-sm text-[#6C757D]">
-                  <li>• Ambiente 100% seguro com criptografia SSL</li>
-                  <li>• Não armazenamos dados sensíveis do carto</li>
-                  <li>• Processo auditado e em conformidade com PCI DSS</li>
-                  <li>• Monitoramento anti-fraude 24 horas por dia</li>
-                </ul>
-              </div>
+          {/* Segurança */}
+          <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4 mt-2">
+            <div className="flex items-center gap-3 text-sm text-[#8A8B95]">
+              <Shield className="h-4 w-4 text-[#8B5FFF] flex-shrink-0" />
+              <span>Ambiente seguro · SSL · Conformidade PCI DSS · Antifraude 24h</span>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Feed de atividade recente */}
+      <Card className="border border-[#DCDDE3]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base text-[#5B2E8C] flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Atividade recente
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 pt-0">
+          {atividadeRecente.map((item, i) => (
+            <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${item.bg}`}>
+              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                item.tipo === 'pagamento' ? 'bg-[#0E8B5A]' :
+                item.tipo === 'alerta' ? 'bg-[#C8324A]' : 'bg-[#C77700]'
+              }`} />
+              <div className="flex-1 min-w-0">
+                <p className={`font-medium leading-snug ${item.cor}`}>{item.texto}</p>
+              </div>
+              <span className="text-xs text-[#8A8B95] flex-shrink-0 mt-0.5">{item.data}</span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
     </div>
   );
 
   const renderContent = () => {
     switch (abaSelecionada) {
+      case 'historico':
+        return <HistoricoPagamentos onIrParaPagamento={onIrParaPagamento} />;
       case 'total-pago':
         return <TotalPago dadosUsuario={usuario} />;
       case 'veiculos':
@@ -764,17 +889,17 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] md:pb-0 pb-20">
+    <div className="min-h-screen bg-[#F7F5FB] md:pb-0 pb-20">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#E0E0E0] sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-[#DCDDE3] sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#003566] rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#5B2E8C] rounded-lg flex items-center justify-center flex-shrink-0">
                 <Car className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#003566]">Pedágio Simples</span>
+              <span className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
             </div>
             
             {/* User Info & Actions */}
@@ -782,7 +907,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <div className="flex items-center gap-2">
                 <button
                   onClick={onLogout}
-                  className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA] rounded-lg transition-all duration-200 flex-shrink-0 lg:hidden"
+                  className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB] rounded-lg transition-all duration-200 flex-shrink-0 lg:hidden"
                   title="Sair"
                 >
                   <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -794,7 +919,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="hidden md:flex items-center gap-2 text-[#6C757D] hover:text-[#dc3545] hover:bg-red-50 transition-colors"
+                className="hidden md:flex items-center gap-2 text-[#8A8B95] hover:text-[#C8324A] hover:bg-[#F8D7DD] transition-colors"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden lg:inline">Sair</span>
@@ -804,7 +929,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </div>
         
         {/* Desktop Navigation - Hidden on Mobile */}
-        <div className="hidden md:block bg-white border-t border-[#E0E0E0]">
+        <div className="hidden md:block bg-white border-t border-[#DCDDE3]">
           <div className="px-4 py-3">
             <nav className="flex items-center gap-8">
               {tabs.map((tab) => {
@@ -817,14 +942,14 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                     onClick={() => setAbaSelecionada(tab.id)}
                     className={`relative flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
                       isActive 
-                        ? (tab.hasAlert ? 'bg-gradient-to-r from-[#FF4757] to-[#FF6B7A] text-white shadow-lg' : 'bg-[#003566] text-white shadow-sm')
-                        : (tab.hasAlert ? 'text-[#FF4757] hover:text-[#FF3742] hover:bg-[#FFF5F5]' : 'text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]')
+                        ? (tab.hasAlert ? 'bg-gradient-to-r from-[#C8324A] to-[#E05270] text-white shadow-lg' : 'bg-[#5B2E8C] text-white shadow-sm')
+                        : (tab.hasAlert ? 'text-[#C8324A] hover:text-[#C8324A] hover:bg-[#F8D7DD]' : 'text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]')
                     }`}
                   >
                     <Icon className="h-5 w-5" />
                     <span className="font-medium">{tab.label}</span>
                     {tab.hasAlert && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#FF4757] rounded-full flex items-center justify-center">
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C8324A] rounded-full flex items-center justify-center">
                         <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -842,8 +967,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       </main>
 
       {/* Bottom Navigation - Mobile Only */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E0E0E0] z-50">
-        <div className="grid grid-cols-4 h-16">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DCDDE3] z-50">
+        <div className="grid grid-cols-5 h-16">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = abaSelecionada === tab.id;
@@ -854,14 +979,14 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 onClick={() => setAbaSelecionada(tab.id)}
                 className={`relative flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                   isActive 
-                    ? (tab.hasAlert ? 'text-[#FF4757] bg-[#FF4757]/10' : 'text-[#003566] bg-[#003566]/5')
-                    : (tab.hasAlert ? 'text-[#FF4757] hover:text-[#FF3742] hover:bg-[#FFF5F5]' : 'text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]')
+                    ? (tab.hasAlert ? 'text-[#C8324A] bg-[#C8324A]/10' : 'text-[#5B2E8C] bg-[#5B2E8C]/5')
+                    : (tab.hasAlert ? 'text-[#C8324A] hover:text-[#C8324A] hover:bg-[#F8D7DD]' : 'text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]')
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{tab.label}</span>
+                <Icon className="h-4.5 w-4.5" />
+                <span className="text-[10px] font-medium leading-none">{tab.label}</span>
                 {tab.hasAlert && (
-                  <div className="absolute -top-1 -right-2 w-2.5 h-2.5 bg-[#FF4757] rounded-full"></div>
+                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#C8324A] rounded-full"></div>
                 )}
               </button>
             );
@@ -873,32 +998,32 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       <Dialog open={modalConfirmacaoPlacaAberto} onOpenChange={setModalConfirmacaoPlacaAberto}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl text-[#003566] flex items-center justify-center gap-2">
+            <DialogTitle className="text-center text-xl text-[#5B2E8C] flex items-center justify-center gap-2">
               <Car className="h-6 w-6" />
               Cadastrar Nova Placa
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#6C757D] pt-2">
-              A placa <strong className="text-[#003566]">{novaPlaca}</strong> ainda não está cadastrada em sua conta.
+            <DialogDescription className="text-center text-sm text-[#8A8B95] pt-2">
+              A placa <strong className="text-[#5B2E8C]">{novaPlaca}</strong> ainda não está cadastrada em sua conta.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6 pt-4">
             {/* Informações da placa */}
-            <div className="bg-gradient-to-r from-[#F0F9FF] to-[#E8F4FD] border border-[#00B4D8] rounded-lg p-4">
+            <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#6C757D]">Nova placa</span>
-                  <span className="text-lg font-bold text-[#003566] tracking-wider">{novaPlaca}</span>
+                  <span className="text-sm text-[#8A8B95]">Nova placa</span>
+                  <span className="text-lg font-bold text-[#5B2E8C] tracking-wider">{novaPlaca}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#6C757D]">Pendências encontradas</span>
-                  <span className="text-base font-semibold text-[#00B4D8]">
+                  <span className="text-sm text-[#8A8B95]">Pendências encontradas</span>
+                  <span className="text-base font-semibold text-[#8B5FFF]">
                     {resultadoConsultaNovaPlaca?.quantidade || 0}
                   </span>
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-[#00B4D8]/20">
-                  <span className="text-sm font-medium text-[#003566]">Valor total</span>
-                  <span className="text-lg font-bold text-[#003566]">
+                <div className="flex items-center justify-between pt-2 border-t border-[#8B5FFF]/20">
+                  <span className="text-sm font-medium text-[#5B2E8C]">Valor total</span>
+                  <span className="text-lg font-bold text-[#5B2E8C]">
                     R$ {(resultadoConsultaNovaPlaca?.valorTotal || 0).toFixed(2).replace('.', ',')}
                   </span>
                 </div>
@@ -906,11 +1031,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </div>
 
             {/* Mensagem de confirmação */}
-            <div className="bg-[#FFF3CD] border border-[#FFEAA7] rounded-lg p-4">
+            <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-[#856404] flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 text-[#9A5B00] flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-[#856404] leading-relaxed">
+                  <p className="text-sm text-[#9A5B00] leading-relaxed">
                     Deseja cadastrar esta placa em sua conta e incluir os débitos no pagamento atual?
                   </p>
                 </div>
@@ -924,7 +1049,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               type="button"
               variant="outline"
               onClick={() => setModalConfirmacaoPlacaAberto(false)}
-              className="w-full sm:w-auto border-[#E0E0E0] text-[#6C757D] hover:bg-[#F8F9FA] hover:text-[#003566]"
+              className="w-full sm:w-auto border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB] hover:text-[#5B2E8C]"
             >
               <X className="h-4 w-4 mr-2" />
               Cancelar
@@ -932,7 +1057,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             <Button
               type="button"
               onClick={confirmarCadastroEAdicionar}
-              className="w-full sm:w-auto bg-[#00B4D8] hover:bg-[#0099c7] text-white"
+              className="w-full sm:w-auto bg-[#8B5FFF] hover:bg-[#7142B8] text-white"
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Sim, cadastrar e adicionar

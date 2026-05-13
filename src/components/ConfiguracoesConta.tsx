@@ -1,33 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { AlertasInteligentes } from "./AlertasInteligentes";
+import { AutomacaoPagamentos } from "./AutomacaoPagamentos";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { toast } from "sonner@2.0.3";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Lock, 
-  Bell, 
+import {
+  User,
+  Mail,
+  Phone,
+  Lock,
+  Bell,
   Shield,
-  Trash2,
   Eye,
   EyeOff,
   CheckCircle,
-  AlertTriangle,
-  LogOut,
-  Download,
-  Smartphone,
-  CreditCard,
   Edit,
   MapPin,
   Loader2,
-  XCircle
+  XCircle,
+  Zap
 } from "lucide-react";
 
 interface ConfiguracoesContaProps {
@@ -53,15 +49,6 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
     senhaAtual: '',
     novaSenha: '',
     confirmarSenha: ''
-  });
-
-  const [configuracoes, setConfiguracoes] = useState({
-    notificacaoEmail: true,
-    notificacaoPush: true,
-    notificacaoSMS: false,
-    salvamentoDados: true,
-    confirmacaoPagamento: true,
-    tema: 'claro'
   });
 
   const [mostrarSenhas, setMostrarSenhas] = useState({
@@ -223,7 +210,6 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
     
     // Simular envio por email
     setTimeout(() => {
-      console.log(`Código enviado para ${dadosPessoais.email}: ${codigo}`);
       setEmailValidando(false);
       setCodigoEnviado(true);
       setModalCodigoAberto(true);
@@ -248,8 +234,6 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
     const novoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
     setCodigoCorreto(novoCodigo);
     setCodigoValidacao('');
-    
-    console.log(`Novo código enviado para ${dadosPessoais.email}: ${novoCodigo}`);
     
     // Reiniciar contagem regressiva
     setTempoReenvio(60);
@@ -307,11 +291,11 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
   const handleSalvarPerfil = () => {
     // Validação básica dos campos obrigatórios
     if (!dadosPessoais.nome.trim()) {
-      alert('Nome é obrigatório');
+      toast.error('Nome é obrigatório');
       return;
     }
     if (!dadosPessoais.email.trim()) {
-      alert('E-mail é obrigatório');
+      toast.error('E-mail é obrigatório');
       return;
     }
 
@@ -327,33 +311,20 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
       
       // Se código foi enviado mas não validado ainda
       if (codigoEnviado && codigoValido !== true) {
-        alert('Por favor, valide o novo e-mail com o código enviado.');
+        toast.error('Por favor, valide o novo e-mail com o código enviado.');
         setModalCodigoAberto(true);
         return;
       }
     }
 
-    // Simular atualização do perfil incluindo endereço
-    console.log('Salvando dados do perfil:', {
-      ...dadosPessoais,
-      endereco: {
-        cep: dadosPessoais.cep,
-        endereco: dadosPessoais.endereco,
-        numero: dadosPessoais.numero,
-        bairro: dadosPessoais.bairro,
-        cidade: dadosPessoais.cidade,
-        estado: dadosPessoais.estado
-      }
-    });
-    
     toast.success('✓ Alterações salvas com sucesso!', {
       description: 'Suas informações pessoais foram atualizadas.',
       duration: 5000,
       position: 'top-center',
       style: {
-        background: '#003566',
+        background: '#5B2E8C',
         color: '#ffffff',
-        border: '2px solid #00B4D8',
+        border: '2px solid #8B5FFF',
         fontSize: '16px',
         fontWeight: '500',
       },
@@ -371,25 +342,22 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
 
   const handleAlterarSenha = () => {
     if (senhas.novaSenha !== senhas.confirmarSenha) {
-      alert('Senhas não coincidem');
+      toast.error('Senhas não coincidem');
       return;
     }
     if (senhas.novaSenha.length < 6) {
-      alert('Senha deve ter no mínimo 6 caracteres');
+      toast.error('Senha deve ter no mínimo 6 caracteres');
       return;
     }
-    
-    // Simular alteração de senha
-    console.log('Alterando senha');
-    
+
     toast.success('✓ Senha alterada com sucesso!', {
       description: 'Sua senha foi atualizada com segurança.',
       duration: 5000,
       position: 'top-center',
       style: {
-        background: '#003566',
+        background: '#5B2E8C',
         color: '#ffffff',
-        border: '2px solid #00B4D8',
+        border: '2px solid #8B5FFF',
         fontSize: '16px',
         fontWeight: '500',
       },
@@ -397,33 +365,6 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
     
     setSenhas({ senhaAtual: '', novaSenha: '', confirmarSenha: '' });
     setAlterandoSenha(false);
-  };
-
-  const handleExportarDados = () => {
-    // Simular export de dados
-    const dados = {
-      perfil: dadosPessoais,
-      configuracoes: configuracoes,
-      dataExport: new Date().toISOString()
-    };
-    
-    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'meus-dados-pedagioonline.json';
-    a.click();
-  };
-
-  const handleExcluirConta = () => {
-    const confirmacao = window.confirm(
-      'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.'
-    );
-    if (confirmacao) {
-      // Simular exclusão da conta
-      console.log('Excluindo conta');
-      onLogout();
-    }
   };
 
   return (
@@ -442,7 +383,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
             {/* Avatar responsivo */}
             <div className="flex-shrink-0">
               <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-                <AvatarFallback className="bg-[#003566]/10 text-[#003566] text-lg sm:text-xl">
+                <AvatarFallback className="bg-[#5B2E8C]/10 text-[#5B2E8C] text-lg sm:text-xl">
                   {getInitials(dadosPessoais.nome)}
                 </AvatarFallback>
               </Avatar>
@@ -452,8 +393,8 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
             <div className="flex-1 w-full min-w-0 text-center sm:text-left">
               {/* Nome e badge */}
               <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <h3 className="text-lg sm:text-xl font-bold text-[#000000] leading-tight">{dadosPessoais.nome}</h3>
-                <Badge variant="default" className="text-xs bg-[#28A745] text-white">
+                <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23] leading-tight">{dadosPessoais.nome}</h3>
+                <Badge variant="default" className="text-xs bg-[#0E8B5A] text-white">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Verificado
                 </Badge>
@@ -462,33 +403,33 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
               {/* Grid de informações responsivo */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
                 {/* Email */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F8F9FA] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <Mail className="h-4 w-4 text-[#6C757D] flex-shrink-0" />
-                  <span className="text-[#000000] truncate">{dadosPessoais.email}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
+                  <Mail className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                  <span className="text-[#1A1B23] truncate">{dadosPessoais.email}</span>
                 </div>
                 
                 {/* Telefone */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F8F9FA] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <Phone className="h-4 w-4 text-[#6C757D] flex-shrink-0" />
-                  <span className="text-[#000000]">{dadosPessoais.telefone}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
+                  <Phone className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                  <span className="text-[#1A1B23]">{dadosPessoais.telefone}</span>
                 </div>
                 
                 {/* CPF */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F8F9FA] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <User className="h-4 w-4 text-[#6C757D] flex-shrink-0" />
-                  <span className="text-[#000000]">CPF: {dadosPessoais.cpf}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
+                  <User className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                  <span className="text-[#1A1B23]">CPF: {dadosPessoais.cpf}</span>
                 </div>
                 
                 {/* Localização */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F8F9FA] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <MapPin className="h-4 w-4 text-[#6C757D] flex-shrink-0" />
-                  <span className="text-[#000000] truncate">{dadosPessoais.cidade}, {dadosPessoais.estado}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
+                  <MapPin className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                  <span className="text-[#1A1B23] truncate">{dadosPessoais.cidade}, {dadosPessoais.estado}</span>
                 </div>
                 
                 {/* Membro desde - ocupa toda a largura */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F8F9FA] sm:bg-transparent rounded-lg sm:rounded-none sm:col-span-2">
-                  <Shield className="h-4 w-4 text-[#6C757D] flex-shrink-0" />
-                  <span className="text-[#000000]">Membro desde: 16/10/2024</span>
+                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none sm:col-span-2">
+                  <Shield className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                  <span className="text-[#1A1B23]">Membro desde: 16/10/2024</span>
                 </div>
               </div>
             </div>
@@ -531,24 +472,24 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                   disabled={!editandoPerfil}
                   className={`pr-12 ${
                     dadosPessoais.email !== emailOriginal ? (
-                      emailValido === true ? 'border-green-500' : 
-                      emailValido === false ? 'border-red-500' : ''
+                      emailValido === true ? 'border-[#0E8B5A]' : 
+                      emailValido === false ? 'border-[#C8324A]' : ''
                     ) : ''
                   }`}
                 />
                 {dadosPessoais.email !== emailOriginal && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     {emailValidando && (
-                      <Loader2 className="h-5 w-5 animate-spin text-[#003566]" />
+                      <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
                     )}
                     {!emailValidando && emailValido === true && !codigoEnviado && (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                     )}
                     {!emailValidando && codigoValido === true && (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                     )}
                     {!emailValidando && emailValido === false && (
-                      <XCircle className="h-5 w-5 text-red-500" />
+                      <XCircle className="h-5 w-5 text-[#C8324A]" />
                     )}
                   </div>
                 )}
@@ -557,7 +498,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                 <>
                   {emailValido === true && !codigoEnviado && !emailValidando && (
                     <>
-                      <p className="text-sm text-green-600 flex items-center gap-1">
+                      <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                         <CheckCircle className="h-4 w-4" />
                         E-mail válido
                       </p>
@@ -565,7 +506,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                         type="button"
                         onClick={enviarCodigoValidacao}
                         disabled={emailValidando}
-                        className="w-full bg-[#003566] hover:bg-[#002a52] text-white mt-2"
+                        className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white mt-2"
                       >
                         {emailValidando ? (
                           <>
@@ -582,25 +523,25 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                     </>
                   )}
                   {codigoEnviado && codigoValido !== true && (
-                    <p className="text-sm text-[#00B4D8] flex items-center gap-1">
+                    <p className="text-sm text-[#8B5FFF] flex items-center gap-1">
                       <Mail className="h-4 w-4" />
                       Código enviado! Verifique seu e-mail.
                     </p>
                   )}
                   {codigoValido === true && (
-                    <p className="text-sm text-green-600 flex items-center gap-1">
+                    <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                       <CheckCircle className="h-4 w-4" />
                       E-mail validado com código
                     </p>
                   )}
                   {emailValidando && (
-                    <p className="text-sm text-[#6C757D] flex items-center gap-1">
+                    <p className="text-sm text-[#8A8B95] flex items-center gap-1">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Verificando e-mail...
                     </p>
                   )}
                   {emailValido === false && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="text-sm text-[#C8324A] flex items-center gap-1">
                       <XCircle className="h-4 w-4" />
                       E-mail inválido
                     </p>
@@ -635,7 +576,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                 disabled={true} // CPF não pode ser alterado
                 maxLength={14}
               />
-              <p className="text-xs text-gray-500">CPF não pode ser alterado por questões de segurança</p>
+              <p className="text-xs text-[#8A8B95]">CPF não pode ser alterado por questões de segurança</p>
             </div>
           </div>
           
@@ -690,7 +631,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                 />
                 {consultandoCEP && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5B2E8C]"></div>
                   </div>
                 )}
               </div>
@@ -865,9 +806,9 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <h4 className="font-semibold text-blue-900 mb-2">Requisitos da senha:</h4>
-                <ul className="text-sm text-blue-800 space-y-1">
+              <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-3">
+                <h4 className="font-semibold text-[#2E1547] mb-2">Requisitos da senha:</h4>
+                <ul className="text-sm text-[#5B2E8C] space-y-1">
                   <li>• Mínimo de 6 caracteres</li>
                   <li>• Recomendado: use letras, números e símbolos</li>
                   <li>• Evite senhas óbvias ou pessoais</li>
@@ -891,20 +832,41 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
       </Card>
 
       {/* Notificações */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notificações e Alertas
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AlertasInteligentes />
+        </CardContent>
+      </Card>
 
 
-
-
+      {/* Automação de Pagamentos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5" />
+            Automação de Pagamentos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AutomacaoPagamentos />
+        </CardContent>
+      </Card>
 
       {/* Modal para Validação do Código de E-mail */}
       <Dialog open={modalCodigoAberto} onOpenChange={setModalCodigoAberto}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl text-[#003566] flex items-center justify-center gap-2">
+            <DialogTitle className="text-center text-xl text-[#5B2E8C] flex items-center justify-center gap-2">
               <Mail className="h-6 w-6" />
               Validar E-mail
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#6C757D]">
+            <DialogDescription className="text-center text-sm text-[#8A8B95]">
               Digite o código de 6 dígitos que enviamos para o seu e-mail para confirmar seu endereço eletrônico.
             </DialogDescription>
           </DialogHeader>
@@ -912,17 +874,17 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
           <div className="space-y-6 pt-4">
             {/* Informação do e-mail */}
             <div className="text-center space-y-2">
-              <p className="text-sm text-[#6C757D]">
+              <p className="text-sm text-[#8A8B95]">
                 Enviamos um código de 6 dígitos para
               </p>
-              <p className="text-base font-medium text-[#003566]">
+              <p className="text-base font-medium text-[#5B2E8C]">
                 {dadosPessoais.email}
               </p>
             </div>
 
             {/* Campo do código */}
             <div className="space-y-3">
-              <Label htmlFor="codigoModal" className="text-[#000000] text-center block">
+              <Label htmlFor="codigoModal" className="text-[#1A1B23] text-center block">
                 Digite o código de verificação
               </Label>
               <div className="relative">
@@ -956,43 +918,43 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                       }, 1000);
                     }
                   }}
-                  className={`text-xl py-4 text-center tracking-[0.5rem] font-mono border-2 focus:border-[#003566] focus:ring-[#003566] ${
-                    codigoValido === true ? 'border-green-500' : 
-                    codigoValido === false ? 'border-red-500' : 'border-[#E0E0E0]'
+                  className={`text-xl py-4 text-center tracking-[0.5rem] font-mono border-2 focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                    codigoValido === true ? 'border-[#0E8B5A]' : 
+                    codigoValido === false ? 'border-[#C8324A]' : 'border-[#DCDDE3]'
                   }`}
                   maxLength={6}
                   autoFocus
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   {validandoCodigo && (
-                    <Loader2 className="h-5 w-5 animate-spin text-[#003566]" />
+                    <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
                   )}
                   {!validandoCodigo && codigoValido === true && (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                   )}
                   {!validandoCodigo && codigoValido === false && (
-                    <XCircle className="h-5 w-5 text-red-500" />
+                    <XCircle className="h-5 w-5 text-[#C8324A]" />
                   )}
                 </div>
               </div>
               
               {/* Feedback do código */}
               {codigoValido === false && (
-                <p className="text-sm text-red-600 text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#C8324A] text-center flex items-center justify-center gap-1">
                   <XCircle className="h-4 w-4" />
                   Código inválido. Verifique e tente novamente.
                 </p>
               )}
               
               {codigoValido === true && (
-                <p className="text-sm text-green-600 text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#0E8B5A] text-center flex items-center justify-center gap-1">
                   <CheckCircle className="h-4 w-4" />
                   Código validado com sucesso!
                 </p>
               )}
               
               {validandoCodigo && (
-                <p className="text-sm text-[#6C757D] text-center flex items-center justify-center gap-1">
+                <p className="text-sm text-[#8A8B95] text-center flex items-center justify-center gap-1">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Validando código...
                 </p>
@@ -1001,7 +963,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
 
             {/* Botão de reenvio */}
             <div className="text-center">
-              <p className="text-sm text-[#6C757D] mb-3">
+              <p className="text-sm text-[#8A8B95] mb-3">
                 Não recebeu o código?
               </p>
               <Button
@@ -1009,7 +971,7 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
                 variant="outline"
                 onClick={reenviarCodigoDoModal}
                 disabled={tempoReenvio > 0}
-                className={`border-[#003566] text-[#003566] hover:bg-[#003566] hover:text-white ${
+                className={`border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white ${
                   tempoReenvio > 0 ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -1019,10 +981,10 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
 
             {/* Botão de fechar - só aparece se o código foi validado */}
             {codigoValido === true && (
-              <div className="pt-4 border-t border-[#F8F9FA]">
+              <div className="pt-4 border-t border-[#F7F5FB]">
                 <Button
                   onClick={() => setModalCodigoAberto(false)}
-                  className="w-full bg-[#003566] hover:bg-[#002a52] text-white py-3"
+                  className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-3"
                 >
                   <CheckCircle className="h-5 w-5 mr-2" />
                   Continuar

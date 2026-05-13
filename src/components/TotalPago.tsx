@@ -32,7 +32,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '1',
       data: '15/01/2025',
-      hora: '14:20',
+      hora: '14:20:00',
       valor: 28.10,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -47,7 +47,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '2',
       data: '12/01/2025',
-      hora: '09:45',
+      hora: '09:45:00',
       valor: 12.50,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -60,7 +60,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '3',
       data: '08/01/2025',
-      hora: '16:30',
+      hora: '16:30:00',
       valor: 22.10,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -75,7 +75,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '4',
       data: '05/01/2025',
-      hora: '11:15',
+      hora: '11:15:00',
       valor: 15.40,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -88,7 +88,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '5',
       data: '28/12/2024',
-      hora: '13:55',
+      hora: '13:55:00',
       valor: 9.80,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -101,7 +101,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     {
       id: '6',
       data: '22/12/2024',
-      hora: '18:40',
+      hora: '18:40:00',
       valor: 7.20,
       metodo: 'PIX',
       status: 'Aprovado',
@@ -301,24 +301,24 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header da Página */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-semibold text-[#003566]">Total Pago</h1>
-        <p className="text-[#6C757D]">Acompanhe seu histórico de pagamentos e estatísticas</p>
+        <h1 className="text-3xl font-semibold text-[#5B2E8C]">Total Pago</h1>
+        <p className="text-[#8A8B95]">Acompanhe seu histórico de pagamentos e estatísticas</p>
       </div>
 
       {/* Cards de Estatísticas */}
       <div className="grid grid-cols-1 gap-3 sm:gap-4">
         {/* Total Gasto */}
-        <Card className="relative overflow-hidden border border-[#E0E0E0] shadow-sm">
+        <Card className="relative overflow-hidden border border-[#DCDDE3] shadow-sm">
           <CardContent className="p-3 sm:p-6">
-            <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-[#00B4D8] opacity-10 rounded-full -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-[#8B5FFF] opacity-10 rounded-full -mr-6 sm:-mr-8 -mt-6 sm:-mt-8"></div>
             <div className="relative z-10">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00B4D8] rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B5FFF] rounded-lg flex items-center justify-center flex-shrink-0">
                   <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm text-[#6C757D] leading-tight">Total Pago</p>
-                  <p className="text-lg sm:text-2xl font-bold text-[#003566] leading-tight mt-1">
+                  <p className="text-xs sm:text-sm text-[#8A8B95] leading-tight">Total Pago</p>
+                  <p className="text-lg sm:text-2xl font-bold text-[#5B2E8C] leading-tight mt-1">
                     R$ {totalPago.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
@@ -341,12 +341,12 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-[#003566]">Histórico de Pagamentos</h2>
+            <h2 className="text-xl font-semibold text-[#5B2E8C]">Histórico de Pagamentos</h2>
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white"
+                className="border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white"
                 onClick={() => {
                   // Gerar e baixar PDF com os dados dos pagamentos
                   const { jsPDF } = require('jspdf');
@@ -354,7 +354,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                   
                   // Header do documento
                   doc.setFontSize(20);
-                  doc.setTextColor(0, 53, 102); // Cor #003566
+                  doc.setTextColor(0, 53, 102); // Cor #5B2E8C
                   doc.text('Pedágio Online - Relatório de Pagamentos', 20, 30);
                   
                   // Informações do usuário
@@ -429,13 +429,13 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
           {/* Filtros */}
           <div className="mb-6">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-[#6C757D]" />
+              <Search className="w-4 h-4 absolute left-3 top-3 text-[#8A8B95]" />
               <input
                 type="text"
                 placeholder="Buscar por rodovia, placa ou protocolo..."
                 value={buscaTexto}
                 onChange={(e) => setBuscaTexto(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20"
+                className="w-full pl-10 pr-4 py-2 border border-[#DCDDE3] rounded-lg focus:outline-none focus:border-[#8B5FFF] focus:ring-2 focus:ring-[#8B5FFF]/20"
               />
             </div>
           </div>
@@ -446,29 +446,29 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
               pagamentosFiltrados.map((pagamento) => (
                 <div
                   key={pagamento.id}
-                  className="p-3 sm:p-4 border border-[#E0E0E0] rounded-lg hover:bg-[#F8F9FA] transition-colors"
+                  className="p-3 sm:p-4 border border-[#DCDDE3] rounded-lg hover:bg-[#F7F5FB] transition-colors"
                 >
                   {/* Mobile Layout */}
                   <div className="sm:hidden">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 bg-[#28A745] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 bg-[#0E8B5A] rounded-lg flex items-center justify-center flex-shrink-0">
                           <CheckCircle className="w-4 h-4 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-[#003566] mb-1 text-sm leading-tight">
+                          <h3 className="font-medium text-[#5B2E8C] mb-1 text-sm leading-tight">
                             {pagamento.passagens.length} {pagamento.passagens.length === 1 ? 'passagem' : 'passagens'}
                           </h3>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="font-semibold text-[#000000] text-sm">
+                        <div className="font-semibold text-[#1A1B23] text-sm">
                           R$ {pagamento.valor.toFixed(2).replace('.', ',')}
                         </div>
                       </div>
                     </div>
                     <div className="ml-11 space-y-2">
-                      <div className="flex flex-col gap-1 text-xs text-[#6C757D]">
+                      <div className="flex flex-col gap-1 text-xs text-[#8A8B95]">
                         <span>{pagamento.data} às {pagamento.hora}</span>
                         <span>
                           {pagamento.placas.length === 1 
@@ -481,13 +481,13 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                         <Badge 
                           variant="outline" 
                           className={`text-xs w-fit ${pagamento.metodo === 'PIX' ? 
-                            'bg-[#E8F5E8] text-[#28A745] border-[#28A745]' : 
-                            'bg-[#E3F2FD] text-[#1976D2] border-[#1976D2]'
+                            'bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A]' : 
+                            'bg-[#F4EFFB] text-[#5B2E8C] border-[#5B2E8C]'
                           }`}
                         >
                           {pagamento.metodo}
                         </Badge>
-                        <div className="text-xs text-[#6C757D] text-right">
+                        <div className="text-xs text-[#8A8B95] text-right">
                           {pagamento.protocolo}
                         </div>
                       </div>
@@ -495,7 +495,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                         size="sm"
                         variant="outline"
                         onClick={() => setComprovanteAberto(pagamento)}
-                        className="w-full mt-2 border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white"
+                        className="w-full mt-2 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white"
                       >
                         <Eye className="w-3 h-3 mr-2" />
                         Ver Comprovante
@@ -506,14 +506,14 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                   {/* Desktop Layout */}
                   <div className="hidden sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="w-12 h-12 bg-[#28A745] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-[#0E8B5A] rounded-lg flex items-center justify-center flex-shrink-0">
                         <CheckCircle className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-[#003566] mb-1 text-base leading-tight">
+                        <h3 className="font-medium text-[#5B2E8C] mb-1 text-base leading-tight">
                           {pagamento.passagens.length} {pagamento.passagens.length === 1 ? 'passagem quitada' : 'passagens quitadas'}
                         </h3>
-                        <div className="flex items-center gap-4 text-sm text-[#6C757D]">
+                        <div className="flex items-center gap-4 text-sm text-[#8A8B95]">
                           <span className="whitespace-nowrap">{pagamento.data} às {pagamento.hora}</span>
                           <span className="whitespace-nowrap">
                             {pagamento.placas.length === 1 
@@ -524,8 +524,8 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                           <Badge 
                             variant="outline" 
                             className={`text-xs ${pagamento.metodo === 'PIX' ? 
-                              'bg-[#E8F5E8] text-[#28A745] border-[#28A745]' : 
-                              'bg-[#E3F2FD] text-[#1976D2] border-[#1976D2]'
+                              'bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A]' : 
+                              'bg-[#F4EFFB] text-[#5B2E8C] border-[#5B2E8C]'
                             }`}
                           >
                             {pagamento.metodo}
@@ -536,10 +536,10 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                     
                     <div className="flex items-center gap-3">
                       <div className="text-right flex-shrink-0">
-                        <div className="font-semibold text-[#000000] mb-1 text-base">
+                        <div className="font-semibold text-[#1A1B23] mb-1 text-base">
                           R$ {pagamento.valor.toFixed(2).replace('.', ',')}
                         </div>
-                        <div className="text-xs text-[#6C757D]">
+                        <div className="text-xs text-[#8A8B95]">
                           {pagamento.protocolo}
                         </div>
                       </div>
@@ -547,7 +547,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                         size="sm"
                         variant="outline"
                         onClick={() => setComprovanteAberto(pagamento)}
-                        className="border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white"
+                        className="border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white"
                       >
                         <Eye className="w-4 h-4 mr-2" />
                         Ver Comprovante
@@ -558,16 +558,16 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
               ))
             ) : (
               <div className="text-center py-8">
-                <Search className="w-12 h-12 text-[#CCCCCC] mx-auto mb-3" />
-                <p className="text-[#6C757D]">Nenhum pagamento encontrado com os filtros selecionados</p>
+                <Search className="w-12 h-12 text-[#C6C7CF] mx-auto mb-3" />
+                <p className="text-[#8A8B95]">Nenhum pagamento encontrado com os filtros selecionados</p>
               </div>
             )}
           </div>
 
           {/* Paginação (simulada) */}
           {pagamentosFiltrados.length > 0 && (
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-[#E0E0E0]">
-              <p className="text-sm text-[#6C757D]">
+            <div className="flex items-center justify-between mt-6 pt-6 border-t border-[#DCDDE3]">
+              <p className="text-sm text-[#8A8B95]">
                 Mostrando {pagamentosFiltrados.length} de {pagamentosRealizados.length} pagamentos
               </p>
               <div className="flex gap-2">
@@ -587,7 +587,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       <Dialog open={!!comprovanteAberto} onOpenChange={(open) => !open && setComprovanteAberto(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-[#003566]">
+            <DialogTitle className="flex items-center gap-2 text-[#5B2E8C]">
               <FileText className="w-5 h-5" />
               Comprovante de Pagamento
             </DialogTitle>
@@ -599,46 +599,46 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
           {comprovanteAberto && (
             <div className="space-y-6">
               {/* Status do Pagamento */}
-              <div className="text-center p-6 bg-green-50 border border-green-200 rounded-lg">
-                <div className="w-16 h-16 bg-[#28A745] rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-6 bg-[#D4F0E2] border border-[#A3D9BE] rounded-lg">
+                <div className="w-16 h-16 bg-[#0E8B5A] rounded-full flex items-center justify-center mx-auto mb-3">
                   <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-semibold text-[#28A745] mb-1">Pagamento Aprovado</h3>
-                <p className="text-sm text-gray-600">Sua pendência foi quitada com sucesso</p>
+                <h3 className="font-semibold text-[#0E8B5A] mb-1">Pagamento Aprovado</h3>
+                <p className="text-sm text-[#8A8B95]">Sua pendência foi quitada com sucesso</p>
               </div>
 
               {/* Detalhes da Transação */}
               <div className="space-y-4">
-                <h4 className="font-semibold text-[#003566]">Detalhes da Transação</h4>
+                <h4 className="font-semibold text-[#5B2E8C]">Detalhes da Transação</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-[#6C757D] mb-1">Protocolo</p>
-                    <p className="font-medium text-[#000000]">{comprovanteAberto.protocolo}</p>
+                    <p className="text-xs text-[#8A8B95] mb-1">Protocolo</p>
+                    <p className="font-medium text-[#1A1B23]">{comprovanteAberto.protocolo}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#6C757D] mb-1">Data e Hora</p>
-                    <p className="font-medium text-[#000000]">{comprovanteAberto.data} às {comprovanteAberto.hora}</p>
+                    <p className="text-xs text-[#8A8B95] mb-1">Data e Hora</p>
+                    <p className="font-medium text-[#1A1B23]">{comprovanteAberto.data} às {comprovanteAberto.hora}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-xs text-[#6C757D] mb-1">
+                    <p className="text-xs text-[#8A8B95] mb-1">
                       {comprovanteAberto.placas.length === 1 ? 'Placa do Veículo' : 'Placas dos Veículos'}
                     </p>
-                    <p className="font-medium text-[#000000]">{comprovanteAberto.placas.join(', ')}</p>
+                    <p className="font-medium text-[#1A1B23]">{comprovanteAberto.placas.join(', ')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#6C757D] mb-1">Método de Pagamento</p>
+                    <p className="text-xs text-[#8A8B95] mb-1">Método de Pagamento</p>
                     <Badge 
                       variant="outline" 
-                      className="bg-[#E8F5E8] text-[#28A745] border-[#28A745] w-fit"
+                      className="bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A] w-fit"
                     >
                       {comprovanteAberto.metodo}
                     </Badge>
                   </div>
                   <div>
-                    <p className="text-xs text-[#6C757D] mb-1">Status</p>
+                    <p className="text-xs text-[#8A8B95] mb-1">Status</p>
                     <Badge 
                       variant="outline" 
-                      className="bg-[#E8F5E8] text-[#28A745] border-[#28A745] w-fit"
+                      className="bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A] w-fit"
                     >
                       {comprovanteAberto.status}
                     </Badge>
@@ -648,7 +648,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
 
               {/* Passagens Agrupadas por Placa */}
               <div className="space-y-4">
-                <h4 className="font-semibold text-[#003566]">Passagens Quitadas</h4>
+                <h4 className="font-semibold text-[#5B2E8C]">Passagens Quitadas</h4>
                 {(() => {
                   // Agrupar passagens por placa
                   const passagensPorPlaca = comprovanteAberto.passagens.reduce((acc: any, passagem: any) => {
@@ -663,23 +663,23 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                     const subtotal = passagens.reduce((sum: number, p: any) => sum + p.valor, 0);
                     
                     return (
-                      <div key={placa} className="border border-[#E0E0E0] rounded-lg p-4">
+                      <div key={placa} className="border border-[#DCDDE3] rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <Car className="w-4 h-4 text-[#003566]" />
-                            <span className="font-semibold text-[#003566]">{placa}</span>
+                            <Car className="w-4 h-4 text-[#5B2E8C]" />
+                            <span className="font-semibold text-[#5B2E8C]">{placa}</span>
                           </div>
                           {Object.keys(passagensPorPlaca).length > 1 && (
-                            <span className="text-sm text-[#6C757D]">
+                            <span className="text-sm text-[#8A8B95]">
                               Subtotal: R$ {subtotal.toFixed(2).replace('.', ',')}
                             </span>
                           )}
                         </div>
                         <div className="space-y-2">
                           {passagens.map((passagem: any, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between text-sm bg-[#F8F9FA] p-2 rounded">
-                              <span className="text-[#6C757D]">{passagem.rodovia}</span>
-                              <span className="font-medium text-[#000000]">
+                            <div key={idx} className="flex items-center justify-between text-sm bg-[#F7F5FB] p-2 rounded">
+                              <span className="text-[#8A8B95]">{passagem.rodovia}</span>
+                              <span className="font-medium text-[#1A1B23]">
                                 R$ {passagem.valor.toFixed(2).replace('.', ',')}
                               </span>
                             </div>
@@ -692,19 +692,19 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
               </div>
 
               {/* Valor Total */}
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="p-4 bg-[#D4F0E2] border border-[#A3D9BE] rounded-lg">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#003566]">Valor Total Pago</span>
-                  <span className="font-bold text-[#28A745]">
+                  <span className="font-semibold text-[#5B2E8C]">Valor Total Pago</span>
+                  <span className="font-bold text-[#0E8B5A]">
                     R$ {comprovanteAberto.valor.toFixed(2).replace('.', ',')}
                   </span>
                 </div>
               </div>
 
               {/* Avisos */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-xs text-blue-900 mb-2 font-semibold">Avisos Importantes:</p>
-                <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+              <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-4">
+                <p className="text-xs text-[#2E1547] mb-2 font-semibold">Avisos Importantes:</p>
+                <ul className="text-xs text-[#5B2E8C] space-y-1 list-disc list-inside">
                   <li>Este comprovante confirma o pagamento {comprovanteAberto.passagens.length === 1 ? 'da passagem' : 'das passagens'} de pedágio {comprovanteAberto.passagens.length === 1 ? 'listada' : 'listadas'} acima.</li>
                   <li>O pagamento não exclui multas por infrações de trânsito.</li>
                   <li>Guarde este comprovante para seus registros.</li>
@@ -715,7 +715,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
               <div className="flex gap-3">
                 <Button
                   onClick={() => gerarPDFComprovante(comprovanteAberto)}
-                  className="flex-1 bg-[#00B4D8] hover:bg-[#0096B8]"
+                  className="flex-1 bg-[#8B5FFF] hover:bg-[#7142B8]"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Baixar PDF

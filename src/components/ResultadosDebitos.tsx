@@ -2,311 +2,397 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Checkbox } from "./ui/checkbox";
-import { ArrowLeft, CreditCard, Calendar, MapPin, Car, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CreditCard, Calendar, MapPin, Car, AlertTriangle, Shield, Clock, ChevronRight, Radio, Lock, UserPlus, LogIn } from "lucide-react";
 import { useState } from "react";
 
-interface Debito {
+interface PassagemFreeFlow {
   id: string;
-  praca: string;
+  portico: string;
+  rodovia: string;
+  concessionaria: string;
+  sentido: string;
   data: string;
   hora: string;
   valor: number;
-  vencimento: string;
-  status: 'pendente';
+  prazoVencimento: string;
+  riscoDeMulta: boolean;
   placa: string;
 }
 
 interface ResultadosDebitosProps {
   onBack: () => void;
-  onPagar: (debitosSelecionados: Debito[], valorTotal: number) => void;
+  onPagar: (debitosSelecionados: PassagemFreeFlow[], valorTotal: number) => void;
+  onCadastrar: () => void;
+  onLogin: () => void;
   dadosVeiculo: any;
+  isAuthenticated?: boolean;
 }
 
-export function ResultadosDebitos({ onBack, onPagar, dadosVeiculo }: ResultadosDebitosProps) {
-  // Dados mock dos débitos encontrados - todos com status pendente
-  const debitos: Debito[] = [
+export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dadosVeiculo, isAuthenticated = false }: ResultadosDebitosProps) {
+  const placa = dadosVeiculo?.placa || "ABC-1234";
+
+  const passagens: PassagemFreeFlow[] = [
     {
       id: "1",
-      praca: "Praça de Pedágio Via Dutra - KM 142",
-      data: "15/12/2024",
-      hora: "14:30",
-      valor: 8.90,
-      vencimento: "30/12/2024",
-      status: "pendente",
-      placa: dadosVeiculo?.placa || "ABC-1234"
+      portico: "Pórtico Free Flow SP-330 — KM 45",
+      rodovia: "Rod. Anhanguera (SP-330)",
+      concessionaria: "CCR AutoBan",
+      sentido: "Sentido Campinas",
+      data: "14/04/2026",
+      hora: "07:42:00:00",
+      valor: 4.30,
+      prazoVencimento: "14/05/2026",
+      riscoDeMulta: true,
+      placa
     },
     {
-      id: "2", 
-      praca: "Praça de Pedágio Fernão Dias - KM 85",
-      data: "22/12/2024",
-      hora: "09:15",
-      valor: 12.50,
-      vencimento: "06/01/2025",
-      status: "pendente",
-      placa: dadosVeiculo?.placa || "ABC-1234"
+      id: "2",
+      portico: "Pórtico Free Flow SP-021 — KM 18",
+      rodovia: "Rod. Anchieta (SP-021)",
+      concessionaria: "Ecovias",
+      sentido: "Sentido Santos",
+      data: "20/04/2026",
+      hora: "14:15:00:00",
+      valor: 6.80,
+      prazoVencimento: "20/05/2026",
+      riscoDeMulta: false,
+      placa
     },
     {
       id: "3",
-      praca: "Praça de Pedágio Anhanguera - KM 23",
-      data: "28/12/2024",
-      hora: "16:45",
-      valor: 6.70,
-      vencimento: "12/01/2025", 
-      status: "pendente",
-      placa: dadosVeiculo?.placa || "ABC-1234"
+      portico: "Pórtico Free Flow SP-270 — KM 33",
+      rodovia: "Rod. Raposo Tavares (SP-270)",
+      concessionaria: "Arteris",
+      sentido: "Sentido São Paulo",
+      data: "28/04/2026",
+      hora: "18:50:00:00",
+      valor: 5.10,
+      prazoVencimento: "28/05/2026",
+      riscoDeMulta: false,
+      placa
     },
     {
       id: "4",
-      praca: "Praça de Pedágio Imigrantes - KM 58",
-      data: "02/01/2025",
-      hora: "11:20",
-      valor: 15.40,
-      vencimento: "17/01/2025",
-      status: "pendente",
-      placa: "XYZ-9876"
+      portico: "Pórtico Free Flow BR-116 — KM 312",
+      rodovia: "Rodovia Régis Bittencourt (BR-116)",
+      concessionaria: "Arteris",
+      sentido: "Sentido Curitiba",
+      data: "02/05/2026",
+      hora: "10:05:00:00",
+      valor: 9.20,
+      prazoVencimento: "01/06/2026",
+      riscoDeMulta: false,
+      placa
     },
-    {
-      id: "5",
-      praca: "Praça de Pedágio Bandeirantes - KM 72",
-      data: "05/01/2025",
-      hora: "18:10",
-      valor: 9.80,
-      vencimento: "20/01/2025",
-      status: "pendente",
-      placa: "XYZ-9876"
-    },
-    {
-      id: "6",
-      praca: "Praça de Pedágio Castello Branco - KM 34",
-      data: "08/01/2025",
-      hora: "13:45",
-      valor: 7.20,
-      vencimento: "23/01/2025",
-      status: "pendente",
-      placa: "DEF-5555"
-    }
   ];
 
-  // Estado para controlar quais débitos estão selecionados
-  const [debitosSelecionados, setDebitosSelecionados] = useState<string[]>(
-    debitos.map(d => d.id) // Todos selecionados por padrão
-  );
+  const [selecionados, setSelecionados] = useState<string[]>(passagens.map(p => p.id));
 
-  const totalDebitos = debitos.reduce((sum, debito) => sum + debito.valor, 0);
-  
-  // Calcular total dos selecionados
-  const debitosParaPagar = debitos.filter(d => debitosSelecionados.includes(d.id));
-  const totalSelecionado = debitosParaPagar.reduce((sum, debito) => sum + debito.valor, 0);
-  const quantidadeSelecionada = debitosSelecionados.length;
+  const passagensSelecionadas = passagens.filter(p => selecionados.includes(p.id));
+  const totalSelecionado = passagensSelecionadas.reduce((sum, p) => sum + p.valor, 0);
+  const comRiscoDeMulta = passagens.filter(p => p.riscoDeMulta).length;
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString.split('/').reverse().join('-')).toLocaleDateString('pt-BR');
-  };
-
-  // Função para alternar seleção de um débito
-  const toggleDebito = (debitoId: string) => {
-    setDebitosSelecionados(prev => 
-      prev.includes(debitoId) 
-        ? prev.filter(id => id !== debitoId)
-        : [...prev, debitoId]
+  const toggle = (id: string) =>
+    setSelecionados(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
-  };
 
-  // Função para selecionar/desselecionar todos
-  const toggleTodos = () => {
-    if (debitosSelecionados.length === debitos.length) {
-      setDebitosSelecionados([]);
-    } else {
-      setDebitosSelecionados(debitos.map(d => d.id));
-    }
-  };
+  const toggleTodos = () =>
+    setSelecionados(selecionados.length === passagens.length ? [] : passagens.map(p => p.id));
 
-  // Função para prosseguir com pagamento
-  const handlePagar = () => {
-    if (debitosSelecionados.length === 0) return;
-    onPagar(debitosParaPagar, totalSelecionado);
+  const diasAteVencimento = (vencimento: string) => {
+    const [d, m, a] = vencimento.split("/").map(Number);
+    const diff = new Date(a, m - 1, d).getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F5FB] to-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#F8F9FA] sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="flex items-center gap-2 text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Nova consulta
-            </Button>
-            
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#003566] rounded-lg flex items-center justify-center">
-                <Car className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-[#003566]">Pedágio Online</span>
+      <header className="bg-white shadow-sm border-b border-[#F7F5FB] sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="flex items-center gap-2 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Nova consulta
+          </Button>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
+              <Car className="h-5 w-5 text-white" />
             </div>
+            <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
           </div>
         </div>
       </header>
 
-      {/* Conteúdo Principal */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto space-y-8">
-          
-          {/* Título e informações do veículo */}
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-[#000000]">
-              Pendências encontradas
-            </h1>
-            <p className="text-xl text-[#6C757D]">
-              Placa: <span className="font-semibold text-[#003566]">{dadosVeiculo?.placa}</span>
+      <main className="container mx-auto px-4 py-10 max-w-4xl space-y-6">
+
+        {/* Título */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 bg-[#FBE8C5] text-[#9A5B00] border border-[#F4C97A] rounded-full px-4 py-1.5 text-sm font-semibold">
+            <Radio className="h-4 w-4" />
+            Passagens Free Flow detectadas
+          </div>
+          <h1 className="text-3xl font-bold text-[#1A1B23]">
+            {passagens.length} passagem{passagens.length > 1 ? "s" : ""} em pórtico encontrada{passagens.length > 1 ? "s" : ""}
+          </h1>
+          <p className="text-[#8A8B95]">
+            Placa <span className="font-semibold text-[#5B2E8C]">{placa}</span> — veículo sem TAG identificado em pórticos Free Flow
+          </p>
+        </div>
+
+        {/* Alerta de risco de multa */}
+        {comRiscoDeMulta > 0 && (
+          <div className="bg-[#F8D7DD] border border-[#F0A8B5] rounded-lg p-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-[#C8324A] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-[#7D1830]">
+                {comRiscoDeMulta} passagem{comRiscoDeMulta > 1 ? "ns" : ""} próxima{comRiscoDeMulta > 1 ? "s" : ""} do prazo de vencimento
+              </p>
+              <p className="text-sm text-[#A3203B] mt-0.5">
+                Débitos não pagos no prazo se transformam em <strong>multa de evasão de pedágio</strong>. Regularize agora para evitar penalidades.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Cards de resumo */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white border border-[#DCDDE3] rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold text-[#1A1B23]">{passagens.length}</p>
+            <p className="text-xs text-[#8A8B95] uppercase tracking-wide mt-1">Passagens</p>
+          </div>
+          <div className="bg-[#5B2E8C] rounded-lg p-4 text-center">
+            {isAuthenticated ? (
+              <p className="text-2xl font-bold text-white">
+                {formatCurrency(passagens.reduce((s, p) => s + p.valor, 0))}
+              </p>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                <Lock className="h-5 w-5 text-white/60" />
+                <p className="text-xl font-bold text-white/60">R$ ••,••</p>
+              </div>
+            )}
+            <p className="text-xs text-white/70 uppercase tracking-wide mt-1">Total a pagar</p>
+          </div>
+          <div className={`rounded-lg p-4 text-center border ${comRiscoDeMulta > 0 ? "bg-[#F8D7DD] border-[#F0A8B5]" : "bg-[#D4F0E2] border-[#A3D9BE]"}`}>
+            <p className={`text-2xl font-bold ${comRiscoDeMulta > 0 ? "text-[#A3203B]" : "text-[#0A6B45]"}`}>
+              {comRiscoDeMulta > 0 ? comRiscoDeMulta : "0"}
+            </p>
+            <p className={`text-xs uppercase tracking-wide mt-1 ${comRiscoDeMulta > 0 ? "text-[#C8324A]" : "text-[#0E8B5A]"}`}>
+              {comRiscoDeMulta > 0 ? "Risco de multa" : "Sem risco"}
             </p>
           </div>
+        </div>
 
-          {/* Cards de resumo - Grid responsivo */}
-
-
-          {/* Lista de débitos */}
-          <Card className="border border-[#E0E0E0] shadow-lg">
-            <CardHeader className="pb-4">
-              <div className="flex flex-col gap-4">
-                <CardTitle className="text-2xl text-[#000000] flex items-center gap-3">
-                  <CreditCard className="h-6 w-6 text-[#003566]" />
-                  Resumo das suas pendências
-                </CardTitle>
-                
-                {/* Resumo Geral - Apenas quantidade e valor total */}
-                <div className="bg-gradient-to-r from-[#F8F9FA] to-white rounded-lg p-6 border border-[#E0E0E0]">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#FFD60A] rounded-lg flex items-center justify-center">
-                        <Car className="h-6 w-6 text-[#000000]" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-[#6C757D] uppercase tracking-wide">Total de Pendências</p>
-                        <p className="text-2xl font-bold text-[#000000]">{debitos.length}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#003566] rounded-lg flex items-center justify-center">
-                        <CreditCard className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-[#6C757D] uppercase tracking-wide">Valor Total</p>
-                        <p className="text-2xl font-bold text-[#000000]">{formatCurrency(totalDebitos)}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#00B4D8] rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-[#6C757D] uppercase tracking-wide">Status</p>
-                        <p className="text-lg font-semibold text-red-600">Pendente</p>
-                      </div>
-                    </div>
-                  </div>
+        {/* Vista autenticada: lista completa */}
+        {isAuthenticated && (
+          <>
+            <Card className="border border-[#DCDDE3] shadow-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg text-[#1A1B23] flex items-center gap-2">
+                    <Radio className="h-5 w-5 text-[#5B2E8C]" />
+                    Passagens por pórtico Free Flow
+                  </CardTitle>
+                  <button
+                    onClick={toggleTodos}
+                    className="text-sm text-[#5B2E8C] hover:underline font-medium"
+                  >
+                    {selecionados.length === passagens.length ? "Desmarcar todas" : "Selecionar todas"}
+                  </button>
                 </div>
-
-                {/* Aviso sobre privacidade */}
-                <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <Car className="w-5 h-5 text-[#00B4D8] flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-[#000000] mb-1">Resumo Simplificado</h4>
-                      <p className="text-sm text-[#6C757D] leading-relaxed">
-                        Por questões de privacidade, exibimos apenas o <strong>resumo geral</strong> das suas pendências.
-                        Detalhes específicos de localização estarão disponíveis na área logada após o cadastro.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              {/* CTA Pagamento */}
-              <div className="bg-gradient-to-r from-[#F8F9FA] to-white rounded-lg p-6 border border-[#E0E0E0]">
-                <div className="text-center space-y-4">
-                  <h3 className="text-xl font-bold text-[#000000]">
-                    {quantidadeSelecionada > 0 
-                      ? `Pagar ${quantidadeSelecionada} pendência${quantidadeSelecionada > 1 ? 's' : ''}` 
-                      : 'Selecione o valor para pagar'
-                    }
-                  </h3>
-                  
-                  <p className="text-[#6C757D] max-w-2xl mx-auto">
-                    {quantidadeSelecionada > 0 ? (
-                      <>
-                        Para prosseguir com o pagamento, você precisa fazer um cadastro rápido em nossa plataforma.
-                        <br />
-                        <strong>É rápido, seguro e sem taxa adicional!</strong>
-                      </>
-                    ) : (
-                      <>
-                        Escolha se deseja pagar o valor total ou apenas parte das suas pendências.
-                        Você terá flexibilidade total no processo de pagamento.
-                      </>
-                    )}
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                    <Button 
-                      size="lg" 
-                      onClick={handlePagar}
-                      disabled={quantidadeSelecionada === 0}
-                      className={`px-8 py-4 text-lg rounded-lg font-medium transition-colors ${
-                        quantidadeSelecionada === 0 
-                          ? 'opacity-50 cursor-not-allowed bg-[#6C757D]' 
-                          : 'bg-[#003566] hover:bg-[#002a52] text-white'
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {passagens.map((p) => {
+                  const selecionado = selecionados.includes(p.id);
+                  const dias = diasAteVencimento(p.prazoVencimento);
+                  const urgente = dias <= 7;
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => toggle(p.id)}
+                      className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        selecionado
+                          ? "bg-[#F4EFFB] border-[#5B2E8C]"
+                          : "bg-white border-[#DCDDE3] hover:border-[#5B2E8C]/40"
                       }`}
                     >
-                      <CreditCard className="h-5 w-5 mr-2" />
-                      {quantidadeSelecionada > 0 
-                        ? `Pagar ${formatCurrency(totalSelecionado)}` 
-                        : 'Selecione valor para pagar'
-                      }
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="lg"
-                      onClick={onBack}
-                      className="px-8 py-4 text-lg border-[#6C757D] text-[#6C757D] hover:bg-[#F8F9FA] rounded-lg font-medium transition-colors"
-                    >
-                      Consultar outro veículo
-                    </Button>
-                  </div>
-                  
-                  {/* Informação adicional */}
-                  {quantidadeSelecionada > 0 && quantidadeSelecionada < debitos.length && (
-                    <div className="mt-4 p-4 bg-[#00B4D8] text-white rounded-lg">
-                      <p className="text-sm">
-                        💡 <strong>Dica:</strong> Você está pagando {quantidadeSelecionada} de {debitos.length} pendências. 
-                        As pendências não pagas continuarão disponíveis para pagamento posterior.
+                      <Checkbox
+                        checked={selecionado}
+                        onCheckedChange={() => toggle(p.id)}
+                        className="mt-1 flex-shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-[#5B2E8C] text-sm truncate">{p.portico}</span>
+                              {p.riscoDeMulta && (
+                                <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Próx. venc.</Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 text-xs text-[#8A8B95]">
+                              <MapPin className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">{p.rodovia} · {p.sentido}</span>
+                            </div>
+                            <div className="flex items-center gap-3 mt-1 text-xs text-[#8A8B95]">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {p.data} às {p.hora}
+                              </span>
+                              <span className="text-[#8A8B95]">·</span>
+                              <span>{p.concessionaria}</span>
+                            </div>
+                          </div>
+                          <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-1 flex-shrink-0">
+                            <span className={`font-bold text-lg ${selecionado ? "text-[#5B2E8C]" : "text-[#8B5FFF]"}`}>
+                              {formatCurrency(p.valor)}
+                            </span>
+                            <div className={`flex items-center gap-1 text-xs ${urgente ? "text-[#C8324A] font-medium" : "text-[#8A8B95]"}`}>
+                              <Clock className="h-3 w-3" />
+                              <span>Vence {p.prazoVencimento}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            <div className="bg-white border border-[#DCDDE3] rounded-lg p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-[#1A1B23] text-lg">
+                    {selecionados.length > 0
+                      ? `${selecionados.length} passagem${selecionados.length > 1 ? "ns" : ""} selecionada${selecionados.length > 1 ? "s" : ""}`
+                      : "Selecione as passagens para pagar"}
+                  </p>
+                  <p className="text-sm text-[#8A8B95]">
+                    Sem taxa adicional · Quitação em tempo real
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-[#5B2E8C]">{formatCurrency(totalSelecionado)}</p>
+                  <p className="text-xs text-[#8A8B95]">valor a pagar</p>
+                </div>
+              </div>
+
+              <Button
+                size="lg"
+                onClick={() => onPagar(passagensSelecionadas, totalSelecionado)}
+                disabled={selecionados.length === 0}
+                className={`w-full h-14 text-base font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  selecionados.length > 0
+                    ? "bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white"
+                    : "bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed"
+                }`}
+              >
+                <CreditCard className="h-5 w-5" />
+                {selecionados.length > 0
+                  ? `Pagar ${formatCurrency(totalSelecionado)} agora`
+                  : "Selecione ao menos uma passagem"}
+                {selecionados.length > 0 && <ChevronRight className="h-5 w-5 ml-1" />}
+              </Button>
+
+              <div className="flex items-center gap-2 text-xs text-[#8A8B95] justify-center">
+                <Shield className="h-3.5 w-3.5" />
+                <span>Pagamento 100% seguro · Sem taxa de serviço · Quitação em tempo real</span>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Vista não autenticada: detalhes bloqueados */}
+        {!isAuthenticated && (
+          <Card className="border border-[#DCDDE3] shadow-sm overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg text-[#1A1B23] flex items-center gap-2">
+                <Radio className="h-5 w-5 text-[#5B2E8C]" />
+                Passagens por pórtico Free Flow
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {/* Blurred rows */}
+              <div className="relative">
+                <div className="space-y-0 divide-y divide-[#ECECF1] px-6 pb-4 select-none pointer-events-none">
+                  {passagens.map((_, i) => (
+                    <div key={i} className="py-4 blur-sm opacity-60">
+                      <div className="flex items-start gap-3">
+                        <div className="w-4 h-4 mt-1 rounded bg-[#DCDDE3] flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="flex justify-between">
+                            <div className="space-y-1.5">
+                              <div className="h-3.5 w-56 bg-[#DCDDE3] rounded" />
+                              <div className="h-2.5 w-40 bg-[#DCDDE3] rounded" />
+                              <div className="h-2.5 w-32 bg-[#DCDDE3] rounded" />
+                            </div>
+                            <div className="space-y-1.5 items-end flex flex-col">
+                              <div className="h-5 w-16 bg-[#DCDDE3] rounded" />
+                              <div className="h-2.5 w-20 bg-[#DCDDE3] rounded" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Lock overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
+                  <div className="text-center space-y-3 px-6">
+                    <div className="w-14 h-14 rounded-full bg-[#5B2E8C] flex items-center justify-center mx-auto shadow-lg">
+                      <Lock className="h-7 w-7 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#5B2E8C] text-base">Detalhes protegidos</p>
+                      <p className="text-sm text-[#8A8B95] mt-1 max-w-xs mx-auto">
+                        Crie uma conta ou faça login para visualizar as passagens e quitar seus débitos.
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
+              </div>
+
+              {/* CTA section */}
+              <div className="px-6 pb-6 pt-4 border-t border-[#ECECF1] space-y-3 bg-[#F7F5FB]">
+                <Button
+                  size="lg"
+                  onClick={onCadastrar}
+                  className="w-full h-12 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="h-5 w-5" />
+                  Criar conta grátis e ver detalhes
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={onLogin}
+                  className="w-full h-12 border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                >
+                  <LogIn className="h-5 w-5" />
+                  Já tenho cadastro — fazer login
+                </Button>
+                <p className="text-xs text-[#8A8B95] text-center flex items-center justify-center gap-1.5">
+                  <Shield className="h-3 w-3" />
+                  Dados protegidos conforme a LGPD · Sem taxa de serviço
+                </p>
               </div>
             </CardContent>
           </Card>
-        </div>
+        )}
+
       </main>
     </div>
   );

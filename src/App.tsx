@@ -22,6 +22,7 @@ import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
 import { PartnerCarousel } from "./components/PartnerCarousel";
+import { LandingBeneficios } from "./components/LandingBeneficios";
 
 type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
 
@@ -137,7 +138,7 @@ export default function App() {
             praca: "Pedágio não identificado",
             valor: 50.00,
             data: "15/03/2026",
-            hora: "14:30",
+            hora: "14:30:00",
             placa: placaTrim
           });
           debitosSimulados.push({
@@ -145,7 +146,7 @@ export default function App() {
             praca: "Pedágio não identificado",
             valor: 50.00,
             data: "16/03/2026",
-            hora: "15:30",
+            hora: "15:30:00",
             placa: placaTrim
           });
         } else if (placaTrim === 'XYZ-5678') {
@@ -155,7 +156,7 @@ export default function App() {
             praca: "Pedágio não identificado",
             valor: 50.00,
             data: "17/03/2026",
-            hora: "16:30",
+            hora: "16:30:00",
             placa: placaTrim
           });
         }
@@ -168,7 +169,7 @@ export default function App() {
         praca: "Pedágio não identificado",
         valor: 89.40,
         data: "15/03/2026",
-        hora: "14:30",
+        hora: "14:30:00",
         placa: placa
       });
     }
@@ -287,7 +288,13 @@ export default function App() {
         <ResultadosDebitos
           onBack={() => setTelaAtual('consulta')}
           onPagar={handleIrParaPagamento}
+          onCadastrar={() => {
+            setPlacaConsultada(dadosVeiculo?.placa || '');
+            setTelaAtual('cadastro');
+          }}
+          onLogin={() => setTelaAtual('login')}
           dadosVeiculo={dadosVeiculo}
+          isAuthenticated={usuarioLogado}
         />
       </>
     );
@@ -396,10 +403,10 @@ export default function App() {
       return (
         <>
           <Toaster />
-          <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
+          <div className="min-h-screen bg-[#F7F5FB] flex items-center justify-center">
             <div className="text-center">
-              <Loader2 className="h-8 w-8 animate-spin text-[#003566] mx-auto mb-4" />
-              <p className="text-[#6C757D]">Carregando dashboard...</p>
+              <Loader2 className="h-8 w-8 animate-spin text-[#5B2E8C] mx-auto mb-4" />
+              <p className="text-[#8A8B95]">Carregando dashboard...</p>
             </div>
           </div>
         </>
@@ -459,21 +466,26 @@ export default function App() {
   // Landing Page (tela padrão)
   const formCard = (
     <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
-      <Card className="bg-white/95 border border-[#E0E0E0] shadow-xl rounded-xl overflow-hidden backdrop-blur-sm">
+      <Card className="bg-white/95 border border-[#DCDDE3] shadow-xl rounded-xl overflow-hidden backdrop-blur-sm">
         <CardContent className="p-4 sm:p-6">
-          {!mostrandoResultados && !carregandoConsulta && (
+          {!mostrandoResultados && (
             <>
-              <div className="mb-4 sm:mb-6 text-center">
-                <h3 className="text-lg sm:text-xl lg:text-2xl text-[#000000] leading-relaxed mb-2">
-                  <strong className="text-[#003566]">Consulte suas pendências</strong> de pedágio
-                  {" "}e <strong className="text-[#003566]">pague com zero complicações</strong>.
+<div className="mb-4 sm:mb-6 text-center">
+                <div className="inline-flex items-center gap-1.5 bg-[#FBE8C5] text-[#9A5B00] border border-[#F4C97A] rounded-full px-3 py-1 text-xs font-semibold mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C77700] animate-pulse" />
+                  Consulta gratuita
+                </div>
+                <h3 className="text-lg sm:text-xl lg:text-2xl text-[#1A1B23] leading-relaxed mb-2">
+                  <strong className="text-[#5B2E8C]">Verifique suas passagens</strong>{" "}
+                  em pórticos Free Flow{" "}
+                  <strong className="text-[#5B2E8C]">e regularize agora</strong>.
                 </h3>
-                <div className="w-12 h-1 bg-[#00B4D8] rounded-full mx-auto" />
+                <div className="w-12 h-1 bg-[#8B5FFF] rounded-full mx-auto" />
               </div>
 
               <div className="mb-4 sm:mb-5">
-                <label htmlFor="hero-placa" className="block text-xs sm:text-sm font-medium text-[#003566] uppercase tracking-wide mb-2 text-center">
-                  Digite sua placa
+                <label htmlFor="hero-placa" className="block text-xs sm:text-sm font-medium text-[#5B2E8C] uppercase tracking-wide mb-2 text-center">
+                  Placa do veículo
                 </label>
                 <input
                   id="hero-placa"
@@ -495,22 +507,22 @@ export default function App() {
                     }
                   }}
                   placeholder="ABC-1234 ou ABC1D23"
-                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white border-2 rounded-xl text-[#000000] text-base sm:text-lg text-center font-semibold tracking-wider placeholder-[#6C757D] focus:outline-none transition-all duration-300 shadow-inner ${
+                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white border-2 rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#8A8B95] focus:outline-none transition-all duration-300 shadow-inner ${
                     placaError
-                      ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50'
+                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/20 bg-[#F8D7DD]'
                       : placaValida
-                        ? 'border-green-500 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 bg-green-50'
-                        : 'border-[#E0E0E0] focus:border-[#003566] focus:ring-2 focus:ring-[#003566]/20'
+                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/20 bg-[#D4F0E2]'
+                        : 'border-[#DCDDE3] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/20'
                   }`}
                   maxLength={8}
                 />
                 {placaError && (
-                  <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center justify-center gap-1">
+                  <p className="text-xs sm:text-sm text-[#C8324A] mt-2 flex items-center justify-center gap-1">
                     <X className="w-4 h-4" />{placaError}
                   </p>
                 )}
                 {placaValida && !placaError && placaValue.length > 0 && (
-                  <p className="text-xs sm:text-sm text-green-600 mt-2 flex items-center justify-center gap-1">
+                  <p className="text-xs sm:text-sm text-[#0E8B5A] mt-2 flex items-center justify-center gap-1">
                     <CheckCircle className="w-4 h-4" />
                     {validarPlaca(placaValue).type === 'antiga' ? 'Placa antiga válida' : 'Placa Mercosul válida'}
                   </p>
@@ -518,11 +530,11 @@ export default function App() {
               </div>
 
               <div className="mb-4 sm:mb-5">
-                <div className="text-xs sm:text-sm text-[#6C757D] leading-relaxed text-center">
+                <div className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed text-center">
                   Ao consultar, você concorda com os{' '}
-                  <a href="#" className="text-[#003566] underline font-medium hover:text-[#002a52] transition-colors">Termos de Uso</a>
+                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Termos de Uso</a>
                   {' '}e o{' '}
-                  <a href="#" className="text-[#003566] underline font-medium hover:text-[#002a52] transition-colors">Aviso de Privacidade</a>.
+                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Aviso de Privacidade</a>.
                 </div>
               </div>
 
@@ -537,96 +549,92 @@ export default function App() {
                 />
               </div>
 
+              {/* #9 — Botão com loading inline */}
               <div className="space-y-3 sm:space-y-4">
                 <Button
                   onClick={handleBuscarDebitos}
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || carregandoConsulta}
                   className={`w-full h-12 sm:h-14 rounded-xl font-semibold text-base sm:text-lg shadow-lg transition-all duration-300 ${
-                    isFormValid
-                      ? 'bg-gradient-to-r from-[#003566] to-[#004080] hover:from-[#002a52] hover:to-[#003566] text-white hover:shadow-xl'
-                      : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                    isFormValid && !carregandoConsulta
+                      ? 'bg-gradient-to-r from-[#5B2E8C] to-[#2E1547] hover:from-[#8B5FFF] hover:to-[#5B2E8C] text-white hover:shadow-xl'
+                      : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                   }`}
                 >
-                  <Car className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Buscar débitos
+                  {carregandoConsulta ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-white border-t-transparent mr-2 flex-shrink-0" />
+                      Consultando...
+                    </>
+                  ) : (
+                    <>
+                      <Car className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                      Consultar passagens Free Flow
+                    </>
+                  )}
                 </Button>
-                <button
-                  onClick={() => setTelaAtual('login')}
-                  className="w-full h-8 sm:h-10 text-[#6C757D] hover:text-[#003566] text-xs sm:text-sm font-medium transition-colors rounded-lg hover:bg-gray-50 text-center"
-                >
-                  Entrar ou se cadastrar
-                </button>
+
+                {/* #2 — Login como link de texto discreto */}
+                {!carregandoConsulta && (
+                  <p className="text-center text-xs text-[#8A8B95]">
+                    Já tem conta?{" "}
+                    <button
+                      onClick={() => setTelaAtual('login')}
+                      className="text-[#5B2E8C] hover:text-[#8B5FFF] font-medium underline underline-offset-2 transition-colors"
+                    >
+                      Entrar
+                    </button>
+                  </p>
+                )}
               </div>
             </>
           )}
 
-          {carregandoConsulta && (
-            <div className="text-center py-8 sm:py-12">
-              <div className="flex flex-col items-center gap-4 sm:gap-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#003566] rounded-full flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-white animate-spin" />
-                </div>
-                <div className="space-y-1 sm:space-y-2">
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#003566]">Consultando pendências...</h3>
-                  <p className="text-xs sm:text-sm text-[#6C757D] px-4">
-                    Buscando débitos para a placa <strong>{placaValue}</strong>
-                  </p>
-                </div>
-                <div className="w-full bg-[#F8F9FA] rounded-full h-2">
-                  <div className="bg-gradient-to-r from-[#003566] to-[#00B4D8] h-2 rounded-full animate-pulse" style={{ width: '60%' }} />
-                </div>
-              </div>
-            </div>
-          )}
-
           {mostrandoResultados && dadosVeiculo && (
             <div className="space-y-4 sm:space-y-6">
-              <div className="pb-3 sm:pb-4 border-b border-[#E0E0E0]">
+              <div className="pb-3 sm:pb-4 border-b border-[#DCDDE3]">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleNovaConsulta}
-                    className="border-[#003566] text-[#003566] hover:bg-[#003566] hover:text-white text-xs sm:text-sm"
+                    className="border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white text-xs sm:text-sm"
                   >
                     <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     Nova consulta
                   </Button>
-                  <div className="flex items-center gap-2 text-[#00B4D8]">
+                  <div className="flex items-center gap-2 text-[#8B5FFF]">
                     <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span className="text-xs sm:text-sm font-medium">Consulta realizada</span>
                   </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-[#003566] text-center">
+                <h3 className="text-base sm:text-lg font-semibold text-[#5B2E8C] text-center">
                   Resultados para placa {dadosVeiculo.placa}
                 </h3>
               </div>
-              <div className="bg-gradient-to-r from-[#E8F4FD] to-[#F0F9FF] border border-[#00B4D8] rounded-lg p-3 sm:p-4">
+              <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-3 sm:p-4">
                 <div className="flex items-start sm:items-center gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00B4D8] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B5FFF] rounded-full flex items-center justify-center flex-shrink-0">
                     <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-[#003566] mb-1 text-sm sm:text-base">6 pendências encontradas</h4>
-                    <p className="text-xs sm:text-sm text-[#6C757D] leading-tight">Para ver os detalhes, faça um cadastro rápido ou acesse sua conta.</p>
+                    <h4 className="font-semibold text-[#5B2E8C] mb-1 text-sm sm:text-base">4 passagens em pórtico encontradas</h4>
+                    <p className="text-xs sm:text-sm text-[#8A8B95] leading-tight">Faça um cadastro rápido para ver os detalhes e pagar antes do prazo.</p>
                   </div>
                 </div>
               </div>
               <Button
                 onClick={() => {
                   const debitosSimulados = [
-                    { id: "1", praca: "Via Dutra - KM 142", valor: 8.90, data: "15/12/2024", hora: "14:30", placa: dadosVeiculo.placa },
-                    { id: "2", praca: "Fernão Dias - KM 85", valor: 12.50, data: "22/12/2024", hora: "09:15", placa: dadosVeiculo.placa },
-                    { id: "3", praca: "Anhanguera - KM 23", valor: 6.70, data: "28/12/2024", hora: "16:45", placa: dadosVeiculo.placa },
-                    { id: "4", praca: "Imigrantes - KM 58", valor: 15.40, data: "02/01/2025", hora: "11:20", placa: "XYZ-9876" },
-                    { id: "5", praca: "Bandeirantes - KM 72", valor: 9.80, data: "05/01/2025", hora: "18:10", placa: "XYZ-9876" },
-                    { id: "6", praca: "Castello Branco - KM 34", valor: 7.20, data: "08/01/2025", hora: "13:45", placa: "DEF-5555" },
+                    { id: "1", praca: "Pórtico Free Flow SP-330 — KM 45", valor: 4.30, data: "14/04/2026", hora: "07:42:00:00", placa: dadosVeiculo.placa },
+                    { id: "2", praca: "Pórtico Free Flow SP-021 — KM 18", valor: 6.80, data: "20/04/2026", hora: "14:15:00:00", placa: dadosVeiculo.placa },
+                    { id: "3", praca: "Pórtico Free Flow SP-270 — KM 33", valor: 5.10, data: "28/04/2026", hora: "18:50:00:00", placa: dadosVeiculo.placa },
+                    { id: "4", praca: "Pórtico Free Flow BR-116 — KM 312", valor: 9.20, data: "02/05/2026", hora: "10:05:00:00", placa: dadosVeiculo.placa },
                   ];
-                  handleIrParaPagamento(debitosSimulados, 60.50);
+                  handleIrParaPagamento(debitosSimulados, 25.40);
                 }}
-                className="w-full h-10 sm:h-12 bg-[#00B4D8] hover:bg-[#0099c7] text-white rounded-lg font-semibold text-sm sm:text-base"
+                className="w-full h-10 sm:h-12 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white rounded-lg font-semibold text-sm sm:text-base"
               >
-                Ver detalhes das pendências
+                Ver passagens e pagar agora
               </Button>
             </div>
           )}
@@ -646,7 +654,6 @@ export default function App() {
           </div>
         }
         navLinks={[
-          { label: "Perguntas frequentes", onClick: () => setTelaAtual('faq') },
           { label: "Acesso Concessionária", onClick: () => setTelaAtual('login-concessionaria') },
         ]}
         topRightAction={
@@ -668,31 +675,35 @@ export default function App() {
         }
         title={
           <>
-            Pendências de pedágio{" "}
-            <span className="text-[#00B4D8]">resolvidas em minutos</span>
+            Passou por um pórtico{" "}
+            <span className="text-[#8B5FFF]">sem TAG?</span>
           </>
         }
-        description="A única plataforma que garante a quitação de suas pendências de pedágio em tempo real, sem burocracia e com zero complicações."
+        description="Regularize suas passagens Free Flow antes que virem multa de evasão. Consulta gratuita por placa — pague em minutos, sem burocracia."
         rightContent={formCard}
-        notice={
-          <div className="bg-[#FFD60A] border-t border-[#e6c109]">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 text-[#000000]">
-                <div className="flex items-center gap-2 text-xs sm:text-sm lg:text-base text-center">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 bg-[#000000] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-[#FFD60A] text-xs font-bold">!</span>
-                  </div>
-                  <span className="font-medium leading-tight">
-                    <strong>Importante:</strong> A quitação de seus débitos não exclui multas por evasão.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+        notice={null}
       />
+      <LandingBeneficios />
       <PartnerCarousel />
       <Footer onNavigateToFAQ={() => setTelaAtual('faq')} />
+
+      {/* #8 — Botão flutuante de suporte */}
+      <a
+        href="#"
+        aria-label="Suporte via WhatsApp"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-0 bg-[#25D366] text-white rounded-full shadow-lg px-3.5 py-3.5 hover:gap-2 transition-all duration-200 group overflow-hidden"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          className="w-5 h-5 flex-shrink-0 fill-white"
+        >
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+        <span className="max-w-0 overflow-hidden group-hover:max-w-[10rem] transition-all duration-200 whitespace-nowrap text-sm font-medium pl-0 group-hover:pl-1">
+          Precisa de ajuda?
+        </span>
+      </a>
     </>
   );
 }

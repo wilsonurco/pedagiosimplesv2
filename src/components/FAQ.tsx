@@ -112,26 +112,26 @@ export function FAQ({ onBack }: FAQProps) {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F5FB] to-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#F8F9FA] sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-[#F7F5FB] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={onBack}
-              className="flex items-center gap-2 text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]"
+              className="flex items-center gap-2 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
             
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#003566] rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
                 <Car className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-semibold text-[#003566]">Pedágio Simples</span>
+              <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
             </div>
           </div>
         </div>
@@ -143,18 +143,18 @@ export function FAQ({ onBack }: FAQProps) {
           
           {/* Título e Introdução */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#003566] text-white rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-6">
               <HelpCircle className="h-4 w-4" />
               <span className="text-sm font-semibold">CENTRAL DE AJUDA</span>
             </div>
-            <h1 className="text-4xl font-bold text-[#000000] mb-4">
+            <h1 className="text-4xl font-bold text-[#1A1B23] mb-4">
               Perguntas Frequentes
             </h1>
 
           </div>
           {/* Consulta Rápida */}
           <div className="mb-12">
-            <Card className="border border-[#00B4D8] bg-gradient-to-r from-[#F8F9FA] to-white shadow-lg">
+            <Card className="border border-[#8B5FFF] bg-gradient-to-r from-[#F7F5FB] to-white shadow-lg">
 
             </Card>
           </div>
@@ -162,14 +162,14 @@ export function FAQ({ onBack }: FAQProps) {
           {/* Lista de Perguntas */}
           <div className="space-y-4">
             {filteredFAQ.length === 0 ? (
-              <Card className="border border-[#E0E0E0] p-8 text-center">
+              <Card className="border border-[#DCDDE3] p-8 text-center">
                 <div className="flex flex-col items-center gap-4">
-                  <Search className="h-12 w-12 text-[#6C757D]" />
+                  <Search className="h-12 w-12 text-[#8A8B95]" />
                   <div>
-                    <h3 className="text-lg font-semibold text-[#000000] mb-2">
+                    <h3 className="text-lg font-semibold text-[#1A1B23] mb-2">
                       Nenhuma pergunta encontrada
                     </h3>
-                    <p className="text-[#6C757D]">
+                    <p className="text-[#8A8B95]">
                       Tente ajustar sua pesquisa ou entrar em contato conosco.
                     </p>
                   </div>
@@ -181,25 +181,25 @@ export function FAQ({ onBack }: FAQProps) {
                 const Icon = item.icon;
                 
                 return (
-                  <Card key={item.id} className="border border-[#E0E0E0] shadow-sm hover:shadow-md transition-all overflow-hidden">
+                  <Card key={item.id} className="border border-[#DCDDE3] shadow-sm hover:shadow-md transition-all overflow-hidden">
                     <button
                       onClick={() => toggleExpanded(item.id)}
-                      className="w-full p-6 text-left hover:bg-[#F8F9FA] transition-colors"
+                      className="w-full p-6 text-left hover:bg-[#F7F5FB] transition-colors"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1">
-                          <div className="w-10 h-10 bg-[#00B4D8] rounded-lg flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 bg-[#8B5FFF] rounded-lg flex items-center justify-center flex-shrink-0">
                             <Icon className="h-5 w-5 text-white" />
                           </div>
-                          <h3 className="text-lg font-semibold text-[#000000] leading-tight">
+                          <h3 className="text-lg font-semibold text-[#1A1B23] leading-tight">
                             {item.question}
                           </h3>
                         </div>
                         <div className="flex-shrink-0">
                           {isExpanded ? (
-                            <ChevronUp className="h-5 w-5 text-[#6C757D]" />
+                            <ChevronUp className="h-5 w-5 text-[#8A8B95]" />
                           ) : (
-                            <ChevronDown className="h-5 w-5 text-[#6C757D]" />
+                            <ChevronDown className="h-5 w-5 text-[#8A8B95]" />
                           )}
                         </div>
                       </div>
@@ -207,8 +207,8 @@ export function FAQ({ onBack }: FAQProps) {
                     
                     {isExpanded && (
                       <CardContent className="px-6 pb-6 pt-0">
-                        <div className="ml-14 border-l-2 border-[#00B4D8] pl-6">
-                          <p className="text-[#000000] leading-relaxed">
+                        <div className="ml-14 border-l-2 border-[#8B5FFF] pl-6">
+                          <p className="text-[#1A1B23] leading-relaxed">
                             {item.answer}
                           </p>
                         </div>
@@ -222,7 +222,7 @@ export function FAQ({ onBack }: FAQProps) {
 
           {/* Seção de Contato */}
           <div className="mt-16">
-            <Card className="bg-[#003566] text-white border-none shadow-lg">
+            <Card className="bg-[#5B2E8C] text-white border-none shadow-lg">
 
             </Card>
           </div>

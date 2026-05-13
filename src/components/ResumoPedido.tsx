@@ -89,7 +89,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
             praca: "Rodovia dos Bandeirantes - KM 45",
             valor: 11.30,
             data: "10/01/2025",
-            hora: "08:15",
+            hora: "08:15:00",
             placa: novaPlaca
           },
           {
@@ -97,7 +97,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
             praca: "Via Anhanguera - KM 67",
             valor: 8.90,
             data: "12/01/2025",
-            hora: "14:22",
+            hora: "14:22:00",
             placa: novaPlaca
           }
         ];
@@ -164,26 +164,26 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#F7F5FB] to-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-[#F8F9FA] sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-[#F7F5FB] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={onBack}
-              className="flex items-center gap-2 text-[#6C757D] hover:text-[#003566] hover:bg-[#F8F9FA]"
+              className="flex items-center gap-2 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
             
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#003566] rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
                 <Car className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-semibold text-[#003566]">Pedágio Online</span>
+              <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Online</span>
             </div>
           </div>
         </div>
@@ -195,39 +195,39 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
           
           {/* Título e Breadcrumb */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#003566] text-white rounded-full px-4 py-2 mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-6">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm font-semibold">RESUMO DO PEDIDO</span>
             </div>
-            <h1 className="text-4xl font-bold text-[#000000] mb-4">
+            <h1 className="text-4xl font-bold text-[#1A1B23] mb-4">
               Revise suas Pendências
             </h1>
 
           </div>
 
           {/* Card Principal */}
-          <Card className="border border-[#E0E0E0] shadow-lg">
+          <Card className="border border-[#DCDDE3] shadow-lg">
             <CardHeader className="pb-6">
-              <CardTitle className="text-2xl text-[#000000] flex items-center gap-2">
-                <Car className="h-6 w-6 text-[#00B4D8]" />
+              <CardTitle className="text-2xl text-[#1A1B23] flex items-center gap-2">
+                <Car className="h-6 w-6 text-[#8B5FFF]" />
                 Pendências Selecionadas
               </CardTitle>
-              <p className="text-[#6C757D] mt-2">
+              <p className="text-[#8A8B95] mt-2">
                 Selecione quais débitos deseja pagar agora
               </p>
             </CardHeader>
             
             <CardContent className="space-y-6">
               {/* Adicionar Nova Placa */}
-              <div className="bg-gradient-to-r from-[#F0F9FF] to-[#E8F4FD] border border-[#00B4D8] rounded-lg p-4">
+              <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#00B4D8] rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-[#8B5FFF] rounded-lg flex items-center justify-center">
                       <Plus className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[#003566] text-sm">Consultar outra placa</h4>
-                      <p className="text-xs text-[#6C757D]">Adicione débitos de outro veículo ao pagamento</p>
+                      <h4 className="font-semibold text-[#5B2E8C] text-sm">Consultar outra placa</h4>
+                      <p className="text-xs text-[#8A8B95]">Adicione débitos de outro veículo ao pagamento</p>
                     </div>
                   </div>
                   {!mostrandoFormularioNovaPlaca && (
@@ -235,7 +235,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                       variant="outline"
                       size="sm"
                       onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                      className="text-xs h-8 px-3 border-[#00B4D8] text-[#00B4D8] hover:bg-[#00B4D8] hover:text-white"
+                      className="text-xs h-8 px-3 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white"
                     >
                       <Plus className="h-3 w-3 mr-1" />
                       Adicionar
@@ -244,7 +244,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                 </div>
                 
                 {mostrandoFormularioNovaPlaca && (
-                  <div className="space-y-3 pt-3 border-t border-[#00B4D8]/20">
+                  <div className="space-y-3 pt-3 border-t border-[#8B5FFF]/20">
                     <div className="flex gap-2">
                       <div className="flex-1">
                         <input
@@ -259,7 +259,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                             setNovaPlaca(value);
                           }}
                           placeholder="ABC-1234"
-                          className="w-full h-10 px-3 bg-white border border-[#E0E0E0] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#6C757D] focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20"
+                          className="w-full h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-2 focus:ring-[#8B5FFF]/20"
                           maxLength={8}
                         />
                       </div>
@@ -267,7 +267,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                         onClick={buscarDebitosNovaPlaca}
                         disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
                         size="sm"
-                        className="h-10 px-4 bg-[#00B4D8] hover:bg-[#0099c7] text-white"
+                        className="h-10 px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white"
                       >
                         {consultandoNovaPlaca ? (
                           <Loader2 className="h-3 w-3 animate-spin" />
@@ -285,31 +285,31 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                           setMostrandoFormularioNovaPlaca(false);
                           setNovaPlaca('');
                         }}
-                        className="h-10 px-3 border-[#E0E0E0] text-[#6C757D] hover:bg-[#F8F9FA]"
+                        className="h-10 px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB]"
                       >
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
                     
                     {resultadoConsultaNovaPlaca && (
-                      <div className="bg-white border border-[#E0E0E0] rounded-lg p-3">
+                      <div className="bg-white border border-[#DCDDE3] rounded-lg p-3">
                         {resultadoConsultaNovaPlaca.success ? (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-green-500" />
-                                <span className="text-sm font-medium text-[#003566]">
+                                <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
+                                <span className="text-sm font-medium text-[#5B2E8C]">
                                   {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
                                 </span>
                               </div>
-                              <span className="text-sm font-semibold text-[#00B4D8]">
+                              <span className="text-sm font-semibold text-[#8B5FFF]">
                                 {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
                               </span>
                             </div>
                             <Button
                               onClick={adicionarDebitosNovaPlaca}
                               size="sm"
-                              className="w-full h-8 bg-[#00B4D8] hover:bg-[#0099c7] text-white text-xs"
+                              className="w-full h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
                             >
                               <Plus className="h-3 w-3 mr-1" />
                               Adicionar ao pagamento
@@ -317,8 +317,8 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <XCircle className="h-4 w-4 text-[#6C757D]" />
-                            <span className="text-sm text-[#6C757D]">
+                            <XCircle className="h-4 w-4 text-[#8A8B95]" />
+                            <span className="text-sm text-[#8A8B95]">
                               Nenhuma pendência encontrada para esta placa
                             </span>
                           </div>
@@ -331,15 +331,15 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
 
               {/* Filtro por Placa - apenas se houver múltiplas placas */}
               {placasUnicas.length > 1 && (
-                <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-4">
+                <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
                   <div className="flex items-center gap-3">
-                    <Filter className="h-4 w-4 text-[#003566] flex-shrink-0" />
+                    <Filter className="h-4 w-4 text-[#5B2E8C] flex-shrink-0" />
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-[#003566] mb-2">
+                      <label className="block text-sm font-medium text-[#5B2E8C] mb-2">
                         Filtrar por placa
                       </label>
                       <Select value={filtroPlaca} onValueChange={setFiltroPlaca}>
-                        <SelectTrigger className="w-full h-10 bg-white border border-[#E0E0E0] text-sm">
+                        <SelectTrigger className="w-full h-10 bg-white border border-[#DCDDE3] text-sm">
                           <SelectValue placeholder="Selecione uma placa" />
                         </SelectTrigger>
                         <SelectContent>
@@ -371,10 +371,10 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               {debitosFiltrados.length > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-[#003566] text-sm uppercase tracking-wide">
+                    <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide">
                       {debitosFiltrados.length} Pendência{debitosFiltrados.length > 1 ? 's' : ''} {filtroPlaca === 'todas' ? 'Disponív' : 'Filtrada'}{debitosFiltrados.length > 1 ? 'eis' : 'el'}
                       {filtroPlaca !== 'todas' && (
-                        <span className="text-[#00B4D8] ml-1">- {filtroPlaca}</span>
+                        <span className="text-[#8B5FFF] ml-1">- {filtroPlaca}</span>
                       )}
                     </h4>
                     {debitosFiltrados.length > 1 && (
@@ -383,7 +383,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                         variant="outline"
                         size="sm"
                         onClick={todosSelecionados ? desselecionarTodos : selecionarTodos}
-                        className="text-xs h-8 px-3 border-[#003566] text-[#003566] hover:bg-[#003566] hover:text-white"
+                        className="text-xs h-8 px-3 border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white"
                       >
                         {todosSelecionados ? (
                           <>
@@ -408,8 +408,8 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                           key={debito.id} 
                           className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all select-none ${
                             isSelected 
-                              ? 'bg-[#E8F4FD] border-[#00B4D8] shadow-sm' 
-                              : 'bg-[#F8F9FA] border-[#E0E0E0] hover:border-[#00B4D8] hover:shadow-sm'
+                              ? 'bg-[#F4EFFB] border-[#8B5FFF] shadow-sm' 
+                              : 'bg-[#F7F5FB] border-[#DCDDE3] hover:border-[#8B5FFF] hover:shadow-sm'
                           }`}
                         >
                           <Checkbox
@@ -421,31 +421,31 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                             <div className="flex justify-between items-start gap-3 mb-3">
                               <div className="flex items-center gap-2">
                                 <MapPin className={`h-4 w-4 flex-shrink-0 transition-colors ${
-                                  isSelected ? 'text-[#003566]' : 'text-[#00B4D8]'
+                                  isSelected ? 'text-[#5B2E8C]' : 'text-[#8B5FFF]'
                                 }`} />
                                 <h3 className={`font-semibold text-base leading-tight transition-colors ${
-                                  isSelected ? 'text-[#003566]' : 'text-[#000000]'
+                                  isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                                 }`}>
                                   {debito.praca}
                                 </h3>
                               </div>
                               <div className="text-right">
                                 <span className={`font-bold text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
-                                  isSelected ? 'text-[#003566] hover:text-[#002a52]' : 'text-[#00B4D8] hover:text-[#0099c7]'
+                                  isSelected ? 'text-[#5B2E8C] hover:text-[#8B5FFF]' : 'text-[#8B5FFF] hover:text-[#7142B8]'
                                 }`}>
                                   {formatCurrency(debito.valor)}
                                 </span>
-                                <Badge className="bg-orange-100 text-orange-800 text-xs ml-2">
+                                <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs ml-2">
                                   Pendente
                                 </Badge>
                               </div>
                             </div>
                             <div className="flex items-center justify-between gap-4">
-                              <div className="flex items-center gap-2 text-sm text-[#6C757D]">
+                              <div className="flex items-center gap-2 text-sm text-[#8A8B95]">
                                 <Calendar className="h-3 w-3" />
-                                <span>Data: 30/09/2025 {debito.data} • Hora: {debito.hora || '14:30'}</span>
+                                <span>Data: 30/09/2025 {debito.data} • Hora: {debito.hora || '14:30:00'}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-[#6C757D]">
+                              <div className="flex items-center gap-2 text-sm text-[#8A8B95]">
                                 <Car className="h-3 w-3" />
                                 <span>Placa: {debito.placa}</span>
                               </div>
@@ -457,16 +457,16 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                   </div>
 
                   {debitosSelecionadosResumo.length === 0 && (
-                    <div className="bg-[#FFF3CD] border border-[#FFEAA7] rounded-lg p-4 text-center">
-                      <p className="text-sm text-[#856404] font-medium">
+                    <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
+                      <p className="text-sm text-[#9A5B00] font-medium">
                         Selecione pelo menos uma pendência para continuar
                       </p>
                     </div>
                   )}
                 </div>
               ) : todosOsDebitos.length > 0 ? (
-                <div className="bg-[#FFF3CD] border border-[#FFEAA7] rounded-lg p-4 text-center">
-                  <p className="text-sm text-[#856404] font-medium">
+                <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
+                  <p className="text-sm text-[#9A5B00] font-medium">
                     Nenhuma pendência encontrada para a placa "{filtroPlaca}"
                   </p>
                   <Button
@@ -479,15 +479,15 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                   </Button>
                 </div>
               ) : (
-                <div className="flex justify-between items-center p-4 bg-[#F8F9FA] rounded-lg border border-[#E0E0E0]">
-                  <span className="text-[#000000] font-medium">Pendências de pedágio</span>
-                  <span className="font-semibold text-[#00B4D8]">{formatCurrency(calcularValorTotal())}</span>
+                <div className="flex justify-between items-center p-4 bg-[#F7F5FB] rounded-lg border border-[#DCDDE3]">
+                  <span className="text-[#1A1B23] font-medium">Pendências de pedágio</span>
+                  <span className="font-semibold text-[#8B5FFF]">{formatCurrency(calcularValorTotal())}</span>
                 </div>
               )}
 
               {/* Total */}
-              <div className="border-t-2 border-[#E0E0E0] pt-6">
-                <div className="bg-[#003566] text-white rounded-lg p-6">
+              <div className="border-t-2 border-[#DCDDE3] pt-6">
+                <div className="bg-[#5B2E8C] text-white rounded-lg p-6">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xl font-semibold">Total a Pagar</span>
                     <span className="text-3xl font-bold">
@@ -495,7 +495,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                     </span>
                   </div>
                   {todosOsDebitos.length > 0 && (
-                    <p className="text-sm text-[#F8F9FA] opacity-90">
+                    <p className="text-sm text-[#F7F5FB] opacity-90">
                       {debitosSelecionadosResumo.length} de {todosOsDebitos.length} pendência{todosOsDebitos.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
                     </p>
                   )}
@@ -509,8 +509,8 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                   disabled={debitosSelecionadosResumo.length === 0}
                   className={`w-full h-14 text-lg font-semibold rounded-lg transition-all ${
                     debitosSelecionadosResumo.length > 0
-                      ? 'bg-[#00B4D8] hover:bg-[#0099c7] text-white hover:shadow-lg'
-                      : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                      ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white hover:shadow-lg'
+                      : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                   }`}
                 >
                   <ArrowRight className="h-5 w-5 mr-3" />
@@ -519,14 +519,14 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               </div>
 
               {/* Selo de Segurança */}
-              <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-6 mt-6">
+              <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-6 mt-6">
                 <div className="flex items-start gap-4">
-                  <Shield className="h-6 w-6 text-[#003566] mt-1 flex-shrink-0" />
+                  <Shield className="h-6 w-6 text-[#5B2E8C] mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-[#000000] mb-2">
+                    <h4 className="font-semibold text-[#1A1B23] mb-2">
                       Sua transação está protegida
                     </h4>
-                    <ul className="space-y-1 text-sm text-[#6C757D]">
+                    <ul className="space-y-1 text-sm text-[#8A8B95]">
                       <li>• Ambiente 100% seguro com criptografia SSL</li>
                       <li>• Não armazenamos dados sensíveis do cartão</li>
                       <li>• Processo auditado e em conformidade com PCI DSS</li>

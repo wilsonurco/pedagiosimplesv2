@@ -110,11 +110,11 @@ export function MetodosPagamento() {
     // Simulando ícones das bandeiras
     const cores = {
       visa: 'bg-blue-600',
-      mastercard: 'bg-red-600', 
+      mastercard: 'bg-[#C8324A]', 
       elo: 'bg-yellow-600',
-      amex: 'bg-green-600'
+      amex: 'bg-[#0E8B5A]'
     };
-    return cores[bandeira as keyof typeof cores] || 'bg-gray-600';
+    return cores[bandeira as keyof typeof cores] || 'bg-[#8A8B95]';
   };
 
   const formatCardNumber = (value: string) => {
@@ -238,12 +238,12 @@ export function MetodosPagamento() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Cartões Salvos</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm text-[#8A8B95]">Cartões Salvos</p>
+                <p className="text-2xl font-bold text-[#5B2E8C]">
                   {cartoesSalvos.filter(c => c.isAtivo).length}
                 </p>
               </div>
-              <CreditCard className="h-8 w-8 text-blue-600" />
+              <CreditCard className="h-8 w-8 text-[#5B2E8C]" />
             </div>
           </CardContent>
         </Card>
@@ -252,12 +252,12 @@ export function MetodosPagamento() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Chaves PIX</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-[#8A8B95]">Chaves PIX</p>
+                <p className="text-2xl font-bold text-[#0E8B5A]">
                   {chavesPix.filter(p => p.isAtivo).length}
                 </p>
               </div>
-              <QrCode className="h-8 w-8 text-green-600" />
+              <QrCode className="h-8 w-8 text-[#0E8B5A]" />
             </div>
           </CardContent>
         </Card>
@@ -288,7 +288,7 @@ export function MetodosPagamento() {
                       
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-gray-900">{cartao.numero}</p>
+                          <p className="font-semibold text-[#1A1B23]">{cartao.numero}</p>
                           {cartao.isPrincipal && (
                             <Badge variant="default" className="text-xs">
                               <Star className="h-3 w-3 mr-1" />
@@ -296,19 +296,19 @@ export function MetodosPagamento() {
                             </Badge>
                           )}
                           {cartao.cobrancaAutomatica && (
-                            <Badge variant="outline" className="text-xs border-blue-200 text-blue-700 bg-blue-50">
+                            <Badge variant="outline" className="text-xs border-[#C9AEEA] text-[#5B2E8C] bg-[#F4EFFB]">
                               <Zap className="h-3 w-3 mr-1" />
                               Cobrança Automática
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">{cartao.nomePortador}</p>
+                        <p className="text-sm text-[#8A8B95]">{cartao.nomePortador}</p>
                         <div className="space-y-1">
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-[#8A8B95]">
                             Válido até {cartao.validade} • Último uso: {new Date(cartao.ultimoUso).toLocaleDateString('pt-BR')}
                           </p>
                           {cartao.cobrancaAutomatica && (
-                            <p className="text-xs text-blue-600 font-medium flex items-center gap-1">
+                            <p className="text-xs text-[#5B2E8C] font-medium flex items-center gap-1">
                               <Zap className="h-3 w-3" />
                               Cobrança automática ativa - Protege contra multas futuras
                             </p>
@@ -345,7 +345,7 @@ export function MetodosPagamento() {
                         variant="outline" 
                         size="sm"
                         onClick={() => handleRemover(cartao.id, 'cartao')}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-[#C8324A] hover:text-[#A3203B]"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -355,11 +355,11 @@ export function MetodosPagamento() {
               ))
             ) : (
               <div className="text-center py-8">
-                <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <CreditCard className="h-12 w-12 text-[#8A8B95] mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-[#1A1B23] mb-2">
                   Nenhum cartão salvo
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-[#8A8B95] mb-4">
                   Adicione um cartão para pagamentos mais rápidos
                 </p>
                 <Button onClick={() => abrirModal('cartao')}>
@@ -384,8 +384,8 @@ export function MetodosPagamento() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
-              <h4 className="font-semibold text-gray-900">Salvamento Automático</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-semibold text-[#1A1B23]">Salvamento Automático</h4>
+              <p className="text-sm text-[#8A8B95]">
                 Salvar automaticamente métodos de pagamento para futuros pagamentos
               </p>
             </div>
@@ -394,8 +394,8 @@ export function MetodosPagamento() {
 
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
-              <h4 className="font-semibold text-gray-900">Confirmação de Pagamento</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-semibold text-[#1A1B23]">Confirmação de Pagamento</h4>
+              <p className="text-sm text-[#8A8B95]">
                 Solicitar confirmação antes de processar pagamentos
               </p>
             </div>
@@ -404,8 +404,8 @@ export function MetodosPagamento() {
 
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
-              <h4 className="font-semibold text-gray-900">Notificações de Transação</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-semibold text-[#1A1B23]">Notificações de Transação</h4>
+              <p className="text-sm text-[#8A8B95]">
                 Receber notificações por email sobre pagamentos realizados
               </p>
             </div>
@@ -414,11 +414,11 @@ export function MetodosPagamento() {
 
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
-              <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Zap className="h-4 w-4 text-blue-600" />
+              <h4 className="font-semibold text-[#1A1B23] flex items-center gap-2">
+                <Zap className="h-4 w-4 text-[#5B2E8C]" />
                 Cobrança Automática
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#8A8B95]">
                 Permitir cobrança automática para pendências futuras de pedágio
               </p>
             </div>
@@ -537,10 +537,10 @@ export function MetodosPagamento() {
                     />
                     <div className="space-y-1">
                       <Label htmlFor="cobranca-automatica" className="text-sm flex items-center gap-1">
-                        <Zap className="h-3 w-3 text-blue-600" />
+                        <Zap className="h-3 w-3 text-[#5B2E8C]" />
                         Cobrança automática para passagens futuras
                       </Label>
-                      <p className="text-xs text-gray-500 leading-tight">
+                      <p className="text-xs text-[#8A8B95] leading-tight">
                         Este cartão será usado automaticamente para quitar pendências de pedágio detectadas no futuro, evitando multas.
                       </p>
                     </div>
@@ -549,14 +549,14 @@ export function MetodosPagamento() {
 
                 {/* Alerta sobre cobrança automática */}
                 {novoCartao.cobrancaAutomatica && (
-                  <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-[#C9AEEA] rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Zap className="h-4 w-4 text-blue-600" />
+                      <div className="w-8 h-8 bg-[#E5D8F5] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Zap className="h-4 w-4 text-[#5B2E8C]" />
                       </div>
                       <div className="space-y-2">
-                        <h5 className="text-sm font-semibold text-blue-900">Como funciona a cobrança automática?</h5>
-                        <ul className="text-xs text-blue-800 space-y-1">
+                        <h5 className="text-sm font-semibold text-[#2E1547]">Como funciona a cobrança automática?</h5>
+                        <ul className="text-xs text-[#5B2E8C] space-y-1">
                           <li>• Monitoramos automaticamente pendências do seu veículo</li>
                           <li>• Cobramos apenas passagens de pedágio válidas</li>
                           <li>• Você recebe notificação antes e após cada cobrança</li>
@@ -568,12 +568,12 @@ export function MetodosPagamento() {
                   </div>
                 )}
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-blue-800">
+                <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-[#5B2E8C]">
                     <Shield className="h-4 w-4" />
                     <span className="text-sm font-semibold">Segurança garantida</span>
                   </div>
-                  <p className="text-xs text-blue-700 mt-1">
+                  <p className="text-xs text-[#5B2E8C] mt-1">
                     Seus dados são criptografados e nunca compartilhados
                   </p>
                 </div>
@@ -643,12 +643,12 @@ export function MetodosPagamento() {
                   </Label>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-green-800">
+                <div className="bg-[#D4F0E2] border border-[#A3D9BE] rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-[#0A6B45]">
                     <CheckCircle className="h-4 w-4" />
                     <span className="text-sm font-semibold">PIX Instantâneo</span>
                   </div>
-                  <p className="text-xs text-green-700 mt-1">
+                  <p className="text-xs text-[#0A6B45] mt-1">
                     Pagamentos processados em segundos, 24h por dia
                   </p>
                 </div>

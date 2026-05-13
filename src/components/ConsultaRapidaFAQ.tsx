@@ -72,7 +72,7 @@ export function ConsultaRapidaFAQ() {
         <div className="space-y-6">
           {/* Campo de Placa */}
           <div>
-            <label className="block text-sm font-medium text-[#003566] uppercase tracking-wide mb-2">
+            <label className="block text-sm font-medium text-[#5B2E8C] uppercase tracking-wide mb-2">
               Digite a placa do veículo
             </label>
             <input
@@ -89,20 +89,20 @@ export function ConsultaRapidaFAQ() {
                 setPlaca(value);
               }}
               placeholder="ABC-1234"
-              className="w-full h-12 px-4 bg-white border-2 border-[#E0E0E0] rounded-lg text-[#000000] text-center font-semibold tracking-wider placeholder-[#6C757D] focus:outline-none focus:border-[#00B4D8] focus:ring-2 focus:ring-[#00B4D8]/20 transition-all"
+              className="w-full h-12 px-4 bg-white border-2 border-[#DCDDE3] rounded-lg text-[#1A1B23] text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-2 focus:ring-[#8B5FFF]/20 transition-all"
               maxLength={8}
             />
           </div>
 
           {/* Captcha */}
           <div>
-            <label className="block text-sm font-medium text-[#003566] uppercase tracking-wide mb-2">
+            <label className="block text-sm font-medium text-[#5B2E8C] uppercase tracking-wide mb-2">
               Verificação de Segurança
             </label>
-            <div className="bg-white border-2 border-[#E0E0E0] rounded-lg shadow-sm overflow-hidden">
-              <div className="relative h-16 bg-gradient-to-r from-gray-50 to-gray-100 flex items-center justify-center">
+            <div className="bg-white border-2 border-[#DCDDE3] rounded-lg shadow-sm overflow-hidden">
+              <div className="relative h-16 bg-gradient-to-r from-[#F7F5FB] to-[#F0EDF8] flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-[#003566] bg-white/90 px-3 py-1 rounded-lg tracking-widest shadow-sm">
+                  <span className="text-lg font-bold text-[#5B2E8C] bg-white/90 px-3 py-1 rounded-lg tracking-widest shadow-sm">
                     {captchaCode}
                   </span>
                 </div>
@@ -117,21 +117,21 @@ export function ConsultaRapidaFAQ() {
                     setCaptchaError('');
                   }}
                   placeholder="Digite o código da imagem"
-                  className={`flex-1 h-10 px-4 text-sm border-r border-[#E0E0E0] focus:outline-none focus:bg-[#F8F9FA] transition-colors ${
-                    captchaError ? 'text-red-600 bg-red-50' : 'text-[#000000]'
+                  className={`flex-1 h-10 px-4 text-sm border-r border-[#DCDDE3] focus:outline-none focus:bg-[#F7F5FB] transition-colors ${
+                    captchaError ? 'text-[#C8324A] bg-[#F8D7DD]' : 'text-[#1A1B23]'
                   }`}
                 />
                 <button 
                   type="button"
                   onClick={generateCaptcha}
-                  className="w-10 h-10 bg-white border-l border-[#E0E0E0] flex items-center justify-center text-[#003566] hover:bg-[#F8F9FA] transition-colors"
+                  className="w-10 h-10 bg-white border-l border-[#DCDDE3] flex items-center justify-center text-[#5B2E8C] hover:bg-[#F7F5FB] transition-colors"
                   title="Gerar novo código">
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
             </div>
             {captchaError && (
-              <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+              <p className="text-sm text-[#C8324A] mt-2 flex items-center gap-1">
                 <X className="w-4 h-4" />
                 {captchaError}
               </p>
@@ -144,8 +144,8 @@ export function ConsultaRapidaFAQ() {
             disabled={!isFormValid || loading}
             className={`w-full h-12 rounded-lg font-semibold transition-all ${
               isFormValid && !loading
-                ? 'bg-[#00B4D8] hover:bg-[#0099c7] text-white'
-                : 'bg-[#CCCCCC] text-[#666666] cursor-not-allowed'
+                ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
+                : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
             }`}
           >
             {loading ? (
@@ -162,12 +162,12 @@ export function ConsultaRapidaFAQ() {
           </Button>
 
           {/* Aviso de Privacidade */}
-          <div className="bg-[#F8F9FA] border border-[#E0E0E0] rounded-lg p-4">
+          <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-[#00B4D8] flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#8B5FFF] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-[#000000] mb-1">Consulta com Privacidade</h4>
-                <p className="text-sm text-[#6C757D] leading-relaxed">
+                <h4 className="font-semibold text-[#1A1B23] mb-1">Consulta com Privacidade</h4>
+                <p className="text-sm text-[#8A8B95] leading-relaxed">
                   Esta consulta mostra apenas um <strong>resumo geral</strong> das suas pendências, 
                   sem revelar localidades específicas ou detalhes das passagens, preservando sua privacidade.
                 </p>
@@ -179,58 +179,58 @@ export function ConsultaRapidaFAQ() {
         /* Resultado da Consulta - Apenas Resumo */
         <div className="space-y-6">
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#00B4D8] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#8B5FFF] rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-[#000000] mb-2">
+            <h3 className="text-xl font-bold text-[#1A1B23] mb-2">
               Consulta Realizada com Sucesso
             </h3>
-            <p className="text-[#6C757D]">
-              Resumo das pendências para a placa <strong className="text-[#003566]">{resultado.placa}</strong>
+            <p className="text-[#8A8B95]">
+              Resumo das pendências para a placa <strong className="text-[#5B2E8C]">{resultado.placa}</strong>
             </p>
           </div>
 
           {/* Resumo das Pendências */}
-          <Card className="border border-[#E0E0E0]">
+          <Card className="border border-[#DCDDE3]">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#FFD60A] rounded-lg flex items-center justify-center">
-                    <AlertCircle className="w-6 h-6 text-[#000000]" />
+                    <AlertCircle className="w-6 h-6 text-[#1A1B23]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6C757D] uppercase tracking-wide">Total de Pendências</p>
-                    <p className="text-2xl font-bold text-[#000000]">{resultado.totalPendencias}</p>
+                    <p className="text-sm text-[#8A8B95] uppercase tracking-wide">Total de Pendências</p>
+                    <p className="text-2xl font-bold text-[#1A1B23]">{resultado.totalPendencias}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#003566] rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
                     <Car className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6C757D] uppercase tracking-wide">Valor Total</p>
-                    <p className="text-2xl font-bold text-[#000000]">R$ {resultado.valorTotal}</p>
+                    <p className="text-sm text-[#8A8B95] uppercase tracking-wide">Valor Total</p>
+                    <p className="text-2xl font-bold text-[#1A1B23]">R$ {resultado.valorTotal}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#6C757D] rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#8A8B95] rounded-lg flex items-center justify-center">
                     <Clock className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6C757D] uppercase tracking-wide">Período</p>
-                    <p className="text-lg font-semibold text-[#000000]">{resultado.periodo}</p>
+                    <p className="text-sm text-[#8A8B95] uppercase tracking-wide">Período</p>
+                    <p className="text-lg font-semibold text-[#1A1B23]">{resultado.periodo}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#FFD60A] rounded-lg flex items-center justify-center">
-                    <AlertCircle className="w-6 h-6 text-[#000000]" />
+                    <AlertCircle className="w-6 h-6 text-[#1A1B23]" />
                   </div>
                   <div>
-                    <p className="text-sm text-[#6C757D] uppercase tracking-wide">Status</p>
-                    <p className="text-lg font-semibold text-red-600">{resultado.status}</p>
+                    <p className="text-sm text-[#8A8B95] uppercase tracking-wide">Status</p>
+                    <p className="text-lg font-semibold text-[#C8324A]">{resultado.status}</p>
                   </div>
                 </div>
               </div>
@@ -240,10 +240,10 @@ export function ConsultaRapidaFAQ() {
           {/* Aviso Importante */}
           <div className="bg-[#FFD60A] border border-[#FFD60A] rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-[#000000] flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-[#1A1B23] flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-[#000000] mb-2">Informações Importantes:</h4>
-                <ul className="text-sm text-[#000000] space-y-1">
+                <h4 className="font-semibold text-[#1A1B23] mb-2">Informações Importantes:</h4>
+                <ul className="text-sm text-[#1A1B23] space-y-1">
                   <li>• Este é apenas um <strong>resumo geral</strong> das suas pendências</li>
                   <li>• Para ver detalhes completos e realizar pagamento, <strong>cadastre-se</strong> em nossa plataforma</li>
                   <li>• Localidades específicas não são exibidas aqui para preservar sua privacidade</li>
@@ -258,12 +258,12 @@ export function ConsultaRapidaFAQ() {
             <Button
               onClick={handleLimpar}
               variant="outline"
-              className="flex-1 border-[#6C757D] text-[#6C757D] hover:bg-[#6C757D] hover:text-white"
+              className="flex-1 border-[#8A8B95] text-[#8A8B95] hover:bg-[#8A8B95] hover:text-white"
             >
               Nova Consulta
             </Button>
             <Button
-              className="flex-1 bg-[#003566] hover:bg-[#002a52] text-white"
+              className="flex-1 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white"
               onClick={() => {
                 // Scroll para o topo da página ou redirecionar para cadastro
                 window.scrollTo({ top: 0, behavior: 'smooth' });
