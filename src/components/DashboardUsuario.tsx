@@ -41,7 +41,7 @@ import { ConfiguracoesConta } from "./ConfiguracoesConta";
 import { TotalPago } from "./TotalPago";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
-import { gerarDebitos, agregarPorTipo, proximoVencimento, type Passagem } from '../utils/simulator';
+import { gerarDebitos, agregarPorTipo, proximoVencimento, filtrarPorTipo, filtrarPorStatus, type Passagem } from '../utils/simulator';
 import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
 
 interface DashboardUsuarioProps {
@@ -72,6 +72,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const [filtroPlaca, setFiltroPlaca] = useState<string[]>(['todas']);
   const [debitosSelecionadosResumo, setDebitosSelecionadosResumo] = useState<string[]>([]);
   const [filtroExpandido, setFiltroExpandido] = useState(false);
+  const [filtroTipo, setFiltroTipo] = useState<'todas' | 'praca_fisica' | 'portico_free_flow'>('todas')
+  const [filtroStatus, setFiltroStatus] = useState<'todas' | 'em_prazo' | 'risco_multa'>('todas')
   const [modalConfirmacaoPlacaAberto, setModalConfirmacaoPlacaAberto] = useState(false);
   const [placasUsuario, setPlacasUsuario] = useState<string[]>(['MOV-1234']); // Placa do usuário logado
   
@@ -120,115 +122,62 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     }
   ]);
 
-  // Mock de pendências Free Flow
-  const pendenciasAtivas: any[] = [
-    {
-      id: 'pend-1',
-      rodovia: 'Pórtico SP-330 — KM 45',
-      concessionaria: 'CCR AutoBan',
-      tipo: 'free-flow',
-      valor: 4.30,
-      data: '14/04/2026',
-      hora: '07:42:00:00',
-      prazoVencimento: '14/05/2026',
-      riscoDeMulta: true,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-2',
-      rodovia: 'Pórtico SP-021 — KM 18',
-      concessionaria: 'Ecovias',
-      tipo: 'free-flow',
-      valor: 6.80,
-      data: '20/04/2026',
-      hora: '14:15:00:00',
-      prazoVencimento: '20/05/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-3',
-      rodovia: 'Pórtico SP-270 — KM 33',
-      concessionaria: 'Arteris',
-      tipo: 'free-flow',
-      valor: 5.10,
-      data: '28/04/2026',
-      hora: '18:50:00:00',
-      prazoVencimento: '28/05/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-4',
-      rodovia: 'Pórtico BR-116 — KM 312',
-      concessionaria: 'Arteris',
-      tipo: 'free-flow',
-      valor: 9.20,
-      data: '02/05/2026',
-      hora: '10:05:00:00',
-      prazoVencimento: '01/06/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    }
-  ];
+  // KPIs consolidados via simulator
+  const passagensTodas: Passagem[] = placasUsuario.flatMap(p => gerarDebitos(p))
+  const agg = agregarPorTipo(passagensTodas)
+  const proximo = proximoVencimento(passagensTodas)
 
-  const totalPendencias = pendenciasAtivas.reduce((acc, pendencia) => acc + pendencia.valor, 0);
-
-  // Dados para o ResumoPedido
-  const todosOsDebitos = pendenciasAtivas.map(p => ({
-    id: p.id,
-    praca: p.rodovia,
-    concessionaria: p.concessionaria,
-    prazoVencimento: p.prazoVencimento,
-    riscoDeMulta: p.riscoDeMulta,
-    valor: p.valor,
-    data: p.data,
-    hora: p.hora,
-    placa: p.placa
-  }));
+  // Lista filtrada e ordenada por prazo (para a seção "Passagens a pagar")
+  const pendentesFiltradas = (() => {
+    let r = passagensTodas
+    if (filtroTipo !== 'todas') r = filtrarPorTipo(r, filtroTipo)
+    if (filtroStatus !== 'todas') r = filtrarPorStatus(r, filtroStatus)
+    return [...r].sort((a, b) => {
+      const [da, ma, ya] = a.prazoLimite.split('/').map(Number)
+      const [db, mb, yb] = b.prazoLimite.split('/').map(Number)
+      return new Date(ya, ma - 1, da).getTime() - new Date(yb, mb - 1, db).getTime()
+    })
+  })()
 
   // Funções para o ResumoPedido
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
   };
 
-  const placasUnicas = [...new Set(todosOsDebitos.map(d => d.placa))];
-  const debitosFiltrados = filtroPlaca.includes('todas') ? todosOsDebitos : todosOsDebitos.filter(d => filtroPlaca.includes(d.placa));
+  const placasUnicas = [...new Set(passagensTodas.map(d => d.placa))];
 
   // Selecionar todas as pendências por padrão ao carregar
   useEffect(() => {
-    if (todosOsDebitos.length > 0 && debitosSelecionadosResumo.length === 0) {
-      setDebitosSelecionadosResumo(todosOsDebitos.map(d => d.id));
+    if (passagensTodas.length > 0 && debitosSelecionadosResumo.length === 0) {
+      setDebitosSelecionadosResumo(passagensTodas.map(d => d.id));
     }
-  }, [todosOsDebitos.length]);
+  }, [passagensTodas.length]);
 
-  // Atualizar seleção quando filtro mudar
+  // Atualizar seleção quando filtros de tipo/status mudarem
   useEffect(() => {
-    if (debitosFiltrados.length > 0) {
-      // Manter apenas os débitos selecionados que ainda estão visíveis no filtro atual
-      const debitosVisiveis = debitosFiltrados.map(d => d.id);
+    if (pendentesFiltradas.length > 0) {
+      const debitosVisiveis = pendentesFiltradas.map(d => d.id);
       const selecaoAtualizada = debitosSelecionadosResumo.filter(id => debitosVisiveis.includes(id));
-      
-      // Se não há débitos selecionados visíveis, selecionar todos os visíveis
-      if (selecaoAtualizada.length === 0 && debitosFiltrados.length > 0) {
+      if (selecaoAtualizada.length === 0) {
         setDebitosSelecionadosResumo(debitosVisiveis);
       } else if (selecaoAtualizada.length !== debitosSelecionadosResumo.length) {
         setDebitosSelecionadosResumo(selecaoAtualizada);
       }
     }
-  }, [filtroPlaca.join(','), debitosFiltrados.length]);
-  const todosSelecionados = debitosFiltrados.length > 0 && debitosFiltrados.every(debito => debitosSelecionadosResumo.includes(debito.id));
+  }, [filtroTipo, filtroStatus, filtroPlaca.join(',')]);
+
+  const todosSelecionados = pendentesFiltradas.length > 0 && pendentesFiltradas.every(debito => debitosSelecionadosResumo.includes(debito.id));
 
   const toggleDebitoSelecionado = (debitoId: string) => {
-    setDebitosSelecionadosResumo(prev => 
-      prev.includes(debitoId) 
+    setDebitosSelecionadosResumo(prev =>
+      prev.includes(debitoId)
         ? prev.filter(id => id !== debitoId)
         : [...prev, debitoId]
     );
   };
 
   const selecionarTodos = () => {
-    setDebitosSelecionadosResumo(debitosFiltrados.map(d => d.id));
+    setDebitosSelecionadosResumo(pendentesFiltradas.map(d => d.id));
   };
 
   const desselecionarTodos = () => {
@@ -236,7 +185,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   const calcularValorTotal = () => {
-    return todosOsDebitos
+    return passagensTodas
       .filter(debito => debitosSelecionadosResumo.includes(debito.id))
       .reduce((acc, debito) => acc + debito.valor, 0);
   };
@@ -309,7 +258,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   const handleProsseguir = () => {
-    const debitosSelecionados = todosOsDebitos.filter(debito => debitosSelecionadosResumo.includes(debito.id));
+    const debitosSelecionados = passagensTodas.filter(debito => debitosSelecionadosResumo.includes(debito.id));
     const valorTotal = calcularValorTotal();
     
     if (onIrParaCheckout) {
@@ -339,16 +288,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     );
   };
 
-  // KPIs consolidados via simulator
-  const passagensTodas: Passagem[] = placasUsuario.flatMap(p => gerarDebitos(p))
-  const agg = agregarPorTipo(passagensTodas)
-  const proximo = proximoVencimento(passagensTodas)
-
   // Métricas para os cards do dashboard
-  const totalEmAberto = pendenciasAtivas.reduce((s, p) => s + p.valor, 0);
-  const vencendoEmBreve = pendenciasAtivas.filter(p => p.riscoDeMulta).length;
+  const totalEmAberto = passagensTodas.reduce((s, p) => s + p.valor, 0);
+  const vencendoEmBreve = passagensTodas.filter(p => p.status === 'risco_multa').length;
   const multasEvitadas = 482.68;
-  const veiculosMonitorados = [...new Set(pendenciasAtivas.map(p => p.placa))].length;
+  const veiculosMonitorados = placasUsuario.length;
 
   // Configuração das abas para navegação
   const tabs = [
@@ -439,7 +383,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <p className="text-sm text-[#8A8B95] mt-0.5">
             {vencendoEmBreve > 0
               ? `Você tem ${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
-              : `Tudo em dia por enquanto — ${pendenciasAtivas.length} passagens pendentes de pagamento`}
+              : `Tudo em dia por enquanto — ${passagensTodas.length} passagem${passagensTodas.length !== 1 ? 'ns' : ''} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
           </p>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[#8A8B95] flex-shrink-0">
@@ -456,7 +400,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#A3203B]' : 'text-[#5B2E8C]'}`}>
             {formatCurrency(totalEmAberto)}
           </p>
-          <p className="text-xs text-[#8A8B95] mt-1">{pendenciasAtivas.length} passagem{pendenciasAtivas.length > 1 ? 'ns' : ''}</p>
+          <p className="text-xs text-[#8A8B95] mt-1">{passagensTodas.length} passagem{passagensTodas.length !== 1 ? 'ns' : ''}</p>
         </div>
 
         {/* Vencendo em breve */}
@@ -631,6 +575,38 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             )}
           </div>
 
+          {/* Filtros de Tipo e Status */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="flex gap-1 bg-[#F7F5FB] rounded-lg p-1">
+              {(['todas', 'praca_fisica', 'portico_free_flow'] as const).map(t => (
+                <button
+                  key={t}
+                  onClick={() => setFiltroTipo(t)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
+                    filtroTipo === t ? 'bg-white text-[#5B2E8C] shadow-sm' : 'text-[#8A8B95] hover:text-[#5B2E8C]'
+                  }`}
+                >
+                  {t === 'praca_fisica' && <Building2 className="h-3.5 w-3.5" />}
+                  {t === 'portico_free_flow' && <Radio className="h-3.5 w-3.5" />}
+                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça SPMAR' : 'Pórtico Free Flow'}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1 bg-[#F7F5FB] rounded-lg p-1">
+              {(['todas', 'em_prazo', 'risco_multa'] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setFiltroStatus(s)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    filtroStatus === s ? 'bg-white text-[#5B2E8C] shadow-sm' : 'text-[#8A8B95] hover:text-[#5B2E8C]'
+                  }`}
+                >
+                  {s === 'todas' ? 'Todos status' : s === 'em_prazo' ? 'Em prazo' : 'Risco de multa'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Filtro por Placa - apenas se houver múltiplas placas */}
           {placasUnicas.length > 1 && (
             <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-2 sm:p-4">
@@ -716,18 +692,18 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           )}
 
           {/* Lista dos débitos */}
-          {debitosFiltrados.length > 0 ? (
+          {pendentesFiltradas.length > 0 ? (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide leading-tight">
-                    {debitosFiltrados.length} Pendência{debitosFiltrados.length > 1 ? 's' : ''} {filtroPlaca.includes('todas') ? 'Disponív' : 'Filtrada'}{debitosFiltrados.length > 1 ? 'eis' : 'el'}
+                    {pendentesFiltradas.length} Pendência{pendentesFiltradas.length > 1 ? 's' : ''} {filtroTipo === 'todas' && filtroStatus === 'todas' ? 'Disponíveis' : 'Filtradas'}
                     {!filtroPlaca.includes('todas') && (
                       <span className="text-[#8B5FFF] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
                     )}
                   </h4>
                 </div>
-                {debitosFiltrados.length > 1 && (
+                {pendentesFiltradas.length > 1 && (
                   <Button
                     type="button"
                     variant="outline"
@@ -751,22 +727,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   </Button>
                 )}
               </div>
-              
+
               <div className="max-h-80 overflow-y-auto space-y-3">
-                {debitosFiltrados.map((debito, index) => {
-                  const isSelected = debitosSelecionadosResumo.includes(debito.id);
+                {pendentesFiltradas.map((p) => {
+                  const isSelected = debitosSelecionadosResumo.includes(p.id);
+                  const isRisco = p.status === 'risco_multa';
                   return (
-                    <div 
-                      key={debito.id} 
+                    <div
+                      key={p.id}
                       className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all select-none ${
-                        isSelected 
-                          ? 'bg-[#F4EFFB] border-[#8B5FFF]' 
+                        isSelected
+                          ? 'bg-[#F4EFFB] border-[#8B5FFF]'
                           : 'bg-[#F7F5FB] border-[#DCDDE3] hover:border-[#8B5FFF]'
                       }`}
                     >
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => toggleDebitoSelecionado(debito.id)}
+                        onCheckedChange={() => toggleDebitoSelecionado(p.id)}
                         className="mt-1 transition-all duration-200 hover:scale-110 flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
@@ -778,16 +755,17 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                             <h3 className={`font-semibold text-sm sm:text-base leading-tight transition-colors truncate ${
                               isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                             }`}>
-                              {debito.praca}
+                              {p.local}
                             </h3>
+                            <TipoPassagemBadge tipo={p.tipo} />
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className={`font-bold text-base sm:text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
                               isSelected ? 'text-[#5B2E8C] hover:text-[#8B5FFF]' : 'text-[#8B5FFF] hover:text-[#7142B8]'
                             }`}>
-                              {formatCurrency(debito.valor)}
+                              {formatCurrency(p.valor)}
                             </span>
-                            {debito.riscoDeMulta ? (
+                            {isRisco ? (
                               <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Vence em breve</Badge>
                             ) : (
                               <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs flex-shrink-0">Pendente</Badge>
@@ -797,24 +775,22 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
                           <div className="flex items-center gap-2 text-xs text-[#8A8B95]">
                             <Calendar className="h-3 w-3 flex-shrink-0" />
-                            <span>{debito.data} às {debito.hora || '14:30:00'}</span>
-                            {debito.concessionaria && (
+                            <span>{p.data} às {p.hora}</span>
+                            {p.concessionaria && (
                               <>
                                 <span className="text-[#DCDDE3]">·</span>
-                                <span>{debito.concessionaria}</span>
+                                <span>{p.concessionaria}</span>
                               </>
                             )}
                           </div>
                           <div className="flex items-center gap-3 text-xs flex-shrink-0">
-                            {debito.prazoVencimento && (
-                              <span className={`flex items-center gap-1 ${debito.riscoDeMulta ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
-                                <Shield className="h-3 w-3" />
-                                Vence: {debito.prazoVencimento}
-                              </span>
-                            )}
+                            <span className={`flex items-center gap-1 ${isRisco ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
+                              <Shield className="h-3 w-3" />
+                              Vence: {p.prazoLimite}
+                            </span>
                             <span className="flex items-center gap-1 text-[#8A8B95]">
                               <Car className="h-3 w-3" />
-                              {debito.placa}
+                              {p.placa}
                             </span>
                           </div>
                         </div>
@@ -832,18 +808,18 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 </div>
               )}
             </div>
-          ) : todosOsDebitos.length > 0 ? (
+          ) : passagensTodas.length > 0 ? (
             <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
               <p className="text-sm text-[#9A5B00] font-medium">
-                Nenhuma pendência encontrada para {filtroPlaca.includes('todas') ? 'os filtros selecionados' : `a(s) placa(s) "${filtroPlaca.join(', ')}"`}
+                Nenhuma pendência encontrada para os filtros selecionados
               </p>
               <Button
-                onClick={() => setFiltroPlaca(['todas'])}
+                onClick={() => { setFiltroTipo('todas'); setFiltroStatus('todas'); }}
                 variant="outline"
                 size="sm"
                 className="mt-2 text-xs"
               >
-                Ver todas as placas
+                Ver todas as passagens
               </Button>
             </div>
           ) : (
@@ -881,9 +857,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   {formatCurrency(calcularValorTotal())}
                 </span>
               </div>
-              {todosOsDebitos.length > 0 && (
+              {passagensTodas.length > 0 && (
                 <p className="text-xs sm:text-sm text-[#F7F5FB] opacity-90">
-                  {debitosSelecionadosResumo.length} de {todosOsDebitos.length} pendência{todosOsDebitos.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
+                  {debitosSelecionadosResumo.length} de {passagensTodas.length} pendência{passagensTodas.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
                 </p>
               )}
             </div>
