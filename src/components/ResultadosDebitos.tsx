@@ -2,26 +2,14 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Checkbox } from "./ui/checkbox";
-import { ArrowLeft, CreditCard, Calendar, MapPin, Car, AlertTriangle, Shield, Clock, ChevronRight, Radio, Lock, UserPlus, LogIn } from "lucide-react";
+import { ArrowLeft, CreditCard, Calendar, MapPin, Car, AlertTriangle, Shield, Clock, ChevronRight, Radio, Lock, UserPlus, LogIn, CheckCircle } from "lucide-react";
 import { useState } from "react";
-
-interface PassagemFreeFlow {
-  id: string;
-  portico: string;
-  rodovia: string;
-  concessionaria: string;
-  sentido: string;
-  data: string;
-  hora: string;
-  valor: number;
-  prazoVencimento: string;
-  riscoDeMulta: boolean;
-  placa: string;
-}
+import { gerarDebitos, agregarPorTipo, type Passagem } from '../utils/simulator';
+import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
 
 interface ResultadosDebitosProps {
   onBack: () => void;
-  onPagar: (debitosSelecionados: PassagemFreeFlow[], valorTotal: number) => void;
+  onPagar: (debitosSelecionados: Passagem[], valorTotal: number) => void;
   onCadastrar: () => void;
   onLogin: () => void;
   dadosVeiculo: any;
@@ -31,66 +19,13 @@ interface ResultadosDebitosProps {
 export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dadosVeiculo, isAuthenticated = false }: ResultadosDebitosProps) {
   const placa = dadosVeiculo?.placa || "ABC-1234";
 
-  const passagens: PassagemFreeFlow[] = [
-    {
-      id: "1",
-      portico: "Pórtico Free Flow SP-330 — KM 45",
-      rodovia: "Rod. Anhanguera (SP-330)",
-      concessionaria: "CCR AutoBan",
-      sentido: "Sentido Campinas",
-      data: "14/04/2026",
-      hora: "07:42:00:00",
-      valor: 4.30,
-      prazoVencimento: "14/05/2026",
-      riscoDeMulta: true,
-      placa
-    },
-    {
-      id: "2",
-      portico: "Pórtico Free Flow SP-021 — KM 18",
-      rodovia: "Rod. Anchieta (SP-021)",
-      concessionaria: "Ecovias",
-      sentido: "Sentido Santos",
-      data: "20/04/2026",
-      hora: "14:15:00:00",
-      valor: 6.80,
-      prazoVencimento: "20/05/2026",
-      riscoDeMulta: false,
-      placa
-    },
-    {
-      id: "3",
-      portico: "Pórtico Free Flow SP-270 — KM 33",
-      rodovia: "Rod. Raposo Tavares (SP-270)",
-      concessionaria: "Arteris",
-      sentido: "Sentido São Paulo",
-      data: "28/04/2026",
-      hora: "18:50:00:00",
-      valor: 5.10,
-      prazoVencimento: "28/05/2026",
-      riscoDeMulta: false,
-      placa
-    },
-    {
-      id: "4",
-      portico: "Pórtico Free Flow BR-116 — KM 312",
-      rodovia: "Rodovia Régis Bittencourt (BR-116)",
-      concessionaria: "Arteris",
-      sentido: "Sentido Curitiba",
-      data: "02/05/2026",
-      hora: "10:05:00:00",
-      valor: 9.20,
-      prazoVencimento: "01/06/2026",
-      riscoDeMulta: false,
-      placa
-    },
-  ];
+  const passagens: Passagem[] = gerarDebitos(placa);
 
   const [selecionados, setSelecionados] = useState<string[]>(passagens.map(p => p.id));
 
   const passagensSelecionadas = passagens.filter(p => selecionados.includes(p.id));
   const totalSelecionado = passagensSelecionadas.reduce((sum, p) => sum + p.valor, 0);
-  const comRiscoDeMulta = passagens.filter(p => p.riscoDeMulta).length;
+  const comRiscoDeMulta = passagens.filter(p => p.status === 'risco_multa').length;
 
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
@@ -146,7 +81,39 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
           <p className="text-[#8A8B95]">
             Placa <span className="font-semibold text-[#5B2E8C]">{placa}</span> — veículo sem TAG identificado em pórticos Free Flow
           </p>
+          {(() => {
+            const r = agregarPorTipo(passagens);
+            if (r.countTotal === 0) return null;
+            return (
+              <p className="text-[#5B2E8C] font-medium">
+                {r.countPraca > 0 && <><strong>{r.countPraca}</strong> {r.countPraca > 1 ? 'praças SPMAR' : 'praça SPMAR'}</>}
+                {r.countPraca > 0 && r.countPortico > 0 && ' · '}
+                {r.countPortico > 0 && <><strong>{r.countPortico}</strong> {r.countPortico > 1 ? 'pórticos Free Flow' : 'pórtico Free Flow'}</>}
+              </p>
+            );
+          })()}
         </div>
+
+        {/* Estado vazio */}
+        {passagens.length === 0 && (
+          <Card className="border border-[#DCDDE3] shadow-sm">
+            <CardContent className="py-12 text-center space-y-3">
+              <CheckCircle className="h-16 w-16 text-[#0E8B5A] mx-auto" />
+              <h2 className="text-xl font-bold text-[#1A1B23]">Nenhuma passagem em aberto</h2>
+              <p className="text-[#8A8B95]">A placa <strong>{placa}</strong> está em dia. Sem cobranças pendentes.</p>
+              <Button
+                onClick={onCadastrar}
+                variant="outline"
+                className="border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white mt-2"
+              >
+                Cadastrar veículo e monitorar
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {passagens.length > 0 && (
+        <>
 
         {/* Alerta de risco de multa */}
         {comRiscoDeMulta > 0 && (
@@ -213,7 +180,7 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
               <CardContent className="space-y-3">
                 {passagens.map((p) => {
                   const selecionado = selecionados.includes(p.id);
-                  const dias = diasAteVencimento(p.prazoVencimento);
+                  const dias = diasAteVencimento(p.prazoLimite);
                   const urgente = dias <= 7;
                   return (
                     <div
@@ -234,15 +201,16 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                           <div className="min-w-0">
+                            <TipoPassagemBadge tipo={p.tipo} className="mb-1.5" />
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-semibold text-[#5B2E8C] text-sm truncate">{p.portico}</span>
-                              {p.riscoDeMulta && (
+                              <span className="font-semibold text-[#5B2E8C] text-sm truncate">{p.local}</span>
+                              {p.status === 'risco_multa' && (
                                 <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Próx. venc.</Badge>
                               )}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1 text-xs text-[#8A8B95]">
                               <MapPin className="h-3 w-3 flex-shrink-0" />
-                              <span className="truncate">{p.rodovia} · {p.sentido}</span>
+                              <span className="truncate">{p.rodovia}{p.km ? ` · KM ${p.km}` : ''}</span>
                             </div>
                             <div className="flex items-center gap-3 mt-1 text-xs text-[#8A8B95]">
                               <span className="flex items-center gap-1">
@@ -259,7 +227,7 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
                             </span>
                             <div className={`flex items-center gap-1 text-xs ${urgente ? "text-[#C8324A] font-medium" : "text-[#8A8B95]"}`}>
                               <Clock className="h-3 w-3" />
-                              <span>Vence {p.prazoVencimento}</span>
+                              <span>Vence {p.prazoLimite}</span>
                             </div>
                           </div>
                         </div>
@@ -391,6 +359,9 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
               </div>
             </CardContent>
           </Card>
+        )}
+
+        </>
         )}
 
       </main>
