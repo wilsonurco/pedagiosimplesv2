@@ -6,12 +6,12 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { toast } from "sonner@2.0.3";
-import { 
-  User, 
-  Car, 
-  History, 
+import {
+  User,
+  Car,
+  History,
   Home,
-  LogOut, 
+  LogOut,
   CheckCircle,
   Bell,
   Gift,
@@ -29,7 +29,10 @@ import {
   ArrowRight,
   Shield,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Building2,
+  Radio,
+  Wallet
 } from "lucide-react";
 
 import { HistoricoPagamentos } from "./HistoricoPagamentos";
@@ -38,6 +41,8 @@ import { ConfiguracoesConta } from "./ConfiguracoesConta";
 import { TotalPago } from "./TotalPago";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
+import { gerarDebitos, agregarPorTipo, proximoVencimento, type Passagem } from '../utils/simulator';
+import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
 
 interface DashboardUsuarioProps {
   onLogout: () => void;
@@ -334,6 +339,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     );
   };
 
+  // KPIs consolidados via simulator
+  const passagensTodas: Passagem[] = placasUsuario.flatMap(p => gerarDebitos(p))
+  const agg = agregarPorTipo(passagensTodas)
+  const proximo = proximoVencimento(passagensTodas)
+
   // Métricas para os cards do dashboard
   const totalEmAberto = pendenciasAtivas.reduce((s, p) => s + p.valor, 0);
   const vencendoEmBreve = pendenciasAtivas.filter(p => p.riscoDeMulta).length;
@@ -359,6 +369,66 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
   const renderHomeContent = () => (
     <div className="max-w-4xl mx-auto space-y-5">
+
+      {/* KPIs — Total / Praças / Pórticos / Próximo vencimento */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        {/* Total em aberto */}
+        <Card className="border border-[#DCDDE3]">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="h-4 w-4 text-[#5B2E8C]" />
+              <span className="text-xs uppercase tracking-wide text-[#8A8B95] font-medium">Total em aberto</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-[#1A1B23]">{formatCurrency(agg.totalGeral)}</p>
+            <p className="text-xs text-[#8A8B95] mt-1">{agg.countTotal} passagem{agg.countTotal === 1 ? '' : 's'}</p>
+          </CardContent>
+        </Card>
+
+        {/* Praças SPMAR */}
+        <Card className="border border-[#DCDDE3] bg-[#F4EFFB]/40">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-[#5B2E8C]" />
+              <span className="text-xs uppercase tracking-wide text-[#5B2E8C] font-medium">Praças SPMAR</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-[#5B2E8C]">{formatCurrency(agg.totalPraca)}</p>
+            <p className="text-xs text-[#8A8B95] mt-1">{agg.countPraca} passagem{agg.countPraca === 1 ? '' : 's'}</p>
+          </CardContent>
+        </Card>
+
+        {/* Pórticos Free Flow */}
+        <Card className="border border-[#DCDDE3] bg-[#DFF4EA]/40">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Radio className="h-4 w-4 text-[#0E8B5A]" />
+              <span className="text-xs uppercase tracking-wide text-[#0E8B5A] font-medium">Pórticos Free Flow</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-[#0E8B5A]">{formatCurrency(agg.totalPortico)}</p>
+            <p className="text-xs text-[#8A8B95] mt-1">{agg.countPortico} passagem{agg.countPortico === 1 ? '' : 's'}</p>
+          </CardContent>
+        </Card>
+
+        {/* Próximo vencimento */}
+        <Card className="border border-[#DCDDE3]">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 text-[#C77700]" />
+              <span className="text-xs uppercase tracking-wide text-[#8A8B95] font-medium">Próximo vencimento</span>
+            </div>
+            {proximo ? (
+              <>
+                <p className="text-xl sm:text-2xl font-bold text-[#1A1B23]">{proximo.prazoLimite}</p>
+                <p className="text-xs text-[#8A8B95] mt-1">{formatCurrency(proximo.valor)}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl sm:text-2xl font-bold text-[#0E8B5A]">—</p>
+                <p className="text-xs text-[#8A8B95] mt-1">Sem pendências</p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Saudação */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
