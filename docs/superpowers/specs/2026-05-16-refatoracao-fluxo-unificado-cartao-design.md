@@ -203,7 +203,7 @@ Implementa, sem dependência externa:
 
 | Cartão | Bandeira | Resultado |
 |---|---|---|
-| `5067 3300 0000 0001` | ELO | Aprovado |
+| `6362 9700 0045 7013` | ELO | Aprovado |
 | `4111 1111 1111 1111` | Visa | Aprovado |
 | `5555 5555 5555 4444` | Mastercard | Aprovado |
 | Qualquer cartão com final `0000` | — | Recusado |

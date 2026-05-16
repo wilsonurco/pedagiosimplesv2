@@ -1593,7 +1593,7 @@ Run: `npm run dev`
 Passos:
 1. Fluxo até `FormaPagamento`. Cards PIX e Cartão visíveis.
 2. Clicar em Cartão → form aparece com 4 campos.
-3. Digitar `5067 3300 0000 0001` → badge ELO aparece, microcopy "Parceiro Pedágio Simples". Preencher 12/30, 123, JOÃO. Botão habilita.
+3. Digitar `6362 9700 0045 7013` → badge ELO aparece, microcopy "Parceiro Pedágio Simples". Preencher 12/30, 123, JOÃO. Botão habilita.
 4. Clicar pagar → loading 2s → vai pra `ConfirmacaoPagamento`.
 5. Voltar e tentar com cartão `4111 1111 1111 0000` → recusado, mostra erro inline.
 6. Voltar pra PIX e confirmar que ainda funciona.
@@ -1644,7 +1644,7 @@ Adicione `CreditCard` e `QrCode` aos imports do `lucide-react` se faltarem.
 
 Run: `npm run dev`
 - Pagar via PIX → confirmação mostra "Pago via PIX".
-- Pagar com ELO `5067 3300 0000 0001` → confirmação mostra "Cartão ELO terminado em 0001".
+- Pagar com ELO `6362 9700 0045 7013` → confirmação mostra "Cartão ELO terminado em 0001".
 - Pagar com Visa `4111 1111 1111 1111` → "Cartão Visa terminado em 1111".
 
 - [ ] **Step 4: Commit**
@@ -1969,7 +1969,7 @@ Abra `http://localhost:5173` em mobile (DevTools) e desktop.
 
 **Cenário 2 — XYZ-5678 (só praça + ELO):**
 - Landing → `XYZ-5678` → consultar → 1 praça SPMAR.
-- Ir pro pagamento → Cartão → digitar `5067 3300 0000 0001` (badge ELO + microcopy "Parceiro Pedágio Simples").
+- Ir pro pagamento → Cartão → digitar `6362 9700 0045 7013` (badge ELO + microcopy "Parceiro Pedágio Simples").
 - Preencher `12/30`, `123`, `JOÃO DA SILVA` → Pagar → Confirmação mostra "Cartão ELO terminado em 0001".
 
 **Cenário 3 — DEF-9012 (só pórticos + Visa):**
@@ -2017,7 +2017,7 @@ Imprimir/comunicar:
 - Quantos testes unitários verdes.
 - Quantos cenários de demo validados.
 - Comandos: `npm test`, `npm run build`, `npm run dev`.
-- Cartões de teste documentados: `5067 3300 0000 0001` (ELO), `4111 1111 1111 1111` (Visa), `5555 5555 5555 4444` (Master), qualquer com final `0000` (recusado).
+- Cartões de teste documentados: `6362 9700 0045 7013` (ELO), `4111 1111 1111 1111` (Visa), `5555 5555 5555 4444` (Master), qualquer com final `0000` (recusado).
 
 ---
 
