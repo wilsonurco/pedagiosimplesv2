@@ -110,8 +110,8 @@ const artigosEducativos = [
     titulo: "Free Flow Significado: Entenda o sistema em detalhes",
     descricao: "Saiba como funciona a cobrança eletrônica nas rodovias brasileiras e o que muda para quem não tem TAG.",
     tempo: "5 min de leitura",
-    imagem: "https://images.pexels.com/photos/20758194/pexels-photo-20758194.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Pórtico de pedágio Free Flow sobre rodovia",
+    imagem: "https://images.pexels.com/photos/16962779/pexels-photo-16962779.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Vista aérea de rodovia chegando à ponte de Florianópolis",
   },
   {
     tag: "Dicas",
@@ -119,8 +119,8 @@ const artigosEducativos = [
     titulo: "Principais Benefícios do Pedágio Free Flow",
     descricao: "Menos trânsito nas praças, mais fluidez e segurança nas rodovias. Entenda as vantagens do sistema.",
     tempo: "4 min de leitura",
-    imagem: "https://images.pexels.com/photos/9716234/pexels-photo-9716234.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Vista aérea de rodovia com tráfego fluido",
+    imagem: "https://images.pexels.com/photos/30623171/pexels-photo-30623171.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Rodovia brasileira com tráfego cercada por vegetação urbana",
   },
   {
     tag: "Tecnologia",
@@ -128,8 +128,8 @@ const artigosEducativos = [
     titulo: "Tecnologia OCR e Inteligência Artificial",
     descricao: "Como câmeras de alta resolução e IA identificam milhões de veículos por dia com precisão de 99,9%.",
     tempo: "6 min de leitura",
-    imagem: "https://images.pexels.com/photos/32635127/pexels-photo-32635127.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Câmera de monitoramento com tecnologia avançada",
+    imagem: "https://images.pexels.com/photos/28174483/pexels-photo-28174483.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Vista aérea de rodovia ao entardecer com rastros de luz dos veículos",
   },
 ];
 
