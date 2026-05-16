@@ -110,6 +110,8 @@ const artigosEducativos = [
     titulo: "Free Flow Significado: Entenda o sistema em detalhes",
     descricao: "Saiba como funciona a cobrança eletrônica nas rodovias brasileiras e o que muda para quem não tem TAG.",
     tempo: "5 min de leitura",
+    imagem: "https://images.pexels.com/photos/20758194/pexels-photo-20758194.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Pórtico de pedágio Free Flow sobre rodovia",
   },
   {
     tag: "Dicas",
@@ -117,6 +119,8 @@ const artigosEducativos = [
     titulo: "Principais Benefícios do Pedágio Free Flow",
     descricao: "Menos trânsito nas praças, mais fluidez e segurança nas rodovias. Entenda as vantagens do sistema.",
     tempo: "4 min de leitura",
+    imagem: "https://images.pexels.com/photos/9716234/pexels-photo-9716234.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Vista aérea de rodovia com tráfego fluido",
   },
   {
     tag: "Tecnologia",
@@ -124,6 +128,8 @@ const artigosEducativos = [
     titulo: "Tecnologia OCR e Inteligência Artificial",
     descricao: "Como câmeras de alta resolução e IA identificam milhões de veículos por dia com precisão de 99,9%.",
     tempo: "6 min de leitura",
+    imagem: "https://images.pexels.com/photos/32635127/pexels-photo-32635127.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
+    alt: "Câmera de monitoramento com tecnologia avançada",
   },
 ];
 
@@ -582,15 +588,14 @@ export function LandingBeneficios() {
               href="#"
               className="group flex flex-col rounded-xl border border-[#DCDDE3] overflow-hidden hover:border-[#8B5FFF]/40 hover:shadow-md transition-all"
             >
-              <div className="h-40 bg-gradient-to-br from-[#2E1547] to-[#8B5FFF] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  {[...Array(3)].map((_, n) => (
-                    <div key={n} className="absolute border border-white/20 rounded-full"
-                      style={{ width: `${(n + 1) * 80}px`, height: `${(n + 1) * 80}px`,
-                        top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-                  ))}
-                </div>
-                <Radio className="h-10 w-10 text-white/40" />
+              <div className="h-40 relative overflow-hidden bg-[#2E1547]">
+                <img
+                  src={a.imagem}
+                  alt={a.alt}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2E1547]/60 via-transparent to-transparent" />
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <span className={`inline-flex text-xs font-semibold rounded-full px-2.5 py-0.5 mb-3 w-fit ${a.tagCor}`}>
