@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { gerarDebitos, agregarPorTipo } from '../utils/simulator';
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -255,6 +256,18 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
                       {veiculo.apelido && (
                         <p className="text-xs text-[#8A8B95] mt-0.5">{veiculo.apelido}</p>
                       )}
+                      {(() => {
+                        const r = agregarPorTipo(gerarDebitos(veiculo.placa))
+                        return (
+                          <p className="text-sm text-[#8A8B95] mt-1">
+                            {r.countPraca} praça{r.countPraca === 1 ? '' : 's'} · {r.countPortico} pórtico{r.countPortico === 1 ? '' : 's'} ·{' '}
+                            <span className="font-semibold text-[#5B2E8C]">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(r.totalGeral)}
+                            </span>{' '}
+                            em aberto
+                          </p>
+                        )
+                      })()}
                       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         <span className="text-xs text-[#8A8B95]">
                           Total pago: <span className="font-semibold text-[#0A6B45] font-mono">{formatCurrency(veiculo.totalPago)}</span>
