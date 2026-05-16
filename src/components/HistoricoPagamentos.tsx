@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
+import { TipoPassagemBadge } from "./ui/tipo-passagem-badge";
 import jsPDF from 'jspdf';
 import {
   Search,
@@ -30,7 +31,8 @@ interface PassagemPaga {
   hora: string;
   valor: number;
   placa: string;
-  formaPagamento: 'pix' | 'cartao';
+  tipo: 'praca_fisica' | 'portico_free_flow';
+  formaPagamento: 'pix' | 'cartao_elo' | 'cartao_visa' | 'cartao_master';
   transactionId: string;
   multa?: {
     economizada: number;
@@ -52,6 +54,7 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "07:42:00:00",
     valor: 4.30,
     placa: "MOV-1234",
+    tipo: "portico_free_flow",
     formaPagamento: "pix",
     transactionId: "FPS-20260415-00142",
     multa: { economizada: 130.00 }
@@ -66,7 +69,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "14:15:00:00",
     valor: 6.80,
     placa: "MOV-1234",
-    formaPagamento: "cartao",
+    tipo: "praca_fisica",
+    formaPagamento: "cartao_elo",
     transactionId: "FPS-20260410-00089",
   },
   {
@@ -79,6 +83,7 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "18:50:00:00",
     valor: 5.10,
     placa: "MOV-1234",
+    tipo: "portico_free_flow",
     formaPagamento: "pix",
     transactionId: "FPS-20260402-00211",
     multa: { economizada: 87.50 }
@@ -93,7 +98,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "10:05:00:00",
     valor: 9.20,
     placa: "MOV-1234",
-    formaPagamento: "cartao",
+    tipo: "praca_fisica",
+    formaPagamento: "cartao_visa",
     transactionId: "FPS-20260328-00178",
   },
   {
@@ -106,6 +112,7 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "19:30:00",
     valor: 4.30,
     placa: "MOV-1234",
+    tipo: "portico_free_flow",
     formaPagamento: "pix",
     transactionId: "FPS-20260320-00055",
   },
@@ -119,7 +126,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "08:20:00",
     valor: 3.80,
     placa: "MOV-1234",
-    formaPagamento: "pix",
+    tipo: "praca_fisica",
+    formaPagamento: "cartao_master",
     transactionId: "FPS-20260315-00312",
     multa: { economizada: 65.00 }
   },
@@ -133,7 +141,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "11:45:00",
     valor: 6.80,
     placa: "MOV-1234",
-    formaPagamento: "cartao",
+    tipo: "portico_free_flow",
+    formaPagamento: "cartao_visa",
     transactionId: "FPS-20260308-00421",
   },
   {
@@ -146,6 +155,7 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "07:15:00",
     valor: 4.30,
     placa: "MOV-1234",
+    tipo: "portico_free_flow",
     formaPagamento: "pix",
     transactionId: "FPS-20260301-00098",
   },
@@ -159,7 +169,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "16:20:00",
     valor: 6.80,
     placa: "MOV-1234",
-    formaPagamento: "cartao",
+    tipo: "praca_fisica",
+    formaPagamento: "cartao_elo",
     transactionId: "FPS-20260222-00532",
     multa: { economizada: 200.00 }
   },
@@ -173,7 +184,8 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
     hora: "09:00:00",
     valor: 9.20,
     placa: "MOV-1234",
-    formaPagamento: "pix",
+    tipo: "praca_fisica",
+    formaPagamento: "cartao_master",
     transactionId: "FPS-20260214-00789",
   },
 ];
@@ -182,6 +194,8 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos');
   const [filtroConcessionaria, setFiltroConcessionaria] = useState('todas');
   const [filtroPlaca, setFiltroPlaca] = useState('todas');
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [filtroFormaPagamento, setFiltroFormaPagamento] = useState('todas');
   const [filtroTexto, setFiltroTexto] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 8;
@@ -212,6 +226,8 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
     }
     if (filtroConcessionaria !== 'todas' && p.concessionaria !== filtroConcessionaria) return false;
     if (filtroPlaca !== 'todas' && p.placa !== filtroPlaca) return false;
+    if (filtroTipo !== 'todos' && p.tipo !== filtroTipo) return false;
+    if (filtroFormaPagamento !== 'todas' && p.formaPagamento !== filtroFormaPagamento) return false;
     if (filtroTexto) {
       const q = filtroTexto.toLowerCase();
       if (
@@ -317,8 +333,12 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
     doc.text('Valor Pago', L, y + 8);
     doc.setFontSize(13);
     doc.text(formatCurrency(passagem.valor), pageWidth - 28, y + 9, { align: 'right' });
+    const formaPagamentoLabel = passagem.formaPagamento === 'pix' ? 'PIX'
+      : passagem.formaPagamento === 'cartao_elo' ? 'Cartão ELO'
+      : passagem.formaPagamento === 'cartao_visa' ? 'Cartão Visa'
+      : 'Cartão Master';
     doc.setFontSize(8);
-    doc.text(`Forma: ${passagem.formaPagamento === 'pix' ? 'PIX' : 'Cartão de Crédito'}`, L, y + 17);
+    doc.text(`Forma: ${formaPagamentoLabel}`, L, y + 17);
 
     if (passagem.multa) {
       y += 30;
@@ -413,8 +433,12 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
       doc.text(`${p.data} ${p.hora}`, cols[0], y);
       doc.text(p.portico.length > 22 ? p.portico.slice(0, 22) + '…' : p.portico, cols[1], y);
       doc.text(p.concessionaria.length > 14 ? p.concessionaria.slice(0, 14) + '…' : p.concessionaria, cols[2], y);
+      const pFormaPagamentoLabel = p.formaPagamento === 'pix' ? 'PIX'
+        : p.formaPagamento === 'cartao_elo' ? 'ELO'
+        : p.formaPagamento === 'cartao_visa' ? 'Visa'
+        : 'Master';
       doc.text(p.placa, cols[3], y);
-      doc.text(p.formaPagamento === 'pix' ? 'PIX' : 'Cartão', cols[4], y);
+      doc.text(pFormaPagamentoLabel, cols[4], y);
       doc.text(formatCurrency(p.valor), cols[5], y);
       y += 10;
     });
@@ -461,7 +485,7 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
       {/* Filters */}
       <Card className="border border-[#DCDDE3]">
         <CardContent className="p-3 sm:p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
             {/* Search */}
             <div className="col-span-2 sm:col-span-1 relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8A8B95]" />
@@ -501,6 +525,32 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
               </SelectContent>
             </Select>
 
+            {/* Tipo */}
+            <Select value={filtroTipo} onValueChange={v => { setFiltroTipo(v); setPaginaAtual(1); }}>
+              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os tipos</SelectItem>
+                <SelectItem value="praca_fisica">Praça SPMAR</SelectItem>
+                <SelectItem value="portico_free_flow">Pórtico Free Flow</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Forma de pagamento */}
+            <Select value={filtroFormaPagamento} onValueChange={v => { setFiltroFormaPagamento(v); setPaginaAtual(1); }}>
+              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
+                <SelectValue placeholder="Forma de pagamento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas as formas</SelectItem>
+                <SelectItem value="pix">PIX</SelectItem>
+                <SelectItem value="cartao_elo">Cartão ELO</SelectItem>
+                <SelectItem value="cartao_visa">Cartão Visa</SelectItem>
+                <SelectItem value="cartao_master">Cartão Master</SelectItem>
+              </SelectContent>
+            </Select>
+
             {/* Export */}
             <Button
               onClick={exportarRelatorio}
@@ -535,7 +585,10 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-[#1A1B23] text-sm leading-tight truncate">{p.portico}</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-[#1A1B23] text-sm leading-tight truncate">{p.portico}</p>
+                              <TipoPassagemBadge tipo={p.tipo} />
+                            </div>
                             <p className="text-xs text-[#8A8B95] mt-0.5">{p.concessionaria} · {p.sentido}</p>
                             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                               <span className="text-xs text-[#8A8B95] flex items-center gap-1">
@@ -551,7 +604,10 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                                   ? <Smartphone className="h-3 w-3" />
                                   : <CreditCard className="h-3 w-3" />
                                 }
-                                {p.formaPagamento === 'pix' ? 'PIX' : 'Cartão'}
+                                {p.formaPagamento === 'pix' ? 'PIX'
+                                  : p.formaPagamento === 'cartao_elo' ? 'Cartão ELO'
+                                  : p.formaPagamento === 'cartao_visa' ? 'Cartão Visa'
+                                  : 'Cartão Master'}
                               </span>
                               {p.multa && (
                                 <span className="text-xs text-[#0E8B5A] bg-[#D4F0E2] border border-[#A3D9BE] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-1">
@@ -686,7 +742,10 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                       : <CreditCard className="h-4 w-4" />
                     }
                     <span className="font-medium text-sm">
-                      {passagemSelecionada.formaPagamento === 'pix' ? 'PIX' : 'Cartão'}
+                      {passagemSelecionada.formaPagamento === 'pix' ? 'PIX'
+                        : passagemSelecionada.formaPagamento === 'cartao_elo' ? 'Cartão ELO'
+                        : passagemSelecionada.formaPagamento === 'cartao_visa' ? 'Cartão Visa'
+                        : 'Cartão Master'}
                     </span>
                   </div>
                 </div>
