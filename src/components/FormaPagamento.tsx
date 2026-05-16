@@ -4,8 +4,9 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 import { Badge } from "./ui/badge";
-import { ArrowLeft, Smartphone, Shield, Clock, QrCode, Car, CheckCircle2, AlertCircle, Copy, Check, Lock } from "lucide-react";
+import { ArrowLeft, Smartphone, Shield, Clock, QrCode, Car, CheckCircle2, AlertCircle, Copy, Check, Lock, CreditCard } from "lucide-react";
 import { useState, useEffect } from "react";
+import { CartaoCreditoForm, type DadosCartao } from './CartaoCreditoForm'
 
 interface FormaPagamentoProps {
   onBack: () => void;
@@ -16,7 +17,11 @@ interface FormaPagamentoProps {
 }
 
 export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSelecionados = [] }: FormaPagamentoProps) {
-  const [formaPagamento, setFormaPagamento] = useState<'pix'>('pix');
+  const [formaPagamento, setFormaPagamento] = useState<'pix' | 'cartao'>('pix');
+  const [cartaoValido, setCartaoValido] = useState(false);
+  const [dadosCartao, setDadosCartao] = useState<DadosCartao | null>(null);
+  const [processandoCartao, setProcessandoCartao] = useState(false);
+  const [erroCartao, setErroCartao] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pixGerado, setPixGerado] = useState(false);
   const [chavePix, setChavePix] = useState('');
@@ -62,9 +67,7 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
 
 
   // Validação do formulário
-  const isFormValid = () => {
-    return true; // Sempre válido para PIX
-  };
+  const isFormValid = () => formaPagamento === 'pix' || (formaPagamento === 'cartao' && cartaoValido);
 
   // Copiar chave PIX
   const copiarChavePix = async () => {
@@ -86,10 +89,30 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
 
   // Processar pagamento
   const handlePagar = () => {
-    // Navegar para tela do PIX QR Code
-    if (onPIX) {
-      onPIX(debitosSelecionados, valorTotal);
+    if (formaPagamento === 'pix') {
+      if (onPIX) onPIX(debitosSelecionados, valorTotal);
+      return;
     }
+    // Cartão
+    if (!dadosCartao) return;
+    setProcessandoCartao(true);
+    setErroCartao(null);
+    setTimeout(() => {
+      const ultimos4 = dadosCartao.numero.slice(-4);
+      if (ultimos4 === '0000') {
+        setProcessandoCartao(false);
+        setErroCartao('Pagamento recusado pela operadora. Tente outro cartão.');
+        return;
+      }
+      onPagar({
+        formaPagamento: 'cartao',
+        bandeira: dadosCartao.bandeira,
+        ultimos4,
+        nome: dadosCartao.nome,
+        valorTotal,
+        debitosSelecionados,
+      });
+    }, 2000);
   };
 
   return (
@@ -189,29 +212,39 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
             </CardHeader>
             
             <CardContent className="space-y-6">
-              {/* Opção de Pagamento PIX */}
+              {/* Opções de Pagamento */}
               <div className="space-y-3">
-                {/* PIX - Única forma de pagamento */}
-                <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-[#8B5FFF] bg-gradient-to-br from-[#8B5FFF]/5 to-[#5B2E8C]/5 shadow-lg ring-2 ring-[#8B5FFF]/20">
+                {/* PIX */}
+                <button
+                  type="button"
+                  onClick={() => setFormaPagamento('pix')}
+                  className={`w-full text-left group relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 transition-all ${
+                    formaPagamento === 'pix'
+                      ? 'border-[#8B5FFF] bg-gradient-to-br from-[#8B5FFF]/5 to-[#5B2E8C]/5 shadow-lg ring-2 ring-[#8B5FFF]/20'
+                      : 'border-[#DCDDE3] bg-white hover:border-[#8B5FFF]/40'
+                  }`}
+                >
                   {/* Background decorativo */}
                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#8B5FFF]/10 to-transparent rounded-full blur-2xl"></div>
-                  
+
                   <div className="relative flex items-start gap-4">
-                    {/* Ícone de check */}
+                    {/* Ícone de check / radio */}
                     <div className="flex-shrink-0 pt-0.5">
-                      <div className="w-5 h-5 bg-[#8B5FFF] rounded-full flex items-center justify-center">
-                        <CheckCircle2 className="h-3 w-3 text-white" />
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 ${
+                        formaPagamento === 'pix' ? 'bg-[#8B5FFF] border-[#8B5FFF]' : 'border-[#C6C7CF]'
+                      }`}>
+                        {formaPagamento === 'pix' && <CheckCircle2 className="h-3 w-3 text-white" />}
                       </div>
                     </div>
-                    
+
                     {/* Conteúdo Principal */}
                     <div className="flex-1">
                       <div className="flex items-start gap-4">
                         {/* Ícone PIX */}
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#8B5FFF] to-[#5B2E8C] rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 scale-105 shadow-lg">
+                        <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#8B5FFF] to-[#5B2E8C] rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 ${formaPagamento === 'pix' ? 'scale-105 shadow-lg' : ''}`}>
                           <QrCode className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                         </div>
-                        
+
                         {/* Informações */}
                         <div className="flex-1 space-y-2 sm:space-y-3">
                           {/* Título e Badge */}
@@ -219,10 +252,10 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
                             <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23]">PIX</h3>
                             <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#8B5FFF] to-[#5B2E8C] text-white px-2.5 py-1 rounded-full text-xs font-medium w-fit">
                               <CheckCircle2 className="h-3 w-3" />
-                              <span>Única opção disponível</span>
+                              <span>Aprovação instantânea</span>
                             </div>
                           </div>
-                          
+
                           {/* Características */}
                           <div className="space-y-1.5 sm:space-y-2">
                             <div className="flex items-center gap-2 text-sm text-[#8A8B95]">
@@ -242,43 +275,95 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Indicador visual de seleção */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B5FFF] to-[#5B2E8C] rounded-b-xl sm:rounded-b-2xl"></div>
-                </div>
+                  {formaPagamento === 'pix' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B5FFF] to-[#5B2E8C] rounded-b-xl sm:rounded-b-2xl"></div>
+                  )}
+                </button>
+
+                {/* Cartão de crédito */}
+                <button
+                  type="button"
+                  onClick={() => setFormaPagamento('cartao')}
+                  className={`w-full text-left group relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 transition-all ${
+                    formaPagamento === 'cartao'
+                      ? 'border-[#8B5FFF] bg-gradient-to-br from-[#8B5FFF]/5 to-[#5B2E8C]/5 shadow-lg ring-2 ring-[#8B5FFF]/20'
+                      : 'border-[#DCDDE3] bg-white hover:border-[#8B5FFF]/40'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 pt-0.5">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 ${
+                        formaPagamento === 'cartao' ? 'bg-[#8B5FFF] border-[#8B5FFF]' : 'border-[#C6C7CF]'
+                      }`}>
+                        {formaPagamento === 'cartao' && <CheckCircle2 className="h-3 w-3 text-white" />}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#8B5FFF] to-[#5B2E8C] rounded-xl flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23]">Cartão de crédito</h3>
+                            <span className="inline-flex items-center justify-center rounded bg-yellow-400 text-yellow-950 px-2 py-0.5 text-xs font-bold">ELO</span>
+                          </div>
+                          <p className="text-sm text-[#8A8B95]">ELO em destaque · Visa e Mastercard aceitos</p>
+                        </div>
+                      </div>
+                      {formaPagamento === 'cartao' && (
+                        <CartaoCreditoForm
+                          onValidChange={(valido, dados) => {
+                            setCartaoValido(valido)
+                            setDadosCartao(dados)
+                            setErroCartao(null)
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </button>
               </div>
 
               {/* Botão de Pagamento */}
               <div className="pt-6 space-y-4">
-                <Button 
+                <Button
                   onClick={handlePagar}
-                  disabled={loading || !isFormValid()}
-                  className={`w-full h-12 sm:h-14 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 bg-gradient-to-r from-[#8B5FFF] to-[#7142B8] hover:from-[#7142B8] hover:to-[#2E1547] text-white shadow-lg hover:shadow-xl ${(!isFormValid() || loading) ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'}`}
+                  disabled={loading || processandoCartao || !isFormValid()}
+                  className={`w-full h-12 sm:h-14 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 bg-gradient-to-r from-[#8B5FFF] to-[#7142B8] hover:from-[#7142B8] hover:to-[#2E1547] text-white shadow-lg hover:shadow-xl ${(!isFormValid() || loading || processandoCartao) ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'}`}
                 >
                   <div className="flex items-center justify-center gap-2 sm:gap-3 w-full">
-                    {loading ? (
+                    {loading || processandoCartao ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-white border-t-transparent flex-shrink-0"></div>
                         <span className="text-sm sm:text-base font-medium">Processando pagamento...</span>
                       </>
-                    ) : (
+                    ) : formaPagamento === 'pix' ? (
                       <>
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <QrCode className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                          <span className="font-semibold text-sm sm:text-base">
-                            Gerar QR Code PIX
-                          </span>
-                        </div>
+                        <QrCode className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                        <span className="font-semibold text-sm sm:text-base">Gerar QR Code PIX</span>
                         <div className="hidden sm:block text-white/80">•</div>
                         <span className="font-bold text-sm sm:text-base bg-white/10 px-2 py-1 rounded-lg">
                           {formatCurrency(valorTotal)}
                         </span>
                       </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                        <span className="font-semibold text-sm sm:text-base">Pagar {formatCurrency(valorTotal)}</span>
+                      </>
                     )}
                   </div>
                 </Button>
 
-
+                {erroCartao && (
+                  <div className="bg-[#F8D7DD] border border-[#F0A8B5] rounded-lg p-3 flex items-start gap-2 mt-3">
+                    <AlertCircle className="h-4 w-4 text-[#C8324A] flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#A3203B]">{erroCartao}</p>
+                  </div>
+                )}
               </div>
 
               {/* Informações de Segurança */}
