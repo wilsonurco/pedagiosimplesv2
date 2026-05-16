@@ -96,7 +96,9 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
     // Forma de pagamento
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    const formaPagamento = 'PIX';
+    const formaPagamento = dadosPagamento?.formaPagamento === 'cartao'
+      ? `Cartão ${dadosPagamento.bandeira === 'elo' ? 'ELO' : dadosPagamento.bandeira === 'visa' ? 'Visa' : 'Mastercard'} terminado em ${dadosPagamento.ultimos4}`
+      : 'PIX';
     doc.text(`Forma de Pagamento: ${formaPagamento}`, 20, yPos);
     yPos += 20;
 
@@ -210,8 +212,17 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
                       <div className="flex justify-between">
                         <span className="text-[#8A8B95]">Forma de pagamento:</span>
                         <span className="font-medium flex items-center gap-1">
-                          <QrCode className="h-4 w-4" />
-                          PIX
+                          {dadosPagamento?.formaPagamento === 'cartao' ? (
+                            <>
+                              <CreditCard className="h-4 w-4 text-[#5B2E8C]" />
+                              Cartão {dadosPagamento.bandeira === 'elo' ? 'ELO' : dadosPagamento.bandeira === 'visa' ? 'Visa' : 'Mastercard'}{' '}terminado em <strong>{dadosPagamento.ultimos4}</strong>
+                            </>
+                          ) : (
+                            <>
+                              <QrCode className="h-4 w-4 text-[#5B2E8C]" />
+                              Pago via PIX
+                            </>
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between">
