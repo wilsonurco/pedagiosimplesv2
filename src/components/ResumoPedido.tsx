@@ -5,12 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ArrowLeft, Car, CheckCircle2, Shield, Calendar, MapPin, ArrowRight, Plus, Minus, Filter, CheckCircle, XCircle, Loader2, X } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { useState } from "react";
+import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
+import type { Passagem } from '../utils/simulator';
 
 interface ResumoPedidoProps {
   onBack: () => void;
-  onProsseguir: (debitosSelecionados: any[], valorTotal: number) => void;
+  onProsseguir: (debitosSelecionados: Passagem[], valorTotal: number) => void;
   valorTotal: number;
-  debitosSelecionados?: any[];
+  debitosSelecionados?: Passagem[];
 }
 
 export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecionados = [] }: ResumoPedidoProps) {
@@ -18,7 +20,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
     debitosSelecionados.map(d => d.id)
   );
   const [filtroPlaca, setFiltroPlaca] = useState<string>('todas');
-  
+
   // Estados para consulta de nova placa
   const [mostrandoFormularioNovaPlaca, setMostrandoFormularioNovaPlaca] = useState<boolean>(false);
   const [novaPlaca, setNovaPlaca] = useState<string>('');
@@ -27,9 +29,9 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
     success: boolean;
     quantidade: number;
     valorTotal: number;
-    debitos: any[];
+    debitos: Passagem[];
   } | null>(null);
-  const [debitosAdicionais, setDebitosAdicionais] = useState<any[]>([]);
+  const [debitosAdicionais, setDebitosAdicionais] = useState<Passagem[]>([]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -83,23 +85,36 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
         });
       } else {
         // Gerar débitos simulados para a nova placa
-        const debitosSimulados = [
+        const ts = Date.now();
+        const debitosSimulados: Passagem[] = [
           {
-            id: `nova_${Date.now()}_1`,
-            praca: "Rodovia dos Bandeirantes - KM 45",
+            id: `nova_${ts}_1`,
+            tipo: 'praca_fisica',
+            local: "Rodovia dos Bandeirantes - KM 45",
+            concessionaria: "AutoBan",
+            rodovia: "SP-330",
+            km: 45,
             valor: 11.30,
             data: "10/01/2025",
             hora: "08:15:00",
-            placa: novaPlaca
+            placa: novaPlaca,
+            status: 'em_prazo',
+            prazoLimite: "30/06/2025",
           },
           {
-            id: `nova_${Date.now()}_2`,
-            praca: "Via Anhanguera - KM 67",
+            id: `nova_${ts}_2`,
+            tipo: 'portico_free_flow',
+            local: "Via Anhanguera - KM 67",
+            concessionaria: "AutoBan",
+            rodovia: "SP-330",
+            km: 67,
             valor: 8.90,
             data: "12/01/2025",
             hora: "14:22:00",
-            placa: novaPlaca
-          }
+            placa: novaPlaca,
+            status: 'em_prazo',
+            prazoLimite: "30/06/2025",
+          },
         ];
         
         const valorTotal = debitosSimulados.reduce((acc, d) => acc + d.valor, 0);
@@ -419,15 +434,16 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-start gap-3 mb-3">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <MapPin className={`h-4 w-4 flex-shrink-0 transition-colors ${
                                   isSelected ? 'text-[#5B2E8C]' : 'text-[#8B5FFF]'
                                 }`} />
                                 <h3 className={`font-semibold text-base leading-tight transition-colors ${
                                   isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                                 }`}>
-                                  {debito.praca}
+                                  {debito.local}
                                 </h3>
+                                <TipoPassagemBadge tipo={debito.tipo} />
                               </div>
                               <div className="text-right">
                                 <span className={`font-bold text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
