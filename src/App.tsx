@@ -18,6 +18,7 @@ import { PIXQRCode } from "./components/PIXQRCode";
 import { Footer } from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "./utils/placaValidation";
+import { gerarDebitos, agregarPorTipo, type Passagem } from "./utils/simulator";
 import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
@@ -120,67 +121,11 @@ export default function App() {
   };
 
   const handleIrParaPagamentoDireto = (placa: string) => {
-    // Verificar se são múltiplas placas (separadas por vírgula)
-    const placas = placa.includes(',') ? placa.split(',') : [placa];
-    
-    // Simular débitos para cada placa
-    const debitosSimulados = [];
-    
-    if (placas.length > 1) {
-      // Múltiplos veículos - criar débitos apenas para ABC-1234 e XYZ-5678
-      placas.forEach((p) => {
-        const placaTrim = p.trim();
-        
-        if (placaTrim === 'ABC-1234') {
-          // ABC-1234: 2 pendências de R$ 50,00 cada = R$ 100,00
-          debitosSimulados.push({
-            id: `abc-1`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "15/03/2026",
-            hora: "14:30:00",
-            placa: placaTrim
-          });
-          debitosSimulados.push({
-            id: `abc-2`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "16/03/2026",
-            hora: "15:30:00",
-            placa: placaTrim
-          });
-        } else if (placaTrim === 'XYZ-5678') {
-          // XYZ-5678: 1 pendência de R$ 50,00
-          debitosSimulados.push({
-            id: `xyz-1`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "17/03/2026",
-            hora: "16:30:00",
-            placa: placaTrim
-          });
-        }
-        // DEF-9012 não tem pendências, então não adiciona nada
-      });
-    } else {
-      // Um único veículo
-      debitosSimulados.push({
-        id: "1",
-        praca: "Pedágio não identificado",
-        valor: 89.40,
-        data: "15/03/2026",
-        hora: "14:30:00",
-        placa: placa
-      });
-    }
-    
-    const valorTotal = debitosSimulados.reduce((acc, d) => acc + d.valor, 0);
-    
-    // Setar os débitos e valor total
-    setDebitosSelecionados(debitosSimulados);
+    const placas = placa.includes(',') ? placa.split(',').map(p => p.trim()) : [placa];
+    const todasPassagens: Passagem[] = placas.flatMap(p => gerarDebitos(p));
+    const valorTotal = todasPassagens.reduce((acc, d) => acc + d.valor, 0);
+    setDebitosSelecionados(todasPassagens);
     setValorTotalSelecionado(valorTotal);
-    
-    // Ir direto para resumo do pedido
     setTelaAtual('resumo-pedido');
   };
 
@@ -477,8 +422,7 @@ export default function App() {
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl text-[#1A1B23] leading-relaxed mb-2">
                   <strong className="text-[#5B2E8C]">Verifique suas passagens</strong>{" "}
-                  em pórticos Free Flow{" "}
-                  <strong className="text-[#5B2E8C]">e regularize agora</strong>.
+                  em <strong className="text-[#5B2E8C]">praças SPMAR e pórticos Free Flow</strong>.
                 </h3>
                 <div className="w-12 h-1 bg-[#8B5FFF] rounded-full mx-auto" />
               </div>
@@ -568,7 +512,7 @@ export default function App() {
                   ) : (
                     <>
                       <Car className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      Consultar passagens Free Flow
+                      Consultar passagens
                     </>
                   )}
                 </Button>
@@ -617,20 +561,27 @@ export default function App() {
                     <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-[#5B2E8C] mb-1 text-sm sm:text-base">4 passagens em pórtico encontradas</h4>
+                    {(() => {
+                      const r = agregarPorTipo(gerarDebitos(dadosVeiculo.placa));
+                      return (
+                        <h4 className="font-semibold text-[#5B2E8C] mb-1 text-sm sm:text-base">
+                          {r.countPraca > 0 && `${r.countPraca} praça${r.countPraca > 1 ? 's' : ''}`}
+                          {r.countPraca > 0 && r.countPortico > 0 && ' e '}
+                          {r.countPortico > 0 && `${r.countPortico} pórtico${r.countPortico > 1 ? 's' : ''}`}
+                          {r.countTotal === 0 && 'Nenhuma passagem em aberto'}
+                          {r.countTotal > 0 && ' encontrad' + (r.countTotal > 1 ? 'os' : 'o')}
+                        </h4>
+                      );
+                    })()}
                     <p className="text-xs sm:text-sm text-[#8A8B95] leading-tight">Faça um cadastro rápido para ver os detalhes e pagar antes do prazo.</p>
                   </div>
                 </div>
               </div>
               <Button
                 onClick={() => {
-                  const debitosSimulados = [
-                    { id: "1", praca: "Pórtico Free Flow SP-330 — KM 45", valor: 4.30, data: "14/04/2026", hora: "07:42:00:00", placa: dadosVeiculo.placa },
-                    { id: "2", praca: "Pórtico Free Flow SP-021 — KM 18", valor: 6.80, data: "20/04/2026", hora: "14:15:00:00", placa: dadosVeiculo.placa },
-                    { id: "3", praca: "Pórtico Free Flow SP-270 — KM 33", valor: 5.10, data: "28/04/2026", hora: "18:50:00:00", placa: dadosVeiculo.placa },
-                    { id: "4", praca: "Pórtico Free Flow BR-116 — KM 312", valor: 9.20, data: "02/05/2026", hora: "10:05:00:00", placa: dadosVeiculo.placa },
-                  ];
-                  handleIrParaPagamento(debitosSimulados, 25.40);
+                  const passagens = gerarDebitos(dadosVeiculo.placa);
+                  const total = passagens.reduce((s, p) => s + p.valor, 0);
+                  handleIrParaPagamento(passagens, total);
                 }}
                 className="w-full h-10 sm:h-12 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white rounded-lg font-semibold text-sm sm:text-base"
               >
@@ -675,11 +626,11 @@ export default function App() {
         }
         title={
           <>
-            Passou por um pórtico{" "}
-            <span className="text-[#8B5FFF]">sem TAG?</span>
+            Pagou o pedágio?{" "}
+            <span className="text-[#8B5FFF]">Consulte e regularize em 2 minutos.</span>
           </>
         }
-        description="Regularize suas passagens Free Flow antes que virem multa de evasão. Consulta gratuita por placa — pague em minutos, sem burocracia."
+        description="Passou por uma praça SPMAR sem dinheiro ou por um pórtico Free Flow sem TAG? Consulte sua placa, veja todas as passagens em aberto e quite antes que virem multa."
         rightContent={formCard}
         notice={null}
       />
