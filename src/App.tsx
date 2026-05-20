@@ -604,9 +604,7 @@ export default function App() {
             <LogoCinza />
           </div>
         }
-        navLinks={[
-          { label: "Acesso Concessionária", onClick: () => setTelaAtual('login-concessionaria') },
-        ]}
+        navLinks={[]}
         topRightAction={
           usuarioLogado ? (
             <Button
@@ -636,7 +634,10 @@ export default function App() {
       />
       <LandingBeneficios />
       <PartnerCarousel />
-      <Footer onNavigateToFAQ={() => setTelaAtual('faq')} />
+      <Footer
+        onNavigateToFAQ={() => setTelaAtual('faq')}
+        onAcessoConcessionaria={() => setTelaAtual('login-concessionaria')}
+      />
 
       {/* #8 — Botão flutuante de suporte */}
       <a

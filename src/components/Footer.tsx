@@ -1,8 +1,9 @@
 import logoFooterImg from "figma:asset/b4b61ea2aff4e0735f9cc375bc7a4846923c94d1.png";
-import { QrCode, CreditCard, Smartphone, Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
+import { QrCode, CreditCard, Smartphone, Instagram, Twitter, Linkedin, Youtube, Building2 } from "lucide-react";
 
 interface FooterProps {
   onNavigateToFAQ?: () => void;
+  onAcessoConcessionaria?: () => void;
 }
 
 const colunas = [
@@ -44,7 +45,7 @@ const redesSociais = [
   { icone: Youtube, label: "YouTube", href: "#" },
 ];
 
-export function Footer({ onNavigateToFAQ }: FooterProps) {
+export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps) {
   return (
     <footer className="bg-[#1A1B23]">
 
@@ -145,9 +146,20 @@ export function Footer({ onNavigateToFAQ }: FooterProps) {
       {/* Bottom bar */}
       <div className="border-t border-white/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/25">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/25">
             <p>© {new Date().getFullYear()} Pedágio Simples — Move Mais Meios de Pagamento. Todos os direitos reservados.</p>
-            <p>CNPJ 00.000.000/0001-00 · São Paulo, SP</p>
+            <div className="flex items-center gap-4">
+              {onAcessoConcessionaria && (
+                <button
+                  onClick={onAcessoConcessionaria}
+                  className="inline-flex items-center gap-1.5 text-white/40 hover:text-white transition-colors"
+                >
+                  <Building2 className="h-3.5 w-3.5" />
+                  Acesso Concessionária
+                </button>
+              )}
+              <p>CNPJ 00.000.000/0001-00 · São Paulo, SP</p>
+            </div>
           </div>
         </div>
       </div>
