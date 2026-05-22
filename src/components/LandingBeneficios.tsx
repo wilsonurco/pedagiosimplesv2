@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   Radio, CreditCard, ShieldCheck, Building2, Search, AlertTriangle, CheckCircle,
   ChevronDown, ChevronUp, Smartphone, Zap, MapPin, Users,
@@ -8,16 +8,16 @@ import {
 // ─── Dados ────────────────────────────────────────────────────────────────────
 
 const parceiros = [
-  { nome: "CCR",                estilo: "font-medium tracking-tighter" },
   { nome: "Arteris",            estilo: "font-medium tracking-tight" },
-  { nome: "EcoRodovias",        estilo: "font-medium tracking-tight" },
   { nome: "Autoban",            estilo: "font-medium tracking-wide" },
-  { nome: "Ecovias",            estilo: "font-medium tracking-tight" },
-  { nome: "Rota das Bandeiras", estilo: "font-medium tracking-tight" },
-  { nome: "Intervias",          estilo: "font-medium tracking-tight" },
   { nome: "Autopista",          estilo: "font-medium tracking-widest" },
-  { nome: "SPMAR",              estilo: "font-medium tracking-widest" },
+  { nome: "CCR",                estilo: "font-medium tracking-tighter" },
   { nome: "Concebra",           estilo: "font-medium tracking-tight" },
+  { nome: "EcoRodovias",        estilo: "font-medium tracking-tight" },
+  { nome: "Ecovias",            estilo: "font-medium tracking-tight" },
+  { nome: "Intervias",          estilo: "font-medium tracking-tight" },
+  { nome: "Rota das Bandeiras", estilo: "font-medium tracking-tight" },
+  { nome: "SPMAR",              estilo: "font-medium tracking-widest" },
 ];
 
 const passosPagamento = [
@@ -238,19 +238,23 @@ export function LandingBeneficios() {
 
       {/* ── 1. Parceiros strip ─────────────────────────────────────── */}
       <div className="border-y border-[#ECECF1] bg-[#F7F5FB]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
-            <span className="flex-shrink-0 text-xs font-semibold text-[#8A8B95] uppercase tracking-widest sm:pr-6 sm:border-r sm:border-[#DCDDE3]">
-              Concessionárias<br className="hidden sm:block" /> parceiras
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 overflow-x-auto">
+          <div className="flex items-center gap-0 flex-nowrap whitespace-nowrap">
+            <span className="flex-shrink-0 text-xs font-semibold text-[#8A8B95] uppercase tracking-widest pr-6 border-r border-[#DCDDE3]">
+              Concessionárias parceiras
             </span>
-            <div className="flex items-center gap-x-6 gap-y-3 sm:pl-6 flex-wrap">
-              {parceiros.map((p) => (
-                <span
-                  key={p.nome}
-                  className={`text-sm leading-none select-none text-[#1A1B23] opacity-50 hover:opacity-80 transition-opacity ${p.estilo}`}
-                >
-                  {p.nome}
-                </span>
+            <div className="flex items-center gap-x-3 pl-6 flex-nowrap">
+              {parceiros.map((p, i) => (
+                <Fragment key={p.nome}>
+                  <span
+                    className={`text-sm leading-none select-none text-[#1A1B23] opacity-50 hover:opacity-80 transition-opacity ${p.estilo}`}
+                  >
+                    {p.nome}
+                  </span>
+                  {i < parceiros.length - 1 && (
+                    <span aria-hidden="true" className="text-[#C6C7CF] text-sm leading-none select-none">|</span>
+                  )}
+                </Fragment>
               ))}
             </div>
           </div>
