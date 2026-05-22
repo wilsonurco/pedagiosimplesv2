@@ -624,11 +624,20 @@ export default function App() {
         }
         title={
           <>
-            Pagou o pedágio?{" "}
-            <span className="text-[#8B5FFF]">Consulte e regularize em 2 minutos.</span>
+            Pendências de pedágio{" "}
+            <span className="text-[#8B5FFF]">resolvidas em minutos</span>
           </>
         }
-        description="Passou por uma praça SPMAR sem dinheiro ou por um pórtico Free Flow sem TAG? Consulte sua placa, veja todas as passagens em aberto e quite antes que virem multa."
+        description={
+          <>
+            A única plataforma que{" "}
+            <strong className="text-[#F4C97A]">garante</strong>{" "}
+            a quitação de suas pendências de pedágio em{" "}
+            <strong className="text-[#8B5FFF]">tempo real</strong>
+            , sem burocracia e com{" "}
+            <strong className="text-[#F4C97A]">zero complicações</strong>.
+          </>
+        }
         rightContent={formCard}
         notice={null}
       />
