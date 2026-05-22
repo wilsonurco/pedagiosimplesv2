@@ -557,16 +557,25 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateCurrentStep()) return;
 
     setLoading(true);
-    
+
     // Simular criação de conta
     setTimeout(() => {
       setLoading(false);
       onCadastrar(formData);
     }, 2000);
+  };
+
+  const handleSubmitSemVeiculo = () => {
+    setLoading(true);
+    // Cria a conta sem vincular o veículo consultado
+    setTimeout(() => {
+      setLoading(false);
+      onCadastrar({ ...formData, placa: '', pularCadastroVeiculo: true });
+    }, 1500);
   };
 
   const getStepTitle = () => {
@@ -1179,24 +1188,41 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       }
                     </Button>
                   ) : (
-                    <Button 
-                      type="submit" 
-                      size="lg" 
-                      className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
-                      disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                          Criando conta...
-                        </>
-                      ) : (
-                        <>
-                          <Car className="h-5 w-5 mr-2" />
-                          Criar conta e prosseguir
-                        </>
-                      )}
-                    </Button>
+                    <>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
+                        disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
+                      >
+                        {loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                            Criando conta...
+                          </>
+                        ) : (
+                          <>
+                            <Car className="h-5 w-5 mr-2" />
+                            Criar conta e prosseguir
+                          </>
+                        )}
+                      </Button>
+
+                      {/* Alternativa: criar conta sem vincular este veículo */}
+                      <div className="mt-4 text-center">
+                        <button
+                          type="button"
+                          onClick={handleSubmitSemVeiculo}
+                          disabled={loading}
+                          className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#8A8B95]"
+                        >
+                          Criar conta sem vincular este veículo
+                        </button>
+                        <p className="text-xs text-[#C6C7CF] mt-1.5">
+                          Você poderá cadastrar veículos depois pelo dashboard
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
               </form>
