@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import {
   Radio, CreditCard, ShieldCheck, Building2, Search, AlertTriangle, CheckCircle,
-  ChevronDown, ChevronUp, Smartphone, Zap, MapPin, Users,
+  ChevronDown, ChevronUp, Smartphone, Zap,
   ArrowRight, Star, Shield, Wifi
 } from "lucide-react";
 
@@ -501,66 +501,6 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 11. CTA final ────────────────────────────────────────────── */}
-      <div className="bg-gradient-to-br from-[#1A1B23] via-[#2E1547] to-[#5B2E8C]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
-                Diga adeus às{" "}
-                <span className="text-[#C9AEEA]">multas de evasão</span>{" "}
-                de pedágio
-              </h2>
-              <p className="text-white/70 leading-relaxed mb-8 max-w-md">
-                Consulte, pague e receba o comprovante RPV em minutos. Seu veículo regularizado, sem burocracia, sem fila e sem sair de casa.
-              </p>
-
-              {/* CTA primário único */}
-              <a
-                href="#"
-                className="inline-flex items-center justify-center gap-2 bg-white text-[#5B2E8C] font-semibold rounded-xl px-8 py-4 hover:bg-[#F4EFFB] transition-colors text-base shadow-lg w-full sm:w-auto"
-              >
-                Consultar minha placa agora
-                <ArrowRight className="h-4 w-4" />
-              </a>
-
-              {/* Link secundário discreto */}
-              <p className="mt-4 text-white/50 text-sm">
-                Ou{" "}
-                <a href="#" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">
-                  crie sua conta grátis e acompanhe todas as suas passagens em um só lugar →
-                </a>
-              </p>
-
-              {/* Micro-copy de segurança */}
-              <p className="mt-5 text-white/35 text-xs flex items-center gap-1.5">
-                <span>🔒</span>
-                Consulta gratuita · Sem cadastro · Dados protegidos por SSL 256-bit
-              </p>
-            </div>
-
-            {/* Trust cards */}
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icone: ShieldCheck, titulo: "PCI DSS Compliant", sub: "Dados criptografados" },
-                { icone: Zap, titulo: "Quitação imediata", sub: "Confirmação em tempo real" },
-                { icone: Users, titulo: "+500k usuários", sub: "Conta ativa na plataforma" },
-                { icone: MapPin, titulo: "+30 rodovias", sub: "SP, RJ, MG, PR e mais" },
-              ].map((c, i) => {
-                const Icon = c.icone;
-                return (
-                  <div key={i} className="bg-white/10 rounded-xl p-4">
-                    <Icon className="h-5 w-5 text-[#C9AEEA] mb-2" />
-                    <p className="text-white font-semibold text-sm">{c.titulo}</p>
-                    <p className="text-white/60 text-xs mt-0.5">{c.sub}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   );
