@@ -8,16 +8,16 @@ import {
 // ─── Dados ────────────────────────────────────────────────────────────────────
 
 const parceiros = [
-  { nome: "CCR",                estilo: "font-black tracking-tighter" },
-  { nome: "Arteris",            estilo: "font-black tracking-tight" },
-  { nome: "EcoRodovias",        estilo: "font-black tracking-tight" },
-  { nome: "Autoban",            estilo: "font-bold tracking-wide" },
-  { nome: "Ecovias",            estilo: "font-black tracking-tight" },
-  { nome: "Rota das Bandeiras", estilo: "font-bold tracking-tight" },
-  { nome: "Intervias",          estilo: "font-bold tracking-tight" },
-  { nome: "Autopista",          estilo: "font-black tracking-widest" },
-  { nome: "SPMAR",              estilo: "font-black tracking-widest" },
-  { nome: "Concebra",           estilo: "font-bold tracking-tight" },
+  { nome: "CCR",                estilo: "font-medium tracking-tighter" },
+  { nome: "Arteris",            estilo: "font-medium tracking-tight" },
+  { nome: "EcoRodovias",        estilo: "font-medium tracking-tight" },
+  { nome: "Autoban",            estilo: "font-medium tracking-wide" },
+  { nome: "Ecovias",            estilo: "font-medium tracking-tight" },
+  { nome: "Rota das Bandeiras", estilo: "font-medium tracking-tight" },
+  { nome: "Intervias",          estilo: "font-medium tracking-tight" },
+  { nome: "Autopista",          estilo: "font-medium tracking-widest" },
+  { nome: "SPMAR",              estilo: "font-medium tracking-widest" },
+  { nome: "Concebra",           estilo: "font-medium tracking-tight" },
 ];
 
 const passosPagamento = [
