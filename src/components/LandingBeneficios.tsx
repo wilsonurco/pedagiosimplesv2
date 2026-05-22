@@ -331,76 +331,7 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 4. RPV ─────────────────────────────────────────────────── */}
-      <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-[#D4F0E2] text-[#0E8B5A] rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Documento oficial
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-4 leading-tight">
-                Registro de Passagem Veicular{" "}
-                <span className="text-[#5B2E8C]">(RPV)</span>
-              </h2>
-              <p className="text-[#8A8B95] leading-relaxed mb-6">
-                O RPV é o comprovante oficial emitido pelas concessionárias confirmando que a PNU foi quitada. Ele protege o motorista de autuações indevidas e é aceito pelo DETRAN em qualquer recurso de infração.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "Cancela automaticamente o processo de autuação em andamento",
-                  "Aceito pelo DETRAN como comprovante de pagamento",
-                  "Emitido em PDF imediatamente após a confirmação",
-                  "Válido para recursos de multa junto às autoridades",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-[#5B5C68]">
-                    <CheckCircle className="h-5 w-5 text-[#0E8B5A] flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-[#DCDDE3] shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-r from-[#5B2E8C] to-[#8B5FFF] px-6 py-4 flex items-center justify-between">
-                <div>
-                  <p className="text-white/70 text-xs uppercase tracking-wide">Comprovante</p>
-                  <p className="text-white font-bold">Registro de Passagem Veicular</p>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                {[
-                  { label: "Placa", valor: "MOV·1234", mono: true },
-                  { label: "Pórtico", valor: "Free Flow SP-330 — KM 45" },
-                  { label: "Concessionária", valor: "Ecovias do Imigrantes" },
-                  { label: "Data da passagem", valor: "14/04/2026 — 07:42:00" },
-                  { label: "Valor quitado", valor: "R$ 4,30", mono: true },
-                  { label: "Status", valor: "✓ Quitado em 14/04/2026" },
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm border-b border-[#F7F5FB] pb-3 last:border-0 last:pb-0">
-                    <span className="text-[#8A8B95]">{f.label}</span>
-                    <span className={`font-medium text-[#1A1B23] ${f.mono ? "font-mono tracking-wide" : ""}`}>
-                      {f.valor}
-                    </span>
-                  </div>
-                ))}
-                <div className="mt-4 pt-2">
-                  <div className="bg-[#D4F0E2] rounded-lg py-2.5 px-4 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
-                    <span className="text-xs font-semibold text-[#0E8B5A]">RPV emitido — autuação cancelada</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 5. Por que usar o Pedágio Simples? ─────────────────────── */}
+      {/* ── 4. Por que usar o Pedágio Simples? ─────────────────────── */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#5B2E8C]">
