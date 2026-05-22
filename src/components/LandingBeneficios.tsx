@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import {
   Radio, CreditCard, ShieldCheck, Building2, Search, AlertTriangle, CheckCircle,
   ChevronDown, ChevronUp, Smartphone, Zap,
-  ArrowRight, Star, Shield, Wifi
+  ArrowRight, Shield, Wifi
 } from "lucide-react";
 
 // ─── Dados ────────────────────────────────────────────────────────────────────
@@ -257,32 +257,6 @@ export function LandingBeneficios() {
                 </Fragment>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2. Banner "1° portal integrado" ────────────────────────── */}
-      <div className="bg-gradient-to-r from-[#2E1547] to-[#5B2E8C]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-            <Star className="h-3.5 w-3.5 text-[#F4C97A]" fill="currentColor" />
-            Lançamento
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-2xl mx-auto">
-            Você está no{" "}
-            <span className="text-[#C9AEEA]">1° portal integrado</span>{" "}
-            de pagamentos de pedágio das Rodovias do Brasil
-          </h2>
-          <p className="mt-4 text-white/70 max-w-xl mx-auto text-sm sm:text-base">
-            Pedágio Simples — by Move Mais. Uma plataforma única para consultar e quitar débitos de pedágio Free Flow em todas as concessionárias do país.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            {["Sem mensalidade", "Pagamento imediato", "Controle total", "Comprovante incluso"].map((f) => (
-              <span key={f} className="flex items-center gap-1.5 bg-white/10 text-white/90 rounded-full px-3 py-1 text-xs font-medium">
-                <CheckCircle className="h-3.5 w-3.5 text-[#C9AEEA]" />
-                {f}
-              </span>
-            ))}
           </div>
         </div>
       </div>
