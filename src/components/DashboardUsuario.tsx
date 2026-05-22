@@ -313,124 +313,41 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   ];
 
   const renderHomeContent = () => (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="max-w-4xl mx-auto space-y-4">
 
-      {/* KPIs — Total / Praças / Pórticos / Próximo vencimento */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        {/* Total em aberto */}
-        <Card className="border border-[#DCDDE3]">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Wallet className="h-4 w-4 text-[#5B2E8C]" />
-              <span className="text-xs uppercase tracking-wide text-[#8A8B95] font-medium">Total em aberto</span>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-[#1A1B23]">{formatCurrency(agg.totalGeral)}</p>
-            <p className="text-xs text-[#8A8B95] mt-1">{agg.countTotal} passagem{agg.countTotal === 1 ? '' : 's'}</p>
-          </CardContent>
-        </Card>
-
-        {/* Praças SPMAR */}
-        <Card className="border border-[#DCDDE3] bg-[#F4EFFB]/40">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Building2 className="h-4 w-4 text-[#5B2E8C]" />
-              <span className="text-xs uppercase tracking-wide text-[#5B2E8C] font-medium">Praças SPMAR</span>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-[#5B2E8C]">{formatCurrency(agg.totalPraca)}</p>
-            <p className="text-xs text-[#8A8B95] mt-1">{agg.countPraca} passagem{agg.countPraca === 1 ? '' : 's'}</p>
-          </CardContent>
-        </Card>
-
-        {/* Pórticos Free Flow */}
-        <Card className="border border-[#DCDDE3] bg-[#DFF4EA]/40">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Radio className="h-4 w-4 text-[#0E8B5A]" />
-              <span className="text-xs uppercase tracking-wide text-[#0E8B5A] font-medium">Pórticos Free Flow</span>
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-[#0E8B5A]">{formatCurrency(agg.totalPortico)}</p>
-            <p className="text-xs text-[#8A8B95] mt-1">{agg.countPortico} passagem{agg.countPortico === 1 ? '' : 's'}</p>
-          </CardContent>
-        </Card>
-
-        {/* Próximo vencimento */}
-        <Card className="border border-[#DCDDE3]">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-[#C77700]" />
-              <span className="text-xs uppercase tracking-wide text-[#8A8B95] font-medium">Próximo vencimento</span>
-            </div>
-            {proximo ? (
-              <>
-                <p className="text-xl sm:text-2xl font-bold text-[#1A1B23]">{proximo.prazoLimite}</p>
-                <p className="text-xs text-[#8A8B95] mt-1">{formatCurrency(proximo.valor)}</p>
-              </>
-            ) : (
-              <>
-                <p className="text-xl sm:text-2xl font-bold text-[#0E8B5A]">—</p>
-                <p className="text-xs text-[#8A8B95] mt-1">Sem pendências</p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Saudação */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      {/* Cabeçalho compacto */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#5B2E8C]">
-            Olá, {(usuario.nome || 'Usuário').split(' ')[0]} 👋
+          <h2 className="text-lg font-semibold text-[#1A1B23]">
+            Olá, {(usuario.nome || 'Usuário').split(' ')[0]}
           </h2>
           <p className="text-sm text-[#8A8B95] mt-0.5">
             {vencendoEmBreve > 0
-              ? `Você tem ${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
-              : `Tudo em dia por enquanto — ${passagensTodas.length} passagem${passagensTodas.length !== 1 ? 'ns' : ''} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-[#8A8B95] flex-shrink-0">
-          <Shield className="h-3.5 w-3.5 text-[#8B5FFF]" />
-          <span>{veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''} monitorado{veiculosMonitorados > 1 ? 's' : ''}</span>
-        </div>
-      </div>
-
-      {/* Cards de métricas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Total em aberto */}
-        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#F8D7DD] border-[#F0A8B5]' : 'bg-white border-[#DCDDE3]'}`}>
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Em aberto</p>
-          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#A3203B]' : 'text-[#5B2E8C]'}`}>
-            {formatCurrency(totalEmAberto)}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">{passagensTodas.length} passagem{passagensTodas.length !== 1 ? 'ns' : ''}</p>
-        </div>
-
-        {/* Vencendo em breve */}
-        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#FBE8C5] border-[#F4C97A]' : 'bg-white border-[#DCDDE3]'}`}>
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Vence em breve</p>
-          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#9A5B00]' : 'text-[#8A8B95]'}`}>
-            {vencendoEmBreve}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">
-            {vencendoEmBreve > 0 ? 'passagem próx. do prazo' : 'nenhuma urgente'}
+              ? `${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
+              : passagensTodas.length === 0
+                ? 'Nenhuma pendência no momento'
+                : `${passagensTodas.length} passagem${passagensTodas.length !== 1 ? 'ns' : ''} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
           </p>
         </div>
 
-        {/* Multas evitadas */}
-        <div className="rounded-xl border-2 bg-[#D4F0E2] border-[#A3D9BE] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Multas evitadas</p>
-          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#0A6B45]">
-            {formatCurrency(multasEvitadas)}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">economia acumulada</p>
-        </div>
-
-        {/* Veículos */}
-        <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Veículos</p>
-          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#5B2E8C]">
-            {veiculosMonitorados}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">monitorado{veiculosMonitorados > 1 ? 's' : ''}</p>
+        {/* Pills de status */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {agg.totalGeral > 0 && (
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${vencendoEmBreve > 0 ? 'bg-[#F8D7DD] text-[#A3203B]' : 'bg-[#F4EFFB] text-[#5B2E8C]'}`}>
+              <Wallet className="h-3 w-3" />
+              {formatCurrency(agg.totalGeral)} em aberto
+            </span>
+          )}
+          {proximo && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#FBE8C5] text-[#9A5B00]">
+              <Calendar className="h-3 w-3" />
+              Vence {proximo.prazoLimite}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1.5 text-xs text-[#8A8B95] px-2 py-1.5">
+            <Shield className="h-3 w-3 text-[#8B5FFF]" />
+            {veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''}
+          </span>
         </div>
       </div>
 
