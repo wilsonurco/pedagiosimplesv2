@@ -1,5 +1,7 @@
+import { useState } from "react";
 import logoFooterImg from "figma:asset/b4b61ea2aff4e0735f9cc375bc7a4846923c94d1.png";
-import { QrCode, CreditCard, Instagram, Twitter, Linkedin, Youtube, Building2 } from "lucide-react";
+import { QrCode, CreditCard, Instagram, Twitter, Linkedin, Youtube, Building2, ShieldCheck } from "lucide-react";
+import { CertificadosModal } from "./CertificadosModal";
 
 interface FooterProps {
   onNavigateToFAQ?: () => void;
@@ -46,6 +48,8 @@ const redesSociais = [
 ];
 
 export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps) {
+  const [modalCertificados, setModalCertificados] = useState(false);
+
   return (
     <footer className="bg-[#1A1B23]">
 
@@ -162,20 +166,28 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
               </div>
             </div>
 
-            {/* Selos de segurança */}
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-[#0E8B5A]">PCI DSS</span>
-                <span className="text-[8px] text-white/30">Compliant</span>
-              </div>
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-[#5B2E8C]">SSL</span>
-                <span className="text-[8px] text-white/30">256-bit</span>
-              </div>
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-white/50">LGPD</span>
-                <span className="text-[8px] text-white/30">Conformidade</span>
-              </div>
+            {/* Selos de segurança + trigger do modal */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {[
+                { label: "PCI DSS", sub: "Compliant", cor: "text-[#0E8B5A]" },
+                { label: "SSL", sub: "256-bit", cor: "text-[#8B5FFF]" },
+                { label: "LGPD", sub: "Conformidade", cor: "text-white/50" },
+              ].map((s) => (
+                <div key={s.label} className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
+                  <span className={`text-[10px] font-bold ${s.cor}`}>{s.label}</span>
+                  <span className="text-[8px] text-white/30">{s.sub}</span>
+                </div>
+              ))}
+              <button
+                onClick={() => setModalCertificados(true)}
+                className="flex items-center gap-1.5 bg-white/5 hover:bg-[#5B2E8C]/40 border border-white/10 hover:border-[#8B5FFF]/40 rounded-lg px-3 py-2 transition-colors group"
+                title="Ver todas as certificações"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-[#8B5FFF] group-hover:text-white transition-colors" />
+                <span className="text-[10px] font-semibold text-white/40 group-hover:text-white/80 transition-colors">
+                  Certificações & Selos
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -202,6 +214,7 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
         </div>
       </div>
 
+      <CertificadosModal open={modalCertificados} onOpenChange={setModalCertificados} />
     </footer>
   );
 }
