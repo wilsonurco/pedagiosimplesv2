@@ -507,10 +507,6 @@ export function LandingBeneficios() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-                <Zap className="h-3.5 w-3.5 text-[#F4C97A]" />
-                Sem mensalidade
-              </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
                 Diga adeus às{" "}
                 <span className="text-[#C9AEEA]">multas de evasão</span>{" "}
