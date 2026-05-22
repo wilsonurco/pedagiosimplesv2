@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "./components/ui/button";
 import { Card, CardContent } from "./components/ui/card";
+import { Checkbox } from "./components/ui/checkbox";
 import { AnimatedHero } from "./components/ui/animated-hero-section-1";
 import { CheckCircle, Car, X, AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -44,6 +45,7 @@ export default function App() {
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [mostrandoResultados, setMostrandoResultados] = useState(false);
   const [carregandoConsulta, setCarregandoConsulta] = useState(false);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
 
   const handleConsultar = (dados: any) => {
     setDadosVeiculo(dados);
@@ -172,13 +174,14 @@ export default function App() {
     setPlacaError('');
     setTurnstileToken(null);
     setTurnstileKey(k => k + 1);
+    setAceitouTermos(false);
   };
 
   // Validação da placa
   const placaValida = isPlacaCompleta(placaValue);
 
   // Lógica do formulário da landing page
-  const isFormValid = placaValida && !!turnstileToken;
+  const isFormValid = placaValida && !!turnstileToken && aceitouTermos;
 
   const handleBuscarDebitos = () => {
     if (!isFormValid) return;
@@ -210,6 +213,7 @@ export default function App() {
     setPlacaError('');
     setTurnstileToken(null);
     setTurnstileKey(k => k + 1);
+    setAceitouTermos(false);
   };
 
   // Renderizar a tela baseada no estado atual
@@ -473,12 +477,35 @@ export default function App() {
               </div>
 
               <div className="mb-4 sm:mb-5">
-                <div className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed text-center">
-                  Ao consultar, você concorda com os{' '}
-                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Termos de Uso</a>
-                  {' '}e o{' '}
-                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Aviso de Privacidade</a>.
-                </div>
+                <label
+                  htmlFor="aceite-termos"
+                  className="flex items-start gap-2.5 cursor-pointer group"
+                >
+                  <Checkbox
+                    id="aceite-termos"
+                    checked={aceitouTermos}
+                    onCheckedChange={(v) => setAceitouTermos(v === true)}
+                    className="mt-0.5 flex-shrink-0 border-[#8A8B95] data-[state=checked]:bg-[#5B2E8C] data-[state=checked]:border-[#5B2E8C]"
+                  />
+                  <span className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed">
+                    Li e concordo com os{' '}
+                    <a
+                      href="#"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors"
+                    >
+                      Termos de Uso
+                    </a>
+                    {' '}e o{' '}
+                    <a
+                      href="#"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors"
+                    >
+                      Aviso de Privacidade
+                    </a>.
+                  </span>
+                </label>
               </div>
 
               <div className="mb-4 sm:mb-6 flex justify-center">
