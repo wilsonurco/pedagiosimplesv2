@@ -237,22 +237,22 @@ export function LandingBeneficios() {
     <div className="bg-white">
 
       {/* ── 1. Parceiros strip ─────────────────────────────────────── */}
-      <div className="border-y border-[#ECECF1] bg-[#F7F5FB]">
+      <div className="border-y border-white/5 bg-[#1A1B23]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 overflow-x-auto">
           <div className="flex items-center gap-0 flex-nowrap whitespace-nowrap">
-            <span className="flex-shrink-0 text-xs font-semibold text-[#8A8B95] uppercase tracking-widest pr-6 border-r border-[#DCDDE3]">
+            <span className="flex-shrink-0 text-xs font-semibold text-white/30 uppercase tracking-widest pr-6 border-r border-white/10">
               Concessionárias parceiras
             </span>
             <div className="flex items-center gap-x-3 pl-6 flex-nowrap">
               {parceiros.map((p, i) => (
                 <Fragment key={p.nome}>
                   <span
-                    className={`text-sm leading-none select-none text-[#1A1B23] opacity-50 hover:opacity-80 transition-opacity ${p.estilo}`}
+                    className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}
                   >
                     {p.nome}
                   </span>
                   {i < parceiros.length - 1 && (
-                    <span aria-hidden="true" className="text-[#C6C7CF] text-sm leading-none select-none">|</span>
+                    <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
                   )}
                 </Fragment>
               ))}
