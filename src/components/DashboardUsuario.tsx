@@ -35,6 +35,7 @@ import {
   Wallet
 } from "lucide-react";
 
+import LogoCinza from "../imports/LogoCinza";
 import { HistoricoPagamentos } from "./HistoricoPagamentos";
 import { VeiculosCadastrados } from "./VeiculosCadastrados";
 import { ConfiguracoesConta } from "./ConfiguracoesConta";
@@ -941,11 +942,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#5B2E8C] rounded-lg flex items-center justify-center flex-shrink-0">
-                <Car className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <span className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
+            <div className="flex items-center">
+              <LogoCinza />
             </div>
             
             {/* User Info & Actions */}
