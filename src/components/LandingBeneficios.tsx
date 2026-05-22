@@ -270,7 +270,7 @@ export function LandingBeneficios() {
               Passo a passo
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-3 leading-tight">
-              É como você pode pagar o{" "}
+              E como você pode pagar o{" "}
               <span className="text-[#5B2E8C]">pedágio Free Flow</span>
             </h2>
             <p className="text-[#8A8B95] mb-8 leading-relaxed">
