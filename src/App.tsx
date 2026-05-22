@@ -421,8 +421,8 @@ export default function App() {
                   Consulta gratuita
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl text-[#1A1B23] leading-relaxed mb-2">
-                  <strong className="text-[#5B2E8C]">Verifique suas passagens</strong>{" "}
-                  em <strong className="text-[#5B2E8C]">praças SPMAR e pórticos Free Flow</strong>.
+                  <strong className="text-[#5B2E8C]">Consulte suas pendências</strong>{" "}
+                  de pedágio e <strong className="text-[#5B2E8C]">pague com zero complicações</strong>.
                 </h3>
                 <div className="w-12 h-1 bg-[#8B5FFF] rounded-full mx-auto" />
               </div>
