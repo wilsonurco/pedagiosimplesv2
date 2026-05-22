@@ -103,36 +103,6 @@ const timelineFreeFlow = [
   },
 ];
 
-const artigosEducativos = [
-  {
-    tag: "Tutorial",
-    tagCor: "bg-[#F4EFFB] text-[#5B2E8C]",
-    titulo: "Free Flow Significado: Entenda o sistema em detalhes",
-    descricao: "Saiba como funciona a cobrança eletrônica nas rodovias brasileiras e o que muda para quem não tem TAG.",
-    tempo: "5 min de leitura",
-    imagem: "https://images.pexels.com/photos/16962779/pexels-photo-16962779.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Vista aérea de rodovia chegando à ponte de Florianópolis",
-  },
-  {
-    tag: "Dicas",
-    tagCor: "bg-[#D4F0E2] text-[#0E8B5A]",
-    titulo: "Principais Benefícios do Pedágio Free Flow",
-    descricao: "Menos trânsito nas praças, mais fluidez e segurança nas rodovias. Entenda as vantagens do sistema.",
-    tempo: "4 min de leitura",
-    imagem: "https://images.pexels.com/photos/30623171/pexels-photo-30623171.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Rodovia brasileira com tráfego cercada por vegetação urbana",
-  },
-  {
-    tag: "Tecnologia",
-    tagCor: "bg-[#FBE8C5] text-[#C77700]",
-    titulo: "Tecnologia OCR e Inteligência Artificial",
-    descricao: "Como câmeras de alta resolução e IA identificam milhões de veículos por dia com precisão de 99,9%.",
-    tempo: "6 min de leitura",
-    imagem: "https://images.pexels.com/photos/28174483/pexels-photo-28174483.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop",
-    alt: "Vista aérea de rodovia ao entardecer com rastros de luz dos veículos",
-  },
-];
-
 const faqItens = [
   {
     pergunta: "O que é Pedágio Eletrônico Free Flow?",
@@ -567,52 +537,7 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 9. Blog ──────────────────────────────────────────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#F4EFFB] text-[#8B5FFF] border border-[#8B5FFF]/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
-              Blog
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23]">Saiba mais sobre Free Flow</h2>
-          </div>
-          <a href="#" className="inline-flex items-center gap-1.5 text-[#5B2E8C] font-semibold hover:text-[#8B5FFF] transition-colors text-sm flex-shrink-0">
-            Ver todos os artigos <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {artigosEducativos.map((a, i) => (
-            <a
-              key={i}
-              href="#"
-              className="group flex flex-col rounded-xl border border-[#DCDDE3] overflow-hidden hover:border-[#8B5FFF]/40 hover:shadow-md transition-all"
-            >
-              <div className="h-40 relative overflow-hidden bg-[#2E1547]">
-                <img
-                  src={a.imagem}
-                  alt={a.alt}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#2E1547]/60 via-transparent to-transparent" />
-              </div>
-              <div className="p-5 flex flex-col flex-1">
-                <span className={`inline-flex text-xs font-semibold rounded-full px-2.5 py-0.5 mb-3 w-fit ${a.tagCor}`}>
-                  {a.tag}
-                </span>
-                <h3 className="font-semibold text-[#1A1B23] text-sm leading-snug mb-2 group-hover:text-[#5B2E8C] transition-colors">
-                  {a.titulo}
-                </h3>
-                <p className="text-xs text-[#8A8B95] leading-relaxed flex-1">{a.descricao}</p>
-                <p className="text-xs text-[#C6C7CF] mt-4">{a.tempo}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* ── 10. FAQ ──────────────────────────────────────────────────── */}
+      {/* ── 9. FAQ ──────────────────────────────────────────────────── */}
       <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
