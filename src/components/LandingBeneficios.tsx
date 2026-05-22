@@ -1,8 +1,8 @@
 import { Fragment, useState } from "react";
 import {
-  Radio, CreditCard, Search, CheckCircle,
+  CreditCard, Search, CheckCircle,
   ChevronDown, ChevronUp, Smartphone, Zap,
-  ArrowRight, Shield, Wifi
+  ArrowRight
 } from "lucide-react";
 
 // ─── Dados ────────────────────────────────────────────────────────────────────
@@ -44,29 +44,6 @@ const passosPagamento = [
 ];
 
 
-const timelineFreeFlow = [
-  {
-    icone: Wifi,
-    cor: "text-[#8B5FFF]",
-    bg: "bg-[#F4EFFB]",
-    titulo: "Tecnologia Avançada",
-    descricao: "Pórticos com sensores ópticos, RFID e câmeras de reconhecimento de placa (OCR) identificam cada veículo em até 50ms.",
-  },
-  {
-    icone: Radio,
-    cor: "text-[#5B2E8C]",
-    bg: "bg-[#EDE7F6]",
-    titulo: "Passagem Fluida",
-    descricao: "Sem redução de velocidade, sem cabine, sem fila. O veículo é identificado e a cobrança gerada automaticamente.",
-  },
-  {
-    icone: Shield,
-    cor: "text-[#0E8B5A]",
-    bg: "bg-[#D4F0E2]",
-    titulo: "Segurança Garantida",
-    descricao: "Todos os dados são criptografados e o processo segue os padrões da ANTT, com imagem armazenada por 90 dias.",
-  },
-];
 
 const faqItens = [
   {
@@ -270,42 +247,6 @@ export function LandingBeneficios() {
 
           <div className="flex justify-center lg:justify-end">
             <PhoneMockup />
-          </div>
-        </div>
-      </div>
-
-      {/* ── 8. Como funciona a Free Flow — timeline ─────────────────── */}
-      <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#F4EFFB] text-[#8B5FFF] border border-[#8B5FFF]/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
-              <Radio className="h-4 w-4" />
-              Tecnologia
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#5B2E8C]">
-              Como Funciona a Free Flow
-            </h2>
-            <p className="mt-3 text-[#8A8B95] max-w-lg mx-auto text-sm sm:text-base">
-              Uma das infraestruturas mais avançadas do mundo para cobrança eletrônica de pedágio.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {timelineFreeFlow.map((t, i) => {
-              const Icon = t.icone;
-              return (
-                <div key={i} className="relative flex flex-col items-center text-center">
-                  {i < timelineFreeFlow.length - 1 && (
-                    <div className="hidden md:block absolute top-7 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-[#8B5FFF]/40 to-[#5B2E8C]/20" />
-                  )}
-                  <div className={`w-14 h-14 rounded-2xl ${t.bg} flex items-center justify-center mb-4 relative z-10`}>
-                    <Icon className={`h-6 w-6 ${t.cor}`} />
-                  </div>
-                  <h3 className="font-bold text-[#1A1B23] mb-2 text-sm sm:text-base">{t.titulo}</h3>
-                  <p className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed">{t.descricao}</p>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
