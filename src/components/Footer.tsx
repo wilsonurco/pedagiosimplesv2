@@ -119,7 +119,9 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
                 <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-3 py-1.5">
                   <CreditCard className="h-4 w-4 text-[#8B5FFF]" />
                   <span className="text-xs font-semibold text-white/60">Cartão de crédito</span>
-                  <span className="text-[10px] font-bold text-white/30 border border-white/15 rounded px-1.5 py-0.5 ml-1">Cielo</span>
+                  {["Mastercard", "Visa", "Elo"].map((brand) => (
+                    <span key={brand} className="text-[10px] font-bold text-white/30 border border-white/15 rounded px-1.5 py-0.5 ml-1">{brand}</span>
+                  ))}
                 </div>
               </div>
             </div>
