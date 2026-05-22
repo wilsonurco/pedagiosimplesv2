@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import {
-  Radio, CreditCard, ShieldCheck, Building2, Search, AlertTriangle, CheckCircle,
+  Radio, CreditCard, Search, CheckCircle,
   ChevronDown, ChevronUp, Smartphone, Zap,
   ArrowRight, Shield, Wifi
 } from "lucide-react";
@@ -40,41 +40,6 @@ const passosPagamento = [
     icone: Zap,
     titulo: "Evite o registro de multa de evasão",
     descricao: "Com o pagamento confirmado, suas passagens são quitadas antes do prazo e a multa não é gerada.",
-  },
-];
-
-const beneficios = [
-  {
-    icone: Building2,
-    cor: "text-[#5B2E8C]",
-    bg: "bg-[#F4EFFB]",
-    destaque: "SPMAR + Free Flow",
-    titulo: "Praça ou pórtico — em um só lugar",
-    descricao: "Consulte por placa e veja todas as suas passagens (SPMAR e Free Flow) num só lugar.",
-  },
-  {
-    icone: AlertTriangle,
-    cor: "text-[#C77700]",
-    bg: "bg-[#FBE8C5]",
-    destaque: "Multa de R$195,23",
-    titulo: "Sem TAG, sem dinheiro? Sem multa.",
-    descricao: "Regularize antes do prazo e evite a multa de evasão.",
-  },
-  {
-    icone: CreditCard,
-    cor: "text-[#0E8B5A]",
-    bg: "bg-[#D4F0E2]",
-    destaque: "PIX · ELO · Visa · Master",
-    titulo: "Pague como preferir",
-    descricao: "PIX instantâneo ou cartão de crédito (ELO, Visa, Mastercard).",
-  },
-  {
-    icone: ShieldCheck,
-    cor: "text-[#8B5FFF]",
-    bg: "bg-[#F4EFFB]",
-    destaque: "PCI DSS Level 1",
-    titulo: "100% seguro e confiável",
-    descricao: "Ambiente criptografado, conformidade PCI DSS e antifraude 24 horas.",
   },
 ];
 
@@ -309,38 +274,7 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 4. Por que usar o Pedágio Simples? ─────────────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#5B2E8C]">
-            Por que usar o Pedágio Simples?
-          </h2>
-          <p className="mt-3 text-[#8A8B95] max-w-lg mx-auto text-sm sm:text-base">
-            A única plataforma pensada especificamente para quem não tem TAG e precisa regularizar passagens Free Flow.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          {beneficios.map((b, i) => {
-            const Icon = b.icone;
-            return (
-              <div
-                key={i}
-                className="flex flex-col items-start p-5 rounded-xl border border-[#DCDDE3] bg-white hover:border-[#8B5FFF]/40 hover:shadow-md transition-all"
-              >
-                <div className={`w-10 h-10 rounded-lg ${b.bg} flex items-center justify-center mb-3`}>
-                  <Icon className={`h-5 w-5 ${b.cor}`} />
-                </div>
-                <p className={`text-base font-bold mb-1 ${b.cor}`}>{b.destaque}</p>
-                <h3 className="font-semibold text-[#5B2E8C] text-sm mb-1">{b.titulo}</h3>
-                <p className="text-xs text-[#8A8B95] leading-relaxed">{b.descricao}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-{/* ── 7. O que é Free Flow ────────────────────────────────────── */}
+      {/* ── 7. O que é Free Flow ────────────────────────────────────── */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="order-2 lg:order-1">
