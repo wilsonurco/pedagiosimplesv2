@@ -35,7 +35,7 @@ import {
   Wallet
 } from "lucide-react";
 
-import LogoCinza from "../imports/LogoCinza";
+import logoPedagioSimples from "../assets/logo-pedagio-simples.svg";
 import { HistoricoPagamentos } from "./HistoricoPagamentos";
 import { VeiculosCadastrados } from "./VeiculosCadastrados";
 import { ConfiguracoesConta } from "./ConfiguracoesConta";
@@ -943,7 +943,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <LogoCinza />
+              <img
+                src={logoPedagioSimples}
+                alt="Pedágio Simples — by Move Mais"
+                className="h-8 sm:h-10 w-auto"
+              />
             </div>
             
             {/* User Info & Actions */}
