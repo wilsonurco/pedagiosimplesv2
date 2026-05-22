@@ -22,7 +22,6 @@ import { gerarDebitos, agregarPorTipo, type Passagem } from "./utils/simulator";
 import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
-import { PartnerCarousel } from "./components/PartnerCarousel";
 import { LandingBeneficios } from "./components/LandingBeneficios";
 
 type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
@@ -642,7 +641,6 @@ export default function App() {
         notice={null}
       />
       <LandingBeneficios />
-      <PartnerCarousel />
       <Footer
         onNavigateToFAQ={() => setTelaAtual('faq')}
         onAcessoConcessionaria={() => setTelaAtual('login-concessionaria')}
