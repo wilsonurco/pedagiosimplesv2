@@ -306,11 +306,8 @@ export function FormaPagamento({ onBack, onPagar, onPIX, valorTotal, debitosSele
                           <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                         </div>
                         <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23]">Cartão de crédito</h3>
-                            <span className="inline-flex items-center justify-center rounded bg-yellow-400 text-yellow-950 px-2 py-0.5 text-xs font-bold">ELO</span>
-                          </div>
-                          <p className="text-sm text-[#8A8B95]">ELO em destaque · Visa e Mastercard aceitos</p>
+                          <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23]">Cartão de crédito</h3>
+                          <p className="text-sm text-[#8A8B95]">Mastercard, Visa e Elo aceitos</p>
                         </div>
                       </div>
                       {formaPagamento === 'cartao' && (
