@@ -17,7 +17,7 @@ interface AnimatedHeroProps {
   navLinks: NavLink[];
   topRightAction?: React.ReactNode;
   title: React.ReactNode;
-  description: string;
+  description: React.ReactNode;
   ctaButton?: {
     text: string;
     onClick: () => void;
