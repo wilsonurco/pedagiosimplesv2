@@ -240,8 +240,8 @@ export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps
         {/* Footer */}
         <p className="mt-2 text-[11px] text-[#C6C7CF] text-center">
           Dúvidas sobre nossas certificações? Entre em contato em{" "}
-          <a href="mailto:compliance@movemais.com.br" className="text-[#5B2E8C] hover:underline">
-            compliance@movemais.com.br
+          <a href="mailto:compliance@movemais.com" className="text-[#5B2E8C] hover:underline">
+            compliance@movemais.com
           </a>
         </p>
       </DialogContent>
