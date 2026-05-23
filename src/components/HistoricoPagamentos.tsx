@@ -481,15 +481,6 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
             </SelectContent>
           </Select>
 
-          {/* Exportar — largura total */}
-          <Button
-            onClick={exportarRelatorio}
-            variant="outline"
-            className="w-full h-9 text-sm border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
-          >
-            <Download className="h-4 w-4 mr-1.5" />
-            Exportar PDF
-          </Button>
         </CardContent>
       </Card>
 
@@ -539,12 +530,6 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                             {p.formaPagamento === 'pix' ? <Smartphone className="h-3 w-3" /> : <CreditCard className="h-3 w-3" />}
                             {formaPagamentoLabel(p.formaPagamento)}
                           </span>
-                          {p.multa && (
-                            <span className="text-[10px] text-[#0E8B5A] bg-[#D4F0E2] border border-[#A3D9BE] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-1">
-                              <Shield className="h-2.5 w-2.5" />
-                              +{formatCurrency(p.multa.economizada)} economizado
-                            </span>
-                          )}
                         </div>
 
                         {/* Linha 4: ID · rodovia · km — detalhes técnicos */}
@@ -616,6 +601,16 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
           )}
         </CardContent>
       </Card>
+
+      {/* Exportar PDF — ao final da página */}
+      <Button
+        onClick={exportarRelatorio}
+        variant="outline"
+        className="w-full h-10 text-sm border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
+      >
+        <Download className="h-4 w-4 mr-1.5" />
+        Exportar PDF
+      </Button>
 
       {/* Modal comprovante */}
       <Dialog open={!!passagemSelecionada} onOpenChange={open => !open && setPassagemSelecionada(null)}>
