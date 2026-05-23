@@ -380,120 +380,6 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Adicionar Nova Placa */}
-          <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-2 sm:p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex w-6 h-6 sm:w-8 sm:h-8 bg-[#8B5FFF] rounded-lg items-center justify-center flex-shrink-0">
-                  <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[#5B2E8C] text-xs sm:text-sm leading-tight">Consultar outra placa</h4>
-                  <p className="text-xs text-[#8A8B95] leading-tight hidden sm:block">Adicione débitos de outro veículo ao pagamento</p>
-                </div>
-              </div>
-              {!mostrandoFormularioNovaPlaca && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                  className="text-xs h-8 px-2 sm:px-3 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white flex-shrink-0 w-full sm:w-auto"
-                >
-                  <Plus className="h-3 w-3 mr-1" />
-                  <span className="sm:hidden">Adicionar</span>
-                  <span className="hidden sm:inline">Adicionar</span>
-                </Button>
-              )}
-            </div>
-            
-            {mostrandoFormularioNovaPlaca && (
-              <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-[#8B5FFF]/20">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={novaPlaca}
-                      onChange={(e) => {
-                        let value = e.target.value.toUpperCase();
-                        value = value.replace(/[^A-Z0-9]/g, '');
-                        if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
-                          value = value.slice(0, 3) + '-' + value.slice(3);
-                        }
-                        setNovaPlaca(value);
-                      }}
-                      placeholder="ABC-1234"
-                      className="w-full h-9 sm:h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
-                      maxLength={8}
-                    />
-                  </div>
-                  <div className="flex gap-2 sm:flex-shrink-0">
-                    <Button
-                      onClick={buscarDebitosNovaPlaca}
-                      disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
-                      size="sm"
-                      className="flex-1 sm:flex-none h-9 sm:h-10 px-3 sm:px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
-                    >
-                      {consultandoNovaPlaca ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <>
-                          <Car className="h-3 w-3 mr-1 hidden sm:inline" />
-                          Buscar
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setMostrandoFormularioNovaPlaca(false);
-                        setNovaPlaca('');
-                      }}
-                      className="h-9 sm:h-10 px-2 sm:px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB] flex-shrink-0"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {resultadoConsultaNovaPlaca && (
-                  <div className="bg-white border border-[#DCDDE3] rounded-lg p-2 sm:p-3">
-                    {resultadoConsultaNovaPlaca.success ? (
-                      <div className="space-y-2">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#0E8B5A] flex-shrink-0" />
-                            <span className="text-xs sm:text-sm font-medium text-[#5B2E8C] leading-tight">
-                              {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
-                            </span>
-                          </div>
-                          <span className="text-xs sm:text-sm font-semibold text-[#8B5FFF] sm:text-right">
-                            {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
-                          </span>
-                        </div>
-                        <Button
-                          onClick={adicionarDebitosNovaPlaca}
-                          size="sm"
-                          className="w-full h-8 sm:h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Adicionar ao pagamento
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#8A8B95] flex-shrink-0" />
-                        <span className="text-xs sm:text-sm text-[#8A8B95] leading-tight">
-                          Nenhuma pendência encontrada para esta placa
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
           {/* Filtros — estilo iOS Segmented Control */}
           <div className="flex flex-wrap gap-2 mb-4">
             {/* Tipo */}
@@ -775,7 +661,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
           {/* Botão de Prosseguir */}
           <div className="pt-4">
-            <Button 
+            <Button
               onClick={handleProsseguir}
               disabled={debitosSelecionadosResumo.length === 0}
               className={`w-full h-12 sm:h-14 text-sm sm:text-lg font-semibold rounded-lg transition-all ${
@@ -788,6 +674,78 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <span className="hidden sm:inline">Prosseguir para Pagamento - {formatCurrency(calcularValorTotal())}</span>
               <span className="sm:hidden">Pagar - {formatCurrency(calcularValorTotal())}</span>
             </Button>
+          </div>
+
+          {/* Consultar outra placa — ação terciária */}
+          <div className="border-t border-[#ECECF1] pt-3">
+            {!mostrandoFormularioNovaPlaca ? (
+              <button
+                onClick={() => setMostrandoFormularioNovaPlaca(true)}
+                className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors group"
+              >
+                <Plus className="h-3 w-3 group-hover:text-[#5B2E8C]" />
+                Consultar outra placa
+              </button>
+            ) : (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
+                  <button
+                    onClick={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
+                    className="text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={novaPlaca}
+                    onChange={(e) => {
+                      let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
+                        value = value.slice(0, 3) + '-' + value.slice(3);
+                      }
+                      setNovaPlaca(value);
+                    }}
+                    placeholder="ABC-1234"
+                    className="flex-1 h-9 px-3 bg-[#F7F7F9] border border-[#E5E6EC] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#B0B1BB] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/15"
+                    maxLength={8}
+                  />
+                  <Button
+                    onClick={buscarDebitosNovaPlaca}
+                    disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
+                    size="sm"
+                    className="h-9 px-4 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs"
+                  >
+                    {consultandoNovaPlaca ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Buscar'}
+                  </Button>
+                </div>
+
+                {resultadoConsultaNovaPlaca && (
+                  <div className="rounded-lg border border-[#DCDDE3] bg-white p-3 mt-1">
+                    {resultadoConsultaNovaPlaca.success ? (
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-[#0E8B5A] flex-shrink-0" />
+                          <span className="text-xs text-[#1A1B23] font-medium">
+                            {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} · {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
+                          </span>
+                        </div>
+                        <Button onClick={adicionarDebitosNovaPlaca} size="sm" className="h-7 px-3 text-xs bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white flex-shrink-0">
+                          Adicionar
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                        <span className="text-xs text-[#8A8B95]">Nenhuma pendência encontrada</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
         </CardContent>
