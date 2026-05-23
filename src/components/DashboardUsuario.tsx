@@ -268,6 +268,14 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     }
   };
 
+  const formatPassagemId = (id: string): string => {
+    let h = 0
+    for (let i = 0; i < id.length; i++) {
+      h = (h * 31 + id.charCodeAt(i)) | 0
+    }
+    return 'PASS-' + String(Math.abs(h) % 1_000_000).padStart(6, '0')
+  }
+
   const getInitials = (nome: string) => {
     if (!nome) return 'U';
     return nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -584,6 +592,26 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                               <Car className="h-3 w-3" />
                               {p.placa}
                             </span>
+                          </div>
+                        </div>
+
+                        {/* Linha de detalhes: ID · Praça · Rodovia · KM */}
+                        <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 grid grid-cols-2 gap-x-4 gap-y-1.5">
+                          <div>
+                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">ID da Passagem</p>
+                            <p className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Rodovia</p>
+                            <p className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</p>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Praça</p>
+                            <p className="text-xs font-semibold text-[#3A3B47] truncate">{p.local}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Quilômetro</p>
+                            <p className="text-xs font-semibold text-[#3A3B47]">km {p.km}</p>
                           </div>
                         </div>
                       </div>
