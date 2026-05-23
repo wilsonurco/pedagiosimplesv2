@@ -212,7 +212,7 @@ export function LandingBeneficios() {
               Passo a passo
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-3 leading-tight">
-              E como eu posso pagar o pedágio?
+              E como eu posso pagar o <span className="text-[#5B2E8C]">pedágio</span>?
             </h2>
             <p className="text-[#8A8B95] mb-8 leading-relaxed">
               Sem precisar ir a nenhuma praça ou concessionária. Resolva pelo celular ou computador em menos de 3 minutos.
