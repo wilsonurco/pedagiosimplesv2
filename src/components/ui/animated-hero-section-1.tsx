@@ -103,7 +103,7 @@ export const AnimatedHero = ({
             style={{ backgroundImage: `url(${backgroundImageUrl})` }}
           />
         ) : null}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/55" />
       </div>
 
       {/* Header */}
@@ -191,13 +191,13 @@ export const AnimatedHero = ({
               >
                 <motion.h1
                   variants={itemVariants}
-                  className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+                  className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl [text-shadow:0_2px_6px_rgba(0,0,0,0.5)]"
                 >
                   {title}
                 </motion.h1>
                 <motion.p
                   variants={itemVariants}
-                  className="mt-6 max-w-xl text-lg leading-8 text-white/80"
+                  className="mt-6 max-w-xl text-lg leading-8 text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]"
                 >
                   {description}
                 </motion.p>
@@ -241,13 +241,13 @@ export const AnimatedHero = ({
           >
             <motion.h1
               variants={itemVariants}
-              className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+              className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl [text-shadow:0_2px_6px_rgba(0,0,0,0.5)]"
             >
               {title}
             </motion.h1>
             <motion.p
               variants={itemVariants}
-              className="mt-6 max-w-2xl text-lg leading-8 text-white/80"
+              className="mt-6 max-w-2xl text-lg leading-8 text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]"
             >
               {description}
             </motion.p>
