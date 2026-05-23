@@ -414,28 +414,7 @@ export default function App() {
   // Landing Page (tela padrão)
   const formCard = (
     <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
-      {/* Liquid Glass card */}
-      <Card
-        className="relative border-0 rounded-2xl overflow-hidden backdrop-blur-2xl"
-        style={{
-          background: 'rgba(255, 255, 255, 0.38)',
-          boxShadow: [
-            'inset 0 1.5px 0 rgba(255,255,255,0.85)',   /* specular top */
-            'inset 1px 0 0 rgba(255,255,255,0.45)',      /* specular left */
-            'inset -1px 0 0 rgba(255,255,255,0.15)',     /* specular right */
-            'inset 0 -1px 0 rgba(0,0,0,0.06)',           /* bottom shadow */
-            '0 0 0 1px rgba(255,255,255,0.30)',          /* border ring */
-            '0 24px 64px rgba(0,0,0,0.30)',              /* ambient shadow */
-            '0 4px 16px rgba(0,0,0,0.18)',               /* near shadow */
-          ].join(', '),
-        }}
-      >
-        {/* Specular highlight bar at top */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none z-10" />
-        {/* Subtle inner glow */}
-        <div className="absolute inset-0 rounded-2xl pointer-events-none z-10"
-          style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18) 0%, transparent 65%)' }}
-        />
+      <Card className="bg-white/95 border border-[#DCDDE3] shadow-xl rounded-xl overflow-hidden backdrop-blur-sm">
         <CardContent className="p-4 sm:p-6">
           {!mostrandoResultados && (
             <>
@@ -475,12 +454,12 @@ export default function App() {
                     }
                   }}
                   placeholder="ABC-1234 ou ABC1D23"
-                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white/70 backdrop-blur-sm border-2 rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#8A8B95] focus:outline-none transition-all duration-300 shadow-inner ${
+                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white border-2 rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#8A8B95] focus:outline-none transition-all duration-300 shadow-inner ${
                     placaError
-                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/20 bg-[#F8D7DD]/80'
+                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/20 bg-[#F8D7DD]'
                       : placaValida
-                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/20 bg-[#D4F0E2]/80'
-                        : 'border-white/50 focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/20'
+                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/20 bg-[#D4F0E2]'
+                        : 'border-[#DCDDE3] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/20'
                   }`}
                   maxLength={8}
                 />
