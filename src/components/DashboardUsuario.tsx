@@ -572,8 +572,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
-                          <div className="flex items-center gap-2 text-xs text-[#8A8B95]">
+                        {/* Linha 2: data · hora · concessionária — vence · placa */}
+                        <div className="flex flex-wrap items-center justify-between gap-y-1 gap-x-3 text-xs text-[#8A8B95]">
+                          <div className="flex items-center gap-2">
                             <Calendar className="h-3 w-3 flex-shrink-0" />
                             <span>{p.data} às {p.hora}</span>
                             {p.concessionaria && (
@@ -583,36 +584,36 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                               </>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 text-xs flex-shrink-0">
+                          <div className="flex items-center gap-3 flex-shrink-0">
                             <span className={`flex items-center gap-1 ${isRisco ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
                               <Shield className="h-3 w-3" />
                               Vence: {p.prazoLimite}
                             </span>
-                            <span className="flex items-center gap-1 text-[#8A8B95]">
+                            <span className="flex items-center gap-1">
                               <Car className="h-3 w-3" />
                               {p.placa}
                             </span>
                           </div>
                         </div>
 
-                        {/* Linha de detalhes: ID · Praça · Rodovia · KM */}
-                        <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 grid grid-cols-2 gap-x-4 gap-y-1.5">
-                          <div>
-                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">ID da Passagem</p>
-                            <p className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Rodovia</p>
-                            <p className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</p>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Praça</p>
-                            <p className="text-xs font-semibold text-[#3A3B47] truncate">{p.local}</p>
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Quilômetro</p>
-                            <p className="text-xs font-semibold text-[#3A3B47]">km {p.km}</p>
-                          </div>
+                        {/* Linha 3: ID · Rodovia · KM — numa linha só */}
+                        <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 flex flex-wrap gap-x-5 gap-y-1.5">
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">ID da Passagem</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Rodovia</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Quilômetro</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">km {p.km}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Praça</span>
+                            <span className="text-xs font-semibold text-[#3A3B47] truncate max-w-[220px]">{p.local}</span>
+                          </span>
                         </div>
                       </div>
                     </div>
