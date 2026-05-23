@@ -380,25 +380,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Filtros — estilo iOS Segmented Control */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {/* Tipo */}
-            <div className="inline-flex items-center bg-[#EBEBED] rounded-full p-0.5">
+          {/* Filtros — estilo iOS Segmented Control, largura total */}
+          <div className="mb-4">
+            <div className="flex w-full bg-[#EBEBED] rounded-full p-0.5">
               {(['todas', 'praca_fisica', 'portico_free_flow'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setFiltroTipo(t)}
-                  className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                  className={`flex-1 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
                     filtroTipo === t
                       ? 'bg-white text-[#1A1B23] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.07)]'
                       : 'text-[#6B6F7A] hover:text-[#1A1B23]'
                   }`}
                 >
-                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça SPMAR' : 'Free Flow'}
+                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça Manual' : 'Free Flow'}
                 </button>
               ))}
             </div>
-
           </div>
 
           {/* Filtro por Placa - apenas se houver múltiplas placas */}
