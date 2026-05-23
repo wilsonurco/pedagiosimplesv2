@@ -19,8 +19,6 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
-  MapPin,
-  Hash,
   X,
 } from "lucide-react";
 
@@ -204,9 +202,6 @@ const PASSAGENS_PAGAS: PassagemPaga[] = [
 
 export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosProps = {}) {
   const [filtroPeriodo, setFiltroPeriodo] = useState('todos');
-  const [filtroConcessionaria, setFiltroConcessionaria] = useState('todas');
-  const [filtroTipo, setFiltroTipo] = useState('todos');
-  const [filtroFormaPagamento, setFiltroFormaPagamento] = useState('todas');
   const [filtroTexto, setFiltroTexto] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 8;
@@ -226,16 +221,11 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
     return d;
   };
 
-  const concessionarias = ['todas', ...Array.from(new Set(PASSAGENS_PAGAS.map(p => p.concessionaria)))];
-
   const passagensFiltradas = PASSAGENS_PAGAS.filter(p => {
     if (filtroPeriodo !== 'todos') {
       const days = filtroPeriodo === '7d' ? 7 : filtroPeriodo === '30d' ? 30 : 90;
       if (parseDate(p.data) < getDaysAgo(days)) return false;
     }
-    if (filtroConcessionaria !== 'todas' && p.concessionaria !== filtroConcessionaria) return false;
-    if (filtroTipo !== 'todos' && p.tipo !== filtroTipo) return false;
-    if (filtroFormaPagamento !== 'todas' && p.formaPagamento !== filtroFormaPagamento) return false;
     if (filtroTexto) {
       const q = filtroTexto.toLowerCase();
       if (
@@ -251,9 +241,6 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
 
   const totalGasto = passagensFiltradas.reduce((s, p) => s + p.valor, 0);
   const totalPassagens = passagensFiltradas.length;
-  const totalEconomia = passagensFiltradas
-    .filter(p => p.multa)
-    .reduce((s, p) => s + (p.multa?.economizada || 0), 0);
 
   const totalPaginas = Math.ceil(passagensFiltradas.length / itensPorPagina);
   const passagensPaginadas = passagensFiltradas.slice(
@@ -262,10 +249,7 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
   );
 
   const formaPagamentoLabel = (f: PassagemPaga['formaPagamento']) =>
-    f === 'pix' ? 'PIX'
-    : f === 'cartao_elo' ? 'Cartão ELO'
-    : f === 'cartao_visa' ? 'Cartão Visa'
-    : 'Cartão Master';
+    f === 'pix' ? 'PIX' : 'Cartão de Crédito';
 
   const gerarComprovantePDF = (passagem: PassagemPaga) => {
     const doc = new jsPDF();
@@ -406,7 +390,6 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
     doc.setFontSize(9);
     doc.text(`Total de passagens: ${totalPassagens}`, 28, y);
     doc.text(`Total pago: ${formatCurrency(totalGasto)}`, pageWidth / 2, y);
-    doc.text(`Multas evitadas: ${formatCurrency(totalEconomia)}`, pageWidth - 80, y);
 
     y += 18;
     doc.setFillColor(...violet);
@@ -456,22 +439,17 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
         <p className="text-sm text-[#8A8B95] mt-0.5">Passagens quitadas e comprovantes</p>
       </div>
 
-      {/* Stats — 3 colunas compactas */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Stats — 2 colunas */}
+      <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl border bg-white border-[#DCDDE3] p-3">
           <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Total Pago</p>
-          <p className="text-sm font-bold text-[#5B2E8C] mt-1.5 leading-none">{formatCurrency(totalGasto)}</p>
+          <p className="text-base font-bold text-[#5B2E8C] mt-1.5 leading-none">{formatCurrency(totalGasto)}</p>
           <p className="text-[10px] text-[#8A8B95] mt-1">{totalPassagens} {totalPassagens === 1 ? 'passagem' : 'passagens'}</p>
         </div>
         <div className="rounded-xl border bg-white border-[#DCDDE3] p-3">
           <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Passagens</p>
-          <p className="text-sm font-bold text-[#5B2E8C] mt-1.5 leading-none">{totalPassagens}</p>
+          <p className="text-base font-bold text-[#5B2E8C] mt-1.5 leading-none">{totalPassagens}</p>
           <p className="text-[10px] text-[#8A8B95] mt-1">no período</p>
-        </div>
-        <div className="rounded-xl border bg-[#D4F0E2] border-[#A3D9BE] p-3">
-          <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Multas Evitadas</p>
-          <p className="text-sm font-bold text-[#0A6B45] mt-1.5 leading-none">{formatCurrency(totalEconomia)}</p>
-          <p className="text-[10px] text-[#8A8B95] mt-1">economia total</p>
         </div>
       </div>
 
@@ -490,57 +468,18 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
             />
           </div>
 
-          {/* Selects em grade 2×2 */}
-          <div className="grid grid-cols-2 gap-2">
-            <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
-              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">Últimos 7 dias</SelectItem>
-                <SelectItem value="30d">Últimos 30 dias</SelectItem>
-                <SelectItem value="90d">Últimos 3 meses</SelectItem>
-                <SelectItem value="todos">Todo o período</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={filtroConcessionaria} onValueChange={v => { setFiltroConcessionaria(v); setPaginaAtual(1); }}>
-              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {concessionarias.map(c => (
-                  <SelectItem key={c} value={c}>
-                    {c === 'todas' ? 'Todas as concess.' : c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={filtroTipo} onValueChange={v => { setFiltroTipo(v); setPaginaAtual(1); }}>
-              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os tipos</SelectItem>
-                <SelectItem value="praca_fisica">Praça Manual</SelectItem>
-                <SelectItem value="portico_free_flow">Free Flow</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={filtroFormaPagamento} onValueChange={v => { setFiltroFormaPagamento(v); setPaginaAtual(1); }}>
-              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todas as formas</SelectItem>
-                <SelectItem value="pix">PIX</SelectItem>
-                <SelectItem value="cartao_elo">Cartão ELO</SelectItem>
-                <SelectItem value="cartao_visa">Cartão Visa</SelectItem>
-                <SelectItem value="cartao_master">Cartão Master</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Período */}
+          <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
+            <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Últimos 7 dias</SelectItem>
+              <SelectItem value="30d">Últimos 30 dias</SelectItem>
+              <SelectItem value="90d">Últimos 3 meses</SelectItem>
+              <SelectItem value="todos">Todo o período</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* Exportar — largura total */}
           <Button
