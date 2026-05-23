@@ -167,8 +167,9 @@ const certificados = [
 export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col overflow-hidden p-0">
+        {/* Header fixo */}
+        <DialogHeader className="sticky top-0 z-10 bg-white border-b border-[#ECECF1] px-6 pt-6 pb-4 flex-shrink-0">
           <DialogTitle className="text-[#1A1B23] text-lg font-bold flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-[#5B2E8C]" />
             Certificações & Selos de Confiança
@@ -178,6 +179,8 @@ export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps
           </p>
         </DialogHeader>
 
+        {/* Conteúdo com scroll */}
+        <div className="overflow-y-auto flex-1 px-6 pb-6">
         <div className="mt-4 space-y-6">
           {certificados.map((grupo) => {
             const Icone = grupo.icone;
@@ -238,12 +241,13 @@ export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps
         </div>
 
         {/* Footer */}
-        <p className="mt-2 text-[11px] text-[#C6C7CF] text-center">
+        <p className="mt-4 text-[11px] text-[#C6C7CF] text-center">
           Dúvidas sobre nossas certificações? Entre em contato em{" "}
           <a href="mailto:compliance@movemais.com" className="text-[#5B2E8C] hover:underline">
             compliance@movemais.com
           </a>
         </p>
+        </div>
       </DialogContent>
     </Dialog>
   );
