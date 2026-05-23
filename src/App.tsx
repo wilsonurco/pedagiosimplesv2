@@ -635,14 +635,16 @@ export default function App() {
           usuarioLogado ? (
             <Button
               onClick={handleIrParaDashboard}
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-colors"
+              size="sm"
+              className="h-9 px-4 text-sm font-semibold bg-white/15 backdrop-blur-sm border border-white/25 text-white hover:bg-white/25 transition-colors rounded-full"
             >
               Minha Conta
             </Button>
           ) : (
             <Button
               onClick={() => setTelaAtual('login')}
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-colors"
+              size="sm"
+              className="h-9 px-4 text-sm font-semibold bg-white/15 backdrop-blur-sm border border-white/25 text-white hover:bg-white/25 transition-colors rounded-full"
             >
               Entrar
             </Button>
