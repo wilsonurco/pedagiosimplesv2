@@ -790,13 +790,6 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </Button>
           </div>
 
-          {/* Segurança */}
-          <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4 mt-2">
-            <div className="flex items-center gap-3 text-sm text-[#8A8B95]">
-              <Shield className="h-4 w-4 text-[#8B5FFF] flex-shrink-0" />
-              <span>Ambiente seguro · SSL · Conformidade PCI DSS · Antifraude 24h</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
