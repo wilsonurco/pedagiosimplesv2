@@ -179,26 +179,48 @@ export function LandingBeneficios() {
     <div className="bg-white">
 
       {/* ── 1. Parceiros strip ─────────────────────────────────────── */}
-      <div className="border-y border-white/5 bg-[#1A1B23]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 overflow-x-auto">
-          <div className="flex items-center gap-0 flex-nowrap whitespace-nowrap">
-            <span className="flex-shrink-0 text-xs font-semibold text-white/30 uppercase tracking-widest pr-6 border-r border-white/10">
-              Concessionárias parceiras
-            </span>
-            <div className="flex items-center gap-x-3 pl-6 flex-nowrap">
-              {parceiros.map((p, i) => (
-                <Fragment key={p.nome}>
-                  <span
-                    className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}
-                  >
-                    {p.nome}
-                  </span>
-                  {i < parceiros.length - 1 && (
-                    <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
-                  )}
-                </Fragment>
-              ))}
-            </div>
+      <div className="border-y border-white/5 bg-[#1A1B23] py-4 overflow-hidden">
+        <style>{`
+          @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+          .marquee-track {
+            animation: marquee-scroll 28s linear infinite;
+          }
+          .marquee-track:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
+
+        {/* Label centralizado */}
+        <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest text-center mb-3">
+          Concessionárias parceiras
+        </p>
+
+        {/* Faixa com fade nas bordas */}
+        <div className="relative [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+          <div className="marquee-track flex items-center gap-x-6 whitespace-nowrap w-max">
+            {/* primeira cópia */}
+            {parceiros.map((p, i) => (
+              <Fragment key={`a-${p.nome}`}>
+                <span className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}>
+                  {p.nome}
+                </span>
+                <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
+              </Fragment>
+            ))}
+            {/* segunda cópia — loop seamless */}
+            {parceiros.map((p, i) => (
+              <Fragment key={`b-${p.nome}`}>
+                <span className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}>
+                  {p.nome}
+                </span>
+                {i < parceiros.length - 1 && (
+                  <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
+                )}
+              </Fragment>
+            ))}
           </div>
         </div>
       </div>
