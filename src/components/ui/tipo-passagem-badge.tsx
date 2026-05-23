@@ -22,7 +22,7 @@ export function TipoPassagemBadge({ tipo, className = '' }: TipoPassagemBadgePro
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-[#DFF4EA] text-[#0E8B5A] ${className}`}
     >
       <Radio className="h-3 w-3" />
-      Pórtico Free Flow
+      Free Flow
     </span>
   )
 }
