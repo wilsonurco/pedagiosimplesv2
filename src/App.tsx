@@ -414,7 +414,7 @@ export default function App() {
   // Landing Page (tela padrão)
   const formCard = (
     <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
-      <Card className="bg-white/95 border border-[#DCDDE3] shadow-xl rounded-xl overflow-hidden backdrop-blur-sm">
+      <Card className="bg-white border-0 shadow-[0_8px_40px_rgba(0,0,0,0.18)] rounded-2xl overflow-hidden">
         <CardContent className="p-4 sm:p-6">
           {!mostrandoResultados && (
             <>
@@ -454,12 +454,12 @@ export default function App() {
                     }
                   }}
                   placeholder="ABC-1234 ou ABC1D23"
-                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white border-2 rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#8A8B95] focus:outline-none transition-all duration-300 shadow-inner ${
+                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-[#F7F7F9] border rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#B0B1BB] focus:outline-none transition-all duration-200 ${
                     placaError
-                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/20 bg-[#F8D7DD]'
+                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/15 bg-[#FDF2F4]'
                       : placaValida
-                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/20 bg-[#D4F0E2]'
-                        : 'border-[#DCDDE3] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/20'
+                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/15 bg-[#F0FAF5]'
+                        : 'border-[#E5E6EC] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/10'
                   }`}
                   maxLength={8}
                 />
