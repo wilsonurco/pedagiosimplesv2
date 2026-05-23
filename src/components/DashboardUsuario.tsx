@@ -80,6 +80,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   
   // Estados para notificações
   const [notificacoesAbertas, setNotificacoesAbertas] = useState(false);
+  const [atividadeAberta, setAtividadeAberta] = useState(false);
   const [notificacoes, setNotificacoes] = useState([
     {
       id: '1',
@@ -810,28 +811,47 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </CardContent>
       </Card>
 
-      {/* Feed de atividade recente */}
-      <Card className="border border-[#DCDDE3]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base text-[#5B2E8C] flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Atividade recente
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 pt-0">
-          {atividadeRecente.map((item, i) => (
-            <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${item.bg}`}>
-              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                item.tipo === 'pagamento' ? 'bg-[#0E8B5A]' :
-                item.tipo === 'alerta' ? 'bg-[#C8324A]' : 'bg-[#C77700]'
-              }`} />
-              <div className="flex-1 min-w-0">
-                <p className={`font-medium leading-snug ${item.cor}`}>{item.texto}</p>
+      {/* Feed de atividade recente — colapsável */}
+      <Card className="border border-[#DCDDE3] overflow-hidden">
+        {/* Cabeçalho clicável */}
+        <button
+          onClick={() => setAtividadeAberta(v => !v)}
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F7F5FB] transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <Calendar className="h-4 w-4 text-[#5B2E8C]" />
+            <span className="text-sm font-semibold text-[#5B2E8C]">Atividade recente</span>
+            {/* Pílulas de resumo quando colapsado */}
+            {!atividadeAberta && (
+              <div className="flex items-center gap-1.5 ml-1">
+                {atividadeRecente.some(a => a.tipo === 'alerta') && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F8D7DD] text-[#C8324A]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8324A]" />
+                    Alerta
+                  </span>
+                )}
+                <span className="text-[11px] text-[#8A8B95]">{atividadeRecente.length} eventos</span>
               </div>
-              <span className="text-xs text-[#8A8B95] flex-shrink-0 mt-0.5">{item.data}</span>
-            </div>
-          ))}
-        </CardContent>
+            )}
+          </div>
+          <ChevronDown className={`h-4 w-4 text-[#8A8B95] transition-transform duration-200 ${atividadeAberta ? 'rotate-180' : ''}`} />
+        </button>
+
+        {/* Lista expansível */}
+        {atividadeAberta && (
+          <div className="px-4 pb-4 space-y-2 border-t border-[#ECECF1] pt-3">
+            {atividadeRecente.map((item, i) => (
+              <div key={i} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm ${item.bg}`}>
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                  item.tipo === 'pagamento' ? 'bg-[#0E8B5A]' :
+                  item.tipo === 'alerta' ? 'bg-[#C8324A]' : 'bg-[#C77700]'
+                }`} />
+                <p className={`flex-1 font-medium leading-snug text-xs sm:text-sm ${item.cor}`}>{item.texto}</p>
+                <span className="text-[11px] text-[#8A8B95] flex-shrink-0">{item.data}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
     </div>
