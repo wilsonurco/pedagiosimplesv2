@@ -494,33 +494,40 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             )}
           </div>
 
-          {/* Filtros de Tipo e Status */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-4">
-            <div className="flex gap-1 bg-[#F7F5FB] rounded-lg p-1">
+          {/* Filtros — estilo iOS Segmented Control */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {/* Tipo */}
+            <div className="inline-flex items-center bg-[#EBEBED] rounded-full p-0.5">
               {(['todas', 'praca_fisica', 'portico_free_flow'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setFiltroTipo(t)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
-                    filtroTipo === t ? 'bg-white text-[#5B2E8C] shadow-sm' : 'text-[#8A8B95] hover:text-[#5B2E8C]'
+                  className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                    filtroTipo === t
+                      ? 'bg-white text-[#1A1B23] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.07)]'
+                      : 'text-[#6B6F7A] hover:text-[#1A1B23]'
                   }`}
                 >
-                  {t === 'praca_fisica' && <Building2 className="h-3.5 w-3.5" />}
-                  {t === 'portico_free_flow' && <Radio className="h-3.5 w-3.5" />}
-                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça SPMAR' : 'Pórtico Free Flow'}
+                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça SPMAR' : 'Free Flow'}
                 </button>
               ))}
             </div>
-            <div className="flex gap-1 bg-[#F7F5FB] rounded-lg p-1">
+
+            {/* Status */}
+            <div className="inline-flex items-center bg-[#EBEBED] rounded-full p-0.5">
               {(['todas', 'em_prazo', 'risco_multa'] as const).map(s => (
                 <button
                   key={s}
                   onClick={() => setFiltroStatus(s)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    filtroStatus === s ? 'bg-white text-[#5B2E8C] shadow-sm' : 'text-[#8A8B95] hover:text-[#5B2E8C]'
+                  className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                    filtroStatus === s
+                      ? `bg-white shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.07)] ${
+                          s === 'risco_multa' ? 'text-[#C8324A]' : 'text-[#1A1B23]'
+                        }`
+                      : 'text-[#6B6F7A] hover:text-[#1A1B23]'
                   }`}
                 >
-                  {s === 'todas' ? 'Todos status' : s === 'em_prazo' ? 'Em prazo' : 'Risco de multa'}
+                  {s === 'todas' ? 'Todos' : s === 'em_prazo' ? 'Em prazo' : 'Risco de multa'}
                 </button>
               ))}
             </div>
