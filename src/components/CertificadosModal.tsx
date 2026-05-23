@@ -3,8 +3,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from "./ui/dialog";
-import { ShieldCheck, Award, Star, ExternalLink } from "lucide-react";
+import { ShieldCheck, Award, Star, ExternalLink, X } from "lucide-react";
 import logoVanzolini from "../assets/logo-vanzolini.webp";
 import logoSectigo from "../assets/logo-sectigo.svg";
 
@@ -167,13 +168,19 @@ const certificados = [
 export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col overflow-hidden p-0">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col overflow-hidden p-0 [&>button]:hidden">
         {/* Header fixo */}
-        <DialogHeader className="sticky top-0 z-10 bg-white border-b border-[#ECECF1] px-6 pt-6 pb-4 flex-shrink-0">
-          <DialogTitle className="text-[#1A1B23] text-lg font-bold flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-[#5B2E8C]" />
-            Certificações & Selos de Confiança
-          </DialogTitle>
+        <DialogHeader className="sticky top-0 z-10 bg-white border-b border-[#ECECF1] px-6 pt-5 pb-4 flex-shrink-0">
+          <div className="flex items-start justify-between gap-4">
+            <DialogTitle className="text-[#1A1B23] text-lg font-bold flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-[#5B2E8C] flex-shrink-0" />
+              Certificações & Selos de Confiança
+            </DialogTitle>
+            <DialogClose className="flex-shrink-0 rounded-md p-1.5 text-[#8A8B95] hover:bg-[#F4EFFB] hover:text-[#5B2E8C] transition-colors mt-0.5">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Fechar</span>
+            </DialogClose>
+          </div>
           <p className="text-sm text-[#8A8B95] mt-1">
             O Pedágio Simples opera com os mais altos padrões de qualidade, segurança e transparência reconhecidos nacionalmente e internacionalmente.
           </p>
