@@ -13,7 +13,7 @@ import {
   Smartphone,
   FileText,
   Eye,
-  Copy,
+  Share2,
   Car,
   Calendar,
   Shield,
@@ -251,7 +251,8 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
   const formaPagamentoLabel = (f: PassagemPaga['formaPagamento']) =>
     f === 'pix' ? 'PIX' : 'Cartão de Crédito';
 
-  const gerarComprovantePDF = (passagem: PassagemPaga) => {
+  // Gera o documento PDF e retorna a instância jsPDF (sem salvar)
+  const gerarComprovanteDoc = (passagem: PassagemPaga): jsPDF => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
@@ -353,7 +354,36 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
     doc.setTextColor(...gray);
     doc.text('Pedágio Simples — pedagiosimples.com.br | Documento gerado automaticamente', pageWidth / 2, footerY + 7, { align: 'center' });
 
-    doc.save(`comprovante-${passagem.transactionId}.pdf`);
+    return doc;
+  };
+
+  // Baixa o PDF diretamente
+  const gerarComprovantePDF = (passagem: PassagemPaga) => {
+    gerarComprovanteDoc(passagem).save(`comprovante-${passagem.transactionId}.pdf`);
+  };
+
+  // Compartilha o PDF via Web Share API (com fallback para download)
+  const compartilharComprovante = async (passagem: PassagemPaga) => {
+    const filename = `comprovante-${passagem.transactionId}.pdf`;
+    const doc = gerarComprovanteDoc(passagem);
+    const blob = doc.output('blob');
+    const file = new File([blob], filename, { type: 'application/pdf' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Comprovante de Passagem — Pedágio Simples',
+          text: `Comprovante da passagem ${passagem.transactionId}`,
+        });
+      } catch {
+        // Usuário cancelou ou erro — faz download como fallback
+        doc.save(filename);
+      }
+    } else {
+      // Navegador não suporta compartilhamento de arquivos — download direto
+      doc.save(filename);
+    }
   };
 
   const exportarRelatorio = () => {
@@ -731,11 +761,11 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigator.clipboard.writeText(passagemSelecionada.transactionId)}
+                    onClick={() => compartilharComprovante(passagemSelecionada)}
                     className="flex-1 border-[#DCDDE3] text-[#5B2E8C] hover:border-[#8B5FFF] hover:text-[#8B5FFF]"
                   >
-                    <Copy className="h-4 w-4 mr-1.5" />
-                    Copiar ID
+                    <Share2 className="h-4 w-4 mr-1.5" />
+                    Compartilhar
                   </Button>
                   <Button
                     size="sm"
