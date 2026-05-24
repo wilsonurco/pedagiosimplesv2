@@ -431,58 +431,72 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-6 lg:items-start space-y-4 lg:space-y-0">
 
-      {/* Título */}
-      <div>
-        <h2 className="text-lg font-bold text-[#1A1B23]">Histórico de Passagens</h2>
-        <p className="text-sm text-[#8A8B95] mt-0.5">Passagens quitadas e comprovantes</p>
-      </div>
+      {/* ── Painel esquerdo: título + stats + filtros ── */}
+      <div className="space-y-4">
 
-      {/* Stats — 2 colunas */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl border bg-white border-[#DCDDE3] p-3">
-          <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Total Pago</p>
-          <p className="text-base font-bold text-[#5B2E8C] mt-1.5 leading-none">{formatCurrency(totalGasto)}</p>
-          <p className="text-[10px] text-[#8A8B95] mt-1">{totalPassagens} {totalPassagens === 1 ? 'passagem' : 'passagens'}</p>
+        {/* Título */}
+        <div>
+          <h2 className="text-lg font-bold text-[#1A1B23]">Histórico de Passagens</h2>
+          <p className="text-sm text-[#8A8B95] mt-0.5">Passagens quitadas e comprovantes</p>
         </div>
-        <div className="rounded-xl border bg-white border-[#DCDDE3] p-3">
-          <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Passagens</p>
-          <p className="text-base font-bold text-[#5B2E8C] mt-1.5 leading-none">{totalPassagens}</p>
-          <p className="text-[10px] text-[#8A8B95] mt-1">no período</p>
-        </div>
-      </div>
 
-      {/* Filtros — mobile-first */}
-      <Card className="border border-[#DCDDE3]">
-        <CardContent className="p-3 space-y-2">
-          {/* Busca textual — largura total */}
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8A8B95]" />
-            <input
-              type="text"
-              placeholder="Pórtico, placa, ID..."
-              value={filtroTexto}
-              onChange={e => { setFiltroTexto(e.target.value); setPaginaAtual(1); }}
-              className="w-full pl-9 pr-3 h-9 bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
-            />
+        {/* Stats — 2 colunas no mobile, empilhadas no desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+          <div className="rounded-xl border bg-white border-[#DCDDE3] p-4">
+            <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Total Pago</p>
+            <p className="text-xl font-bold text-[#5B2E8C] mt-2 leading-none">{formatCurrency(totalGasto)}</p>
+            <p className="text-xs text-[#8A8B95] mt-1.5">{totalPassagens} {totalPassagens === 1 ? 'passagem' : 'passagens'}</p>
           </div>
+          <div className="rounded-xl border bg-white border-[#DCDDE3] p-4">
+            <p className="text-[10px] font-semibold text-[#8A8B95] uppercase tracking-wide leading-none">Passagens</p>
+            <p className="text-xl font-bold text-[#5B2E8C] mt-2 leading-none">{totalPassagens}</p>
+            <p className="text-xs text-[#8A8B95] mt-1.5">no período</p>
+          </div>
+        </div>
 
-          {/* Período */}
-          <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
-            <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Últimos 7 dias</SelectItem>
-              <SelectItem value="30d">Últimos 30 dias</SelectItem>
-              <SelectItem value="90d">Últimos 3 meses</SelectItem>
-              <SelectItem value="todos">Todo o período</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Filtros */}
+        <Card className="border border-[#DCDDE3]">
+          <CardContent className="p-3 space-y-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8A8B95]" />
+              <input
+                type="text"
+                placeholder="Pórtico, placa, ID..."
+                value={filtroTexto}
+                onChange={e => { setFiltroTexto(e.target.value); setPaginaAtual(1); }}
+                className="w-full pl-9 pr-3 h-9 bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
+              />
+            </div>
+            <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
+              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                <SelectItem value="90d">Últimos 3 meses</SelectItem>
+                <SelectItem value="todos">Todo o período</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
 
-        </CardContent>
-      </Card>
+        {/* Exportar PDF — no desktop fica na sidebar */}
+        <Button
+          onClick={exportarRelatorio}
+          variant="outline"
+          className="hidden lg:flex w-full h-10 text-sm border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
+        >
+          <Download className="h-4 w-4 mr-1.5" />
+          Exportar PDF
+        </Button>
+
+      </div>
+
+      {/* ── Painel direito: lista ── */}
+      <div className="space-y-4">
 
       {/* Lista de passagens */}
       <Card className="border border-[#DCDDE3]">
@@ -602,15 +616,17 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
         </CardContent>
       </Card>
 
-      {/* Exportar PDF — ao final da página */}
+      {/* Exportar PDF — visível só no mobile (no desktop está na sidebar) */}
       <Button
         onClick={exportarRelatorio}
         variant="outline"
-        className="w-full h-10 text-sm border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
+        className="lg:hidden w-full h-10 text-sm border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
       >
         <Download className="h-4 w-4 mr-1.5" />
         Exportar PDF
       </Button>
+
+      </div>{/* fim painel direito */}
 
       {/* Modal comprovante */}
       <Dialog open={!!passagemSelecionada} onOpenChange={open => !open && setPassagemSelecionada(null)}>
