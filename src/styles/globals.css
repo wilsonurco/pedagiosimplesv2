@@ -179,8 +179,8 @@
 
   body {
     @apply bg-background text-foreground;
-    /* Geist Sans → Inter → fallback sans-serif (conforme tokens.ts › fontFamily.sans) */
-    font-family: 'Geist Sans', 'Inter', 'Inter Display', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* Inter → fallback sans-serif do sistema (conforme tokens.ts › fontFamily.sans) */
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
 }
 

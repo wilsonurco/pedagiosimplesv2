@@ -88,14 +88,14 @@ export const semanticColors = {
 
 /**
  * Famílias tipográficas.
- * Prioridade: Geist Sans > Inter > fallback sans-serif do sistema.
- * Geist Mono para todos os elementos técnicos (placas, valores, códigos).
+ * Prioridade: Inter > fallback sans-serif do sistema.
+ * Monospace do sistema para todos os elementos técnicos (placas, valores, códigos).
  */
 export const fontFamily = {
   /** Display, texto corrido, UI e labels */
-  sans: "'Geist Sans', 'Inter', 'Inter Display', system-ui, -apple-system, sans-serif",
+  sans: "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif",
   /** Placas veiculares, valores monetários, códigos de transação, números de boleto */
-  mono: "'Geist Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace",
+  mono: "ui-monospace, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
 } as const;
 
 /** Pesos tipográficos utilizados no sistema */
