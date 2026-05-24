@@ -538,7 +538,7 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                           </span>
                           <span className="text-xs text-[#8A8B95] flex items-center gap-1">
                             <Car className="h-3 w-3" />
-                            <span className="font-mono tracking-wide">{p.placa}</span>
+                            <span className="tracking-wide">{p.placa}</span>
                           </span>
                           <span className="text-xs text-[#8A8B95] flex items-center gap-1">
                             {p.formaPagamento === 'pix' ? <Smartphone className="h-3 w-3" /> : <CreditCard className="h-3 w-3" />}
@@ -659,7 +659,7 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                 {/* Transação */}
                 <div className="bg-[#F4EFFB] border border-[#8B5FFF]/30 rounded-lg p-3">
                   <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide">Número da Transação</p>
-                  <p className="font-mono font-semibold text-[#5B2E8C] tracking-wide mt-0.5 text-sm">
+                  <p className="font-semibold text-[#5B2E8C] tracking-wide mt-0.5 text-sm">
                     {passagemSelecionada.transactionId}
                   </p>
                 </div>
@@ -692,7 +692,7 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
                   </div>
                   <div>
                     <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Placa</p>
-                    <p className="font-mono font-semibold text-[#1A1B23] tracking-[0.05em] mt-0.5">{passagemSelecionada.placa}</p>
+                    <p className="font-semibold text-[#1A1B23] tracking-[0.05em] mt-0.5">{passagemSelecionada.placa}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide">Data / Horário</p>

@@ -107,7 +107,7 @@ function PhoneMockup() {
         <div className="bg-[#F7F5FB] rounded-[2rem] overflow-hidden min-h-[420px]">
           <div className="bg-[#5B2E8C] px-4 pt-6 pb-4">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-white/70 text-[9px] font-mono">09:41</div>
+              <div className="text-white/70 text-[9px]">09:41</div>
               <div className="flex gap-1">
                 <div className="w-3 h-1.5 bg-white/60 rounded-sm" />
                 <div className="w-3 h-1.5 bg-white/60 rounded-sm" />
@@ -121,7 +121,7 @@ function PhoneMockup() {
           <div className="bg-[#5B2E8C] px-4 pb-5">
             <div className="bg-white/10 rounded-xl p-3">
               <p className="text-white/60 text-[9px] uppercase tracking-wide">Débito em aberto</p>
-              <p className="text-white text-xl font-bold font-mono mt-0.5">R$ 25,40</p>
+              <p className="text-white text-xl font-bold mt-0.5">R$ 25,40</p>
               <p className="text-white/60 text-[9px] mt-0.5">4 passagens • MOV-1234</p>
             </div>
           </div>
@@ -139,7 +139,7 @@ function PhoneMockup() {
                   <p className="text-[8px] text-[#8A8B95]">{p.data}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-mono font-semibold text-[#C77700]">{p.valor}</span>
+                  <span className="text-[9px] font-semibold text-[#C77700]">{p.valor}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C77700]" />
                 </div>
               </div>

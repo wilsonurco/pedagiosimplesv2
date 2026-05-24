@@ -178,7 +178,7 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
         </div>
         <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
           <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Total pago</p>
-          <p className="text-lg sm:text-xl font-bold mt-1 text-[#0A6B45] font-mono">{formatCurrency(totalGeral)}</p>
+          <p className="text-lg sm:text-xl font-bold mt-1 text-[#0A6B45]">{formatCurrency(totalGeral)}</p>
           <p className="text-xs text-[#8A8B95] mt-1">todos os veículos</p>
         </div>
       </div>
@@ -237,7 +237,7 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[#1A1B23] font-mono tracking-[0.05em] uppercase text-base">
+                        <span className="font-bold text-[#1A1B23] tracking-[0.05em] uppercase text-base">
                           {veiculo.placa}
                         </span>
                         {veiculo.isPrincipal && (
@@ -270,11 +270,11 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
                       })()}
                       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         <span className="text-xs text-[#8A8B95]">
-                          Total pago: <span className="font-semibold text-[#0A6B45] font-mono">{formatCurrency(veiculo.totalPago)}</span>
+                          Total pago: <span className="font-semibold text-[#0A6B45]">{formatCurrency(veiculo.totalPago)}</span>
                         </span>
                         {veiculo.totalPendencias > 0 && (
                           <span className="text-xs text-[#C8324A]">
-                            Pendente: <span className="font-semibold font-mono">{formatCurrency(veiculo.valorPendente)}</span>
+                            Pendente: <span className="font-semibold">{formatCurrency(veiculo.valorPendente)}</span>
                           </span>
                         )}
                       </div>
@@ -443,7 +443,7 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
             <div className="space-y-4">
               <div className="bg-[#F8D7DD] border border-[#F0A8B5] rounded-lg p-4 text-center">
                 <p className="text-xs text-[#8A8B95] mb-1">Placa a remover</p>
-                <p className="text-2xl font-bold font-mono tracking-[0.1em] text-[#A3203B]">
+                <p className="text-2xl font-bold tracking-[0.1em] text-[#A3203B]">
                   {veiculoParaExcluir.placa}
                 </p>
                 {veiculoParaExcluir.apelido && (

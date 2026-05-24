@@ -967,7 +967,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
                           <span className="block text-sm font-semibold text-[#1A1B23]">
                             {formatBRL(pedido.valor)}
                           </span>
-                          <span className="text-[10px] text-[#8A8B95] font-mono">
+                          <span className="text-[10px] text-[#8A8B95]">
                             #{protocolo(pedido)}
                           </span>
                         </div>
