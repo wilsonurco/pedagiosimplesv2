@@ -3,10 +3,10 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { 
-  Calendar, 
-  TrendingUp, 
-  Clock, 
+import {
+  Calendar,
+  TrendingUp,
+  Clock,
   Car,
   CheckCircle,
   Download,
@@ -14,7 +14,9 @@ import {
   Search,
   DollarSign,
   Eye,
-  FileText
+  FileText,
+  MapPin,
+  Hash,
 } from "lucide-react";
 import { BrazilianRealIcon } from "./BrazilianRealIcon";
 import jsPDF from 'jspdf';
@@ -39,9 +41,9 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP240115001',
       placas: ['ABC-1234', 'XYZ-9876', 'DEF-5555'],
       passagens: [
-        { placa: 'ABC-1234', rodovia: 'Rod. Presidente Dutra', valor: 8.90 },
-        { placa: 'ABC-1234', rodovia: 'Rod. dos Bandeirantes', valor: 12.50 },
-        { placa: 'XYZ-9876', rodovia: 'Rod. Anhanguera', valor: 6.70 }
+        { id: 'PASS-010101', placa: 'ABC-1234', rodovia: 'Rod. Presidente Dutra', praca: 'Praça de Pedágio BR-116 — KM 154', km: 154, data: '15/01/2025', hora: '14:32:07', valor: 8.90 },
+        { id: 'PASS-010102', placa: 'ABC-1234', rodovia: 'Rod. dos Bandeirantes', praca: 'Praça de Pedágio SP-348 — KM 88', km: 88,  data: '15/01/2025', hora: '14:50:21', valor: 12.50 },
+        { id: 'PASS-010103', placa: 'XYZ-9876', rodovia: 'Rod. Anhanguera',       praca: 'Pórtico Free Flow SP-330 — KM 45', km: 45, data: '15/01/2025', hora: '16:05:44', valor: 6.70 },
       ]
     },
     {
@@ -54,7 +56,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP240112002',
       placas: ['ABC-1234'],
       passagens: [
-        { placa: 'ABC-1234', rodovia: 'Rod. dos Bandeirantes', valor: 12.50 }
+        { id: 'PASS-010201', placa: 'ABC-1234', rodovia: 'Rod. dos Bandeirantes', praca: 'Praça de Pedágio SP-348 — KM 88', km: 88, data: '12/01/2025', hora: '09:18:43', valor: 12.50 },
       ]
     },
     {
@@ -67,9 +69,9 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP240108003',
       placas: ['XYZ-9876', 'DEF-5555'],
       passagens: [
-        { placa: 'XYZ-9876', rodovia: 'Rod. Anhanguera', valor: 6.70 },
-        { placa: 'XYZ-9876', rodovia: 'Rod. Fernão Dias', valor: 9.60 },
-        { placa: 'DEF-5555', rodovia: 'Rod. dos Imigrantes', valor: 5.80 }
+        { id: 'PASS-010301', placa: 'XYZ-9876', rodovia: 'Rod. Anhanguera',       praca: 'Pórtico Free Flow SP-330 — KM 45', km: 45, data: '08/01/2025', hora: '16:12:09', valor: 6.70 },
+        { id: 'PASS-010302', placa: 'XYZ-9876', rodovia: 'Rod. Fernão Dias',      praca: 'Pórtico Free Flow BR-116 — KM 312', km: 312, data: '08/01/2025', hora: '16:40:55', valor: 9.60 },
+        { id: 'PASS-010303', placa: 'DEF-5555', rodovia: 'Rod. dos Imigrantes',   praca: 'Pórtico Free Flow SP-160 — KM 9', km: 9, data: '08/01/2025', hora: '17:01:30', valor: 5.80 },
       ]
     },
     {
@@ -82,7 +84,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP240105004',
       placas: ['ABC-1234'],
       passagens: [
-        { placa: 'ABC-1234', rodovia: 'Rod. Fernão Dias', valor: 15.40 }
+        { id: 'PASS-010401', placa: 'ABC-1234', rodovia: 'Rod. Fernão Dias', praca: 'Praça de Pedágio BR-116 — KM 340', km: 340, data: '05/01/2025', hora: '11:05:52', valor: 15.40 },
       ]
     },
     {
@@ -95,7 +97,7 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP241228005',
       placas: ['DEF-5555'],
       passagens: [
-        { placa: 'DEF-5555', rodovia: 'Rod. dos Imigrantes', valor: 9.80 }
+        { id: 'PASS-010501', placa: 'DEF-5555', rodovia: 'Rod. dos Imigrantes', praca: 'Pórtico Free Flow SP-160 — KM 9', km: 9, data: '28/12/2024', hora: '13:42:18', valor: 9.80 },
       ]
     },
     {
@@ -108,9 +110,9 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
       protocolo: 'FP241222006',
       placas: ['ABC-1234'],
       passagens: [
-        { placa: 'ABC-1234', rodovia: 'Rod. Castello Branco', valor: 7.20 }
+        { id: 'PASS-010601', placa: 'ABC-1234', rodovia: 'Rod. Castello Branco', praca: 'Praça de Pedágio SP-280 — KM 29', km: 29, data: '22/12/2024', hora: '18:20:45', valor: 7.20 },
       ]
-    }
+    },
   ];
 
   const totalPago = pagamentosRealizados.reduce((acc, pagamento) => acc + pagamento.valor, 0);
@@ -646,49 +648,70 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                 </div>
               </div>
 
-              {/* Passagens Agrupadas por Placa */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-[#5B2E8C]">Passagens Quitadas</h4>
-                {(() => {
-                  // Agrupar passagens por placa
-                  const passagensPorPlaca = comprovanteAberto.passagens.reduce((acc: any, passagem: any) => {
-                    if (!acc[passagem.placa]) {
-                      acc[passagem.placa] = [];
-                    }
-                    acc[passagem.placa].push(passagem);
-                    return acc;
-                  }, {});
+              {/* Passagens individuais */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold text-[#8A8B95] uppercase tracking-widest">
+                  Passagens ({comprovanteAberto.passagens.length})
+                </h4>
 
-                  return Object.entries(passagensPorPlaca).map(([placa, passagens]: [string, any]) => {
-                    const subtotal = passagens.reduce((sum: number, p: any) => sum + p.valor, 0);
-                    
-                    return (
-                      <div key={placa} className="border border-[#DCDDE3] rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <Car className="w-4 h-4 text-[#5B2E8C]" />
-                            <span className="font-semibold text-[#5B2E8C]">{placa}</span>
-                          </div>
-                          {Object.keys(passagensPorPlaca).length > 1 && (
-                            <span className="text-sm text-[#8A8B95]">
-                              Subtotal: R$ {subtotal.toFixed(2).replace('.', ',')}
-                            </span>
-                          )}
-                        </div>
-                        <div className="space-y-2">
-                          {passagens.map((passagem: any, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between text-sm bg-[#F7F5FB] p-2 rounded">
-                              <span className="text-[#8A8B95]">{passagem.rodovia}</span>
-                              <span className="font-medium text-[#1A1B23]">
-                                R$ {passagem.valor.toFixed(2).replace('.', ',')}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                {comprovanteAberto.passagens.map((passagem: any) => (
+                  <div key={passagem.id} className="border border-[#DCDDE3] rounded-lg overflow-hidden">
+
+                    {/* Cabeçalho: placa + valor */}
+                    <div className="flex items-start justify-between px-4 pt-4 pb-3">
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none">Número da Placa</p>
+                        <p className="font-bold text-[#5B2E8C] text-base tracking-wide mt-1">{passagem.placa}</p>
                       </div>
-                    );
-                  });
-                })()}
+                      <div className="text-right">
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none">Valor</p>
+                        <p className="font-bold text-[#5B2E8C] text-base mt-1">R$ {passagem.valor.toFixed(2).replace('.', ',')}</p>
+                      </div>
+                    </div>
+
+                    {/* Divisor */}
+                    <div className="border-t border-[#DCDDE3] mx-4" />
+
+                    {/* Grid de detalhes */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-4 py-3">
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Data</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{passagem.data}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Horário</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{passagem.hora}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">ID da Passagem</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{passagem.id}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Placa do Veículo</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 tracking-wide">{passagem.placa}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Praça</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 flex items-start gap-1">
+                          <MapPin className="h-3.5 w-3.5 text-[#8A8B95] flex-shrink-0 mt-0.5" />
+                          <span className="leading-tight">{passagem.praca}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Quilômetro</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 flex items-center gap-1">
+                          <Hash className="h-3.5 w-3.5 text-[#8A8B95] flex-shrink-0" />
+                          km {passagem.km}
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Rodovia</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{passagem.rodovia}</p>
+                      </div>
+                    </div>
+
+                  </div>
+                ))}
               </div>
 
               {/* Valor Total */}
