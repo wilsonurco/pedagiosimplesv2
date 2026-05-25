@@ -5,12 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ArrowLeft, Car, CheckCircle2, Shield, Calendar, MapPin, ArrowRight, Plus, Minus, Filter, CheckCircle, XCircle, Loader2, X } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { useState } from "react";
+import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
+import type { Passagem } from '../utils/simulator';
 
 interface ResumoPedidoProps {
   onBack: () => void;
-  onProsseguir: (debitosSelecionados: any[], valorTotal: number) => void;
+  onProsseguir: (debitosSelecionados: Passagem[], valorTotal: number) => void;
   valorTotal: number;
-  debitosSelecionados?: any[];
+  debitosSelecionados?: Passagem[];
 }
 
 export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecionados = [] }: ResumoPedidoProps) {
@@ -18,7 +20,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
     debitosSelecionados.map(d => d.id)
   );
   const [filtroPlaca, setFiltroPlaca] = useState<string>('todas');
-  
+
   // Estados para consulta de nova placa
   const [mostrandoFormularioNovaPlaca, setMostrandoFormularioNovaPlaca] = useState<boolean>(false);
   const [novaPlaca, setNovaPlaca] = useState<string>('');
@@ -27,9 +29,9 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
     success: boolean;
     quantidade: number;
     valorTotal: number;
-    debitos: any[];
+    debitos: Passagem[];
   } | null>(null);
-  const [debitosAdicionais, setDebitosAdicionais] = useState<any[]>([]);
+  const [debitosAdicionais, setDebitosAdicionais] = useState<Passagem[]>([]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -83,23 +85,36 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
         });
       } else {
         // Gerar débitos simulados para a nova placa
-        const debitosSimulados = [
+        const ts = Date.now();
+        const debitosSimulados: Passagem[] = [
           {
-            id: `nova_${Date.now()}_1`,
-            praca: "Rodovia dos Bandeirantes - KM 45",
+            id: `nova_${ts}_1`,
+            tipo: 'praca_fisica',
+            local: "Rodovia dos Bandeirantes - KM 45",
+            concessionaria: "AutoBan",
+            rodovia: "SP-330",
+            km: 45,
             valor: 11.30,
             data: "10/01/2025",
             hora: "08:15:00",
-            placa: novaPlaca
+            placa: novaPlaca,
+            status: 'em_prazo',
+            prazoLimite: "30/06/2025",
           },
           {
-            id: `nova_${Date.now()}_2`,
-            praca: "Via Anhanguera - KM 67",
+            id: `nova_${ts}_2`,
+            tipo: 'portico_free_flow',
+            local: "Via Anhanguera - KM 67",
+            concessionaria: "AutoBan",
+            rodovia: "SP-330",
+            km: 67,
             valor: 8.90,
             data: "12/01/2025",
             hora: "14:22:00",
-            placa: novaPlaca
-          }
+            placa: novaPlaca,
+            status: 'em_prazo',
+            prazoLimite: "30/06/2025",
+          },
         ];
         
         const valorTotal = debitosSimulados.reduce((acc, d) => acc + d.valor, 0);
@@ -190,16 +205,16 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 sm:py-12">
         <div className="max-w-4xl mx-auto">
-          
+
           {/* Título e Breadcrumb */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-6">
+          <div className="text-center mb-6 sm:mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-4 sm:mb-6">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm font-semibold">RESUMO DO PEDIDO</span>
             </div>
-            <h1 className="text-4xl font-bold text-[#1A1B23] mb-4">
+            <h1 className="text-2xl sm:text-4xl font-bold text-[#1A1B23] mb-4">
               Revise suas Pendências
             </h1>
 
@@ -218,117 +233,6 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
             </CardHeader>
             
             <CardContent className="space-y-6">
-              {/* Adicionar Nova Placa */}
-              <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#8B5FFF] rounded-lg flex items-center justify-center">
-                      <Plus className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#5B2E8C] text-sm">Consultar outra placa</h4>
-                      <p className="text-xs text-[#8A8B95]">Adicione débitos de outro veículo ao pagamento</p>
-                    </div>
-                  </div>
-                  {!mostrandoFormularioNovaPlaca && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                      className="text-xs h-8 px-3 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white"
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Adicionar
-                    </Button>
-                  )}
-                </div>
-                
-                {mostrandoFormularioNovaPlaca && (
-                  <div className="space-y-3 pt-3 border-t border-[#8B5FFF]/20">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={novaPlaca}
-                          onChange={(e) => {
-                            let value = e.target.value.toUpperCase();
-                            value = value.replace(/[^A-Z0-9]/g, '');
-                            if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
-                              value = value.slice(0, 3) + '-' + value.slice(3);
-                            }
-                            setNovaPlaca(value);
-                          }}
-                          placeholder="ABC-1234"
-                          className="w-full h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-2 focus:ring-[#8B5FFF]/20"
-                          maxLength={8}
-                        />
-                      </div>
-                      <Button
-                        onClick={buscarDebitosNovaPlaca}
-                        disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
-                        size="sm"
-                        className="h-10 px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white"
-                      >
-                        {consultandoNovaPlaca ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <>
-                            <Car className="h-3 w-3 mr-1" />
-                            Buscar
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setMostrandoFormularioNovaPlaca(false);
-                          setNovaPlaca('');
-                        }}
-                        className="h-10 px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB]"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    
-                    {resultadoConsultaNovaPlaca && (
-                      <div className="bg-white border border-[#DCDDE3] rounded-lg p-3">
-                        {resultadoConsultaNovaPlaca.success ? (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
-                                <span className="text-sm font-medium text-[#5B2E8C]">
-                                  {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
-                                </span>
-                              </div>
-                              <span className="text-sm font-semibold text-[#8B5FFF]">
-                                {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
-                              </span>
-                            </div>
-                            <Button
-                              onClick={adicionarDebitosNovaPlaca}
-                              size="sm"
-                              className="w-full h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
-                            >
-                              <Plus className="h-3 w-3 mr-1" />
-                              Adicionar ao pagamento
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <XCircle className="h-4 w-4 text-[#8A8B95]" />
-                            <span className="text-sm text-[#8A8B95]">
-                              Nenhuma pendência encontrada para esta placa
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
               {/* Filtro por Placa - apenas se houver múltiplas placas */}
               {placasUnicas.length > 1 && (
                 <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
@@ -419,15 +323,16 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-start gap-3 mb-3">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <MapPin className={`h-4 w-4 flex-shrink-0 transition-colors ${
                                   isSelected ? 'text-[#5B2E8C]' : 'text-[#8B5FFF]'
                                 }`} />
                                 <h3 className={`font-semibold text-base leading-tight transition-colors ${
                                   isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                                 }`}>
-                                  {debito.praca}
+                                  {debito.local}
                                 </h3>
+                                <TipoPassagemBadge tipo={debito.tipo} />
                               </div>
                               <div className="text-right">
                                 <span className={`font-bold text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
@@ -490,7 +395,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                 <div className="bg-[#5B2E8C] text-white rounded-lg p-6">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xl font-semibold">Total a Pagar</span>
-                    <span className="text-3xl font-bold">
+                    <span className="text-2xl sm:text-3xl font-bold">
                       {formatCurrency(calcularValorTotal())}
                     </span>
                   </div>
@@ -504,18 +409,123 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
 
               {/* Botão de Prosseguir */}
               <div className="pt-4">
-                <Button 
+                <Button
                   onClick={handleProsseguir}
                   disabled={debitosSelecionadosResumo.length === 0}
-                  className={`w-full h-14 text-lg font-semibold rounded-lg transition-all ${
+                  className={`w-full h-12 sm:h-14 text-base sm:text-lg font-semibold rounded-lg transition-all ${
                     debitosSelecionadosResumo.length > 0
                       ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white hover:shadow-lg'
                       : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                   }`}
                 >
-                  <ArrowRight className="h-5 w-5 mr-3" />
-                  Prosseguir para Pagamento - {formatCurrency(calcularValorTotal())}
+                  <ArrowRight className="h-5 w-5 mr-2 shrink-0" />
+                  <span className="truncate">
+                    <span className="sm:hidden">
+                      Prosseguir — {formatCurrency(calcularValorTotal())}
+                    </span>
+                    <span className="hidden sm:inline">
+                      Prosseguir para Pagamento — {formatCurrency(calcularValorTotal())}
+                    </span>
+                  </span>
                 </Button>
+              </div>
+
+              {/* Consultar outra placa — ação terciária */}
+              <div className="border-t border-[#DCDDE3] pt-4">
+                {!mostrandoFormularioNovaPlaca ? (
+                  <button
+                    onClick={() => setMostrandoFormularioNovaPlaca(true)}
+                    className="w-full flex items-center justify-center gap-1.5 text-sm text-[#8A8B95] hover:text-[#5B2E8C] transition-colors py-1"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Consultar outra placa
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#5B2E8C]">Consultar outra placa</span>
+                      <button
+                        onClick={() => {
+                          setMostrandoFormularioNovaPlaca(false);
+                          setNovaPlaca('');
+                          setResultadoConsultaNovaPlaca(null);
+                        }}
+                        className="text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={novaPlaca}
+                          onChange={(e) => {
+                            let value = e.target.value.toUpperCase();
+                            value = value.replace(/[^A-Z0-9]/g, '');
+                            if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
+                              value = value.slice(0, 3) + '-' + value.slice(3);
+                            }
+                            setNovaPlaca(value);
+                          }}
+                          placeholder="ABC-1234"
+                          className="w-full h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-2 focus:ring-[#8B5FFF]/20"
+                          maxLength={8}
+                        />
+                      </div>
+                      <Button
+                        onClick={buscarDebitosNovaPlaca}
+                        disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
+                        size="sm"
+                        className="h-10 px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white"
+                      >
+                        {consultandoNovaPlaca ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <>
+                            <Car className="h-3 w-3 mr-1" />
+                            Buscar
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {resultadoConsultaNovaPlaca && (
+                      <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-3">
+                        {resultadoConsultaNovaPlaca.success ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
+                                <span className="text-sm font-medium text-[#5B2E8C]">
+                                  {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
+                                </span>
+                              </div>
+                              <span className="text-sm font-semibold text-[#8B5FFF]">
+                                {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
+                              </span>
+                            </div>
+                            <Button
+                              onClick={adicionarDebitosNovaPlaca}
+                              size="sm"
+                              className="w-full h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
+                            >
+                              <Plus className="h-3 w-3 mr-1" />
+                              Adicionar ao pagamento
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <XCircle className="h-4 w-4 text-[#8A8B95]" />
+                            <span className="text-sm text-[#8A8B95]">
+                              Nenhuma pendência encontrada para esta placa
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Selo de Segurança */}

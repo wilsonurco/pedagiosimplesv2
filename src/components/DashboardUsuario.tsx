@@ -6,12 +6,12 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { toast } from "sonner@2.0.3";
-import { 
-  User, 
-  Car, 
-  History, 
+import {
+  User,
+  Car,
+  History,
   Home,
-  LogOut, 
+  LogOut,
   CheckCircle,
   Bell,
   Gift,
@@ -29,15 +29,22 @@ import {
   ArrowRight,
   Shield,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Building2,
+  Radio,
+  Wallet
 } from "lucide-react";
 
+import logoPedagioSimples from "../assets/logo-pedagio-simples.svg";
 import { HistoricoPagamentos } from "./HistoricoPagamentos";
 import { VeiculosCadastrados } from "./VeiculosCadastrados";
 import { ConfiguracoesConta } from "./ConfiguracoesConta";
 import { TotalPago } from "./TotalPago";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
+import { gerarDebitos, agregarPorTipo, proximoVencimento, filtrarPorTipo, filtrarPorStatus, type Passagem } from '../utils/simulator';
+import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
+import { FooterLogado } from './FooterLogado';
 
 interface DashboardUsuarioProps {
   onLogout: () => void;
@@ -67,11 +74,14 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const [filtroPlaca, setFiltroPlaca] = useState<string[]>(['todas']);
   const [debitosSelecionadosResumo, setDebitosSelecionadosResumo] = useState<string[]>([]);
   const [filtroExpandido, setFiltroExpandido] = useState(false);
+  const [filtroTipo, setFiltroTipo] = useState<'todas' | 'praca_fisica' | 'portico_free_flow'>('todas')
+  const [filtroStatus, setFiltroStatus] = useState<'todas' | 'em_prazo' | 'risco_multa'>('todas')
   const [modalConfirmacaoPlacaAberto, setModalConfirmacaoPlacaAberto] = useState(false);
   const [placasUsuario, setPlacasUsuario] = useState<string[]>(['MOV-1234']); // Placa do usuário logado
   
   // Estados para notificações
   const [notificacoesAbertas, setNotificacoesAbertas] = useState(false);
+  const [atividadeAberta, setAtividadeAberta] = useState(false);
   const [notificacoes, setNotificacoes] = useState([
     {
       id: '1',
@@ -115,115 +125,62 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
     }
   ]);
 
-  // Mock de pendências Free Flow
-  const pendenciasAtivas: any[] = [
-    {
-      id: 'pend-1',
-      rodovia: 'Pórtico SP-330 — KM 45',
-      concessionaria: 'CCR AutoBan',
-      tipo: 'free-flow',
-      valor: 4.30,
-      data: '14/04/2026',
-      hora: '07:42:00:00',
-      prazoVencimento: '14/05/2026',
-      riscoDeMulta: true,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-2',
-      rodovia: 'Pórtico SP-021 — KM 18',
-      concessionaria: 'Ecovias',
-      tipo: 'free-flow',
-      valor: 6.80,
-      data: '20/04/2026',
-      hora: '14:15:00:00',
-      prazoVencimento: '20/05/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-3',
-      rodovia: 'Pórtico SP-270 — KM 33',
-      concessionaria: 'Arteris',
-      tipo: 'free-flow',
-      valor: 5.10,
-      data: '28/04/2026',
-      hora: '18:50:00:00',
-      prazoVencimento: '28/05/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    },
-    {
-      id: 'pend-4',
-      rodovia: 'Pórtico BR-116 — KM 312',
-      concessionaria: 'Arteris',
-      tipo: 'free-flow',
-      valor: 9.20,
-      data: '02/05/2026',
-      hora: '10:05:00:00',
-      prazoVencimento: '01/06/2026',
-      riscoDeMulta: false,
-      placa: 'MOV-1234'
-    }
-  ];
+  // KPIs consolidados via simulator
+  const passagensTodas: Passagem[] = placasUsuario.flatMap(p => gerarDebitos(p))
+  const agg = agregarPorTipo(passagensTodas)
+  const proximo = proximoVencimento(passagensTodas)
 
-  const totalPendencias = pendenciasAtivas.reduce((acc, pendencia) => acc + pendencia.valor, 0);
-
-  // Dados para o ResumoPedido
-  const todosOsDebitos = pendenciasAtivas.map(p => ({
-    id: p.id,
-    praca: p.rodovia,
-    concessionaria: p.concessionaria,
-    prazoVencimento: p.prazoVencimento,
-    riscoDeMulta: p.riscoDeMulta,
-    valor: p.valor,
-    data: p.data,
-    hora: p.hora,
-    placa: p.placa
-  }));
+  // Lista filtrada e ordenada por prazo (para a seção "Passagens a pagar")
+  const pendentesFiltradas = (() => {
+    let r = passagensTodas
+    if (filtroTipo !== 'todas') r = filtrarPorTipo(r, filtroTipo)
+    if (filtroStatus !== 'todas') r = filtrarPorStatus(r, filtroStatus)
+    return [...r].sort((a, b) => {
+      const [da, ma, ya] = a.prazoLimite.split('/').map(Number)
+      const [db, mb, yb] = b.prazoLimite.split('/').map(Number)
+      return new Date(ya, ma - 1, da).getTime() - new Date(yb, mb - 1, db).getTime()
+    })
+  })()
 
   // Funções para o ResumoPedido
   const formatCurrency = (value: number) => {
     return `R$ ${value.toFixed(2).replace('.', ',')}`;
   };
 
-  const placasUnicas = [...new Set(todosOsDebitos.map(d => d.placa))];
-  const debitosFiltrados = filtroPlaca.includes('todas') ? todosOsDebitos : todosOsDebitos.filter(d => filtroPlaca.includes(d.placa));
+  const placasUnicas = [...new Set(passagensTodas.map(d => d.placa))];
 
   // Selecionar todas as pendências por padrão ao carregar
   useEffect(() => {
-    if (todosOsDebitos.length > 0 && debitosSelecionadosResumo.length === 0) {
-      setDebitosSelecionadosResumo(todosOsDebitos.map(d => d.id));
+    if (passagensTodas.length > 0 && debitosSelecionadosResumo.length === 0) {
+      setDebitosSelecionadosResumo(passagensTodas.map(d => d.id));
     }
-  }, [todosOsDebitos.length]);
+  }, [passagensTodas.length]);
 
-  // Atualizar seleção quando filtro mudar
+  // Atualizar seleção quando filtros de tipo/status mudarem
   useEffect(() => {
-    if (debitosFiltrados.length > 0) {
-      // Manter apenas os débitos selecionados que ainda estão visíveis no filtro atual
-      const debitosVisiveis = debitosFiltrados.map(d => d.id);
+    if (pendentesFiltradas.length > 0) {
+      const debitosVisiveis = pendentesFiltradas.map(d => d.id);
       const selecaoAtualizada = debitosSelecionadosResumo.filter(id => debitosVisiveis.includes(id));
-      
-      // Se não há débitos selecionados visíveis, selecionar todos os visíveis
-      if (selecaoAtualizada.length === 0 && debitosFiltrados.length > 0) {
+      if (selecaoAtualizada.length === 0) {
         setDebitosSelecionadosResumo(debitosVisiveis);
       } else if (selecaoAtualizada.length !== debitosSelecionadosResumo.length) {
         setDebitosSelecionadosResumo(selecaoAtualizada);
       }
     }
-  }, [filtroPlaca.join(','), debitosFiltrados.length]);
-  const todosSelecionados = debitosFiltrados.length > 0 && debitosFiltrados.every(debito => debitosSelecionadosResumo.includes(debito.id));
+  }, [filtroTipo, filtroStatus, filtroPlaca.join(',')]);
+
+  const todosSelecionados = pendentesFiltradas.length > 0 && pendentesFiltradas.every(debito => debitosSelecionadosResumo.includes(debito.id));
 
   const toggleDebitoSelecionado = (debitoId: string) => {
-    setDebitosSelecionadosResumo(prev => 
-      prev.includes(debitoId) 
+    setDebitosSelecionadosResumo(prev =>
+      prev.includes(debitoId)
         ? prev.filter(id => id !== debitoId)
         : [...prev, debitoId]
     );
   };
 
   const selecionarTodos = () => {
-    setDebitosSelecionadosResumo(debitosFiltrados.map(d => d.id));
+    setDebitosSelecionadosResumo(pendentesFiltradas.map(d => d.id));
   };
 
   const desselecionarTodos = () => {
@@ -231,7 +188,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   const calcularValorTotal = () => {
-    return todosOsDebitos
+    return passagensTodas
       .filter(debito => debitosSelecionadosResumo.includes(debito.id))
       .reduce((acc, debito) => acc + debito.valor, 0);
   };
@@ -304,13 +261,21 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   const handleProsseguir = () => {
-    const debitosSelecionados = todosOsDebitos.filter(debito => debitosSelecionadosResumo.includes(debito.id));
+    const debitosSelecionados = passagensTodas.filter(debito => debitosSelecionadosResumo.includes(debito.id));
     const valorTotal = calcularValorTotal();
     
     if (onIrParaCheckout) {
       onIrParaCheckout(debitosSelecionados, valorTotal);
     }
   };
+
+  const formatPassagemId = (id: string): string => {
+    let h = 0
+    for (let i = 0; i < id.length; i++) {
+      h = (h * 31 + id.charCodeAt(i)) | 0
+    }
+    return 'PASS-' + String(Math.abs(h) % 1_000_000).padStart(6, '0')
+  }
 
   const getInitials = (nome: string) => {
     if (!nome) return 'U';
@@ -335,10 +300,10 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   // Métricas para os cards do dashboard
-  const totalEmAberto = pendenciasAtivas.reduce((s, p) => s + p.valor, 0);
-  const vencendoEmBreve = pendenciasAtivas.filter(p => p.riscoDeMulta).length;
+  const totalEmAberto = passagensTodas.reduce((s, p) => s + p.valor, 0);
+  const vencendoEmBreve = passagensTodas.filter(p => p.status === 'risco_multa').length;
   const multasEvitadas = 482.68;
-  const veiculosMonitorados = [...new Set(pendenciasAtivas.map(p => p.placa))].length;
+  const veiculosMonitorados = placasUsuario.length;
 
   // Configuração das abas para navegação
   const tabs = [
@@ -358,64 +323,41 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   ];
 
   const renderHomeContent = () => (
-    <div className="max-w-4xl mx-auto space-y-5">
+    <div className="max-w-4xl mx-auto space-y-4">
 
-      {/* Saudação */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      {/* Cabeçalho compacto */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#5B2E8C]">
-            Olá, {(usuario.nome || 'Usuário').split(' ')[0]} 👋
+          <h2 className="text-lg font-semibold text-[#1A1B23]">
+            Olá, {(usuario.nome || 'Usuário').split(' ')[0]}
           </h2>
           <p className="text-sm text-[#8A8B95] mt-0.5">
             {vencendoEmBreve > 0
-              ? `Você tem ${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
-              : `Tudo em dia por enquanto — ${pendenciasAtivas.length} passagens pendentes de pagamento`}
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-[#8A8B95] flex-shrink-0">
-          <Shield className="h-3.5 w-3.5 text-[#8B5FFF]" />
-          <span>{veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''} monitorado{veiculosMonitorados > 1 ? 's' : ''}</span>
-        </div>
-      </div>
-
-      {/* Cards de métricas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Total em aberto */}
-        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#F8D7DD] border-[#F0A8B5]' : 'bg-white border-[#DCDDE3]'}`}>
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Em aberto</p>
-          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#A3203B]' : 'text-[#5B2E8C]'}`}>
-            {formatCurrency(totalEmAberto)}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">{pendenciasAtivas.length} passagem{pendenciasAtivas.length > 1 ? 'ns' : ''}</p>
-        </div>
-
-        {/* Vencendo em breve */}
-        <div className={`rounded-xl border-2 p-3 sm:p-4 ${vencendoEmBreve > 0 ? 'bg-[#FBE8C5] border-[#F4C97A]' : 'bg-white border-[#DCDDE3]'}`}>
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Vence em breve</p>
-          <p className={`text-xl sm:text-2xl font-bold mt-1 ${vencendoEmBreve > 0 ? 'text-[#9A5B00]' : 'text-[#8A8B95]'}`}>
-            {vencendoEmBreve}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">
-            {vencendoEmBreve > 0 ? 'passagem próx. do prazo' : 'nenhuma urgente'}
+              ? `${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
+              : passagensTodas.length === 0
+                ? 'Nenhuma pendência no momento'
+                : `${passagensTodas.length} passagem${passagensTodas.length !== 1 ? 'ns' : ''} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
           </p>
         </div>
 
-        {/* Multas evitadas */}
-        <div className="rounded-xl border-2 bg-[#D4F0E2] border-[#A3D9BE] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Multas evitadas</p>
-          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#0A6B45]">
-            {formatCurrency(multasEvitadas)}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">economia acumulada</p>
-        </div>
-
-        {/* Veículos */}
-        <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Veículos</p>
-          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#5B2E8C]">
-            {veiculosMonitorados}
-          </p>
-          <p className="text-xs text-[#8A8B95] mt-1">monitorado{veiculosMonitorados > 1 ? 's' : ''}</p>
+        {/* Pills de status */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {agg.totalGeral > 0 && (
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${vencendoEmBreve > 0 ? 'bg-[#F8D7DD] text-[#A3203B]' : 'bg-[#F4EFFB] text-[#5B2E8C]'}`}>
+              <Wallet className="h-3 w-3" />
+              {formatCurrency(agg.totalGeral)} em aberto
+            </span>
+          )}
+          {proximo && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#FBE8C5] text-[#9A5B00]">
+              <Calendar className="h-3 w-3" />
+              Vence {proximo.prazoLimite}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1.5 text-xs text-[#8A8B95] px-2 py-1.5">
+            <Shield className="h-3 w-3 text-[#8B5FFF]" />
+            {veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''}
+          </span>
         </div>
       </div>
 
@@ -447,118 +389,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Adicionar Nova Placa */}
-          <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border border-[#8B5FFF] rounded-lg p-2 sm:p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden sm:flex w-6 h-6 sm:w-8 sm:h-8 bg-[#8B5FFF] rounded-lg items-center justify-center flex-shrink-0">
-                  <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[#5B2E8C] text-xs sm:text-sm leading-tight">Consultar outra placa</h4>
-                  <p className="text-xs text-[#8A8B95] leading-tight hidden sm:block">Adicione débitos de outro veículo ao pagamento</p>
-                </div>
-              </div>
-              {!mostrandoFormularioNovaPlaca && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                  className="text-xs h-8 px-2 sm:px-3 border-[#8B5FFF] text-[#8B5FFF] hover:bg-[#8B5FFF] hover:text-white flex-shrink-0 w-full sm:w-auto"
+          {/* Filtros — estilo iOS Segmented Control, largura total */}
+          <div className="mb-4">
+            <div className="flex w-full bg-[#EBEBED] rounded-full p-0.5">
+              {(['todas', 'praca_fisica', 'portico_free_flow'] as const).map(t => (
+                <button
+                  key={t}
+                  onClick={() => setFiltroTipo(t)}
+                  className={`flex-1 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap ${
+                    filtroTipo === t
+                      ? 'bg-white text-[#1A1B23] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.07)]'
+                      : 'text-[#6B6F7A] hover:text-[#1A1B23]'
+                  }`}
                 >
-                  <Plus className="h-3 w-3 mr-1" />
-                  <span className="sm:hidden">Adicionar</span>
-                  <span className="hidden sm:inline">Adicionar</span>
-                </Button>
-              )}
+                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça Manual' : 'Free Flow'}
+                </button>
+              ))}
             </div>
-            
-            {mostrandoFormularioNovaPlaca && (
-              <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 border-t border-[#8B5FFF]/20">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={novaPlaca}
-                      onChange={(e) => {
-                        let value = e.target.value.toUpperCase();
-                        value = value.replace(/[^A-Z0-9]/g, '');
-                        if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
-                          value = value.slice(0, 3) + '-' + value.slice(3);
-                        }
-                        setNovaPlaca(value);
-                      }}
-                      placeholder="ABC-1234"
-                      className="w-full h-9 sm:h-10 px-3 bg-white border border-[#DCDDE3] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
-                      maxLength={8}
-                    />
-                  </div>
-                  <div className="flex gap-2 sm:flex-shrink-0">
-                    <Button
-                      onClick={buscarDebitosNovaPlaca}
-                      disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
-                      size="sm"
-                      className="flex-1 sm:flex-none h-9 sm:h-10 px-3 sm:px-4 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
-                    >
-                      {consultandoNovaPlaca ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <>
-                          <Car className="h-3 w-3 mr-1 hidden sm:inline" />
-                          Buscar
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setMostrandoFormularioNovaPlaca(false);
-                        setNovaPlaca('');
-                      }}
-                      className="h-9 sm:h-10 px-2 sm:px-3 border-[#DCDDE3] text-[#8A8B95] hover:bg-[#F7F5FB] flex-shrink-0"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {resultadoConsultaNovaPlaca && (
-                  <div className="bg-white border border-[#DCDDE3] rounded-lg p-2 sm:p-3">
-                    {resultadoConsultaNovaPlaca.success ? (
-                      <div className="space-y-2">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#0E8B5A] flex-shrink-0" />
-                            <span className="text-xs sm:text-sm font-medium text-[#5B2E8C] leading-tight">
-                              {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} encontrada{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''}
-                            </span>
-                          </div>
-                          <span className="text-xs sm:text-sm font-semibold text-[#8B5FFF] sm:text-right">
-                            {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
-                          </span>
-                        </div>
-                        <Button
-                          onClick={adicionarDebitosNovaPlaca}
-                          size="sm"
-                          className="w-full h-8 sm:h-8 bg-[#8B5FFF] hover:bg-[#7142B8] text-white text-xs"
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Adicionar ao pagamento
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-[#8A8B95] flex-shrink-0" />
-                        <span className="text-xs sm:text-sm text-[#8A8B95] leading-tight">
-                          Nenhuma pendência encontrada para esta placa
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Filtro por Placa - apenas se houver múltiplas placas */}
@@ -611,11 +458,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       />
                       <label htmlFor="todas-placas" className="text-xs sm:text-sm cursor-pointer flex items-center gap-1 sm:gap-2 whitespace-nowrap">
                         <Car className="h-3 w-3" />
-                        <span>Todas as placas ({todosOsDebitos.length})</span>
+                        <span>Todas as placas ({passagensTodas.length})</span>
                       </label>
                     </div>
                     {placasUnicas.map(placa => {
-                      const qtdDebitos = todosOsDebitos.filter(d => d.placa === placa).length;
+                      const qtdDebitos = passagensTodas.filter(d => d.placa === placa).length;
                       const isChecked = filtroPlaca.includes(placa);
                       return (
                         <div key={placa} className="flex items-center space-x-2">
@@ -646,18 +493,18 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           )}
 
           {/* Lista dos débitos */}
-          {debitosFiltrados.length > 0 ? (
+          {pendentesFiltradas.length > 0 ? (
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide leading-tight">
-                    {debitosFiltrados.length} Pendência{debitosFiltrados.length > 1 ? 's' : ''} {filtroPlaca.includes('todas') ? 'Disponív' : 'Filtrada'}{debitosFiltrados.length > 1 ? 'eis' : 'el'}
+                    {pendentesFiltradas.length} Pendência{pendentesFiltradas.length > 1 ? 's' : ''} {filtroTipo === 'todas' && filtroStatus === 'todas' ? 'Disponíveis' : 'Filtradas'}
                     {!filtroPlaca.includes('todas') && (
                       <span className="text-[#8B5FFF] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
                     )}
                   </h4>
                 </div>
-                {debitosFiltrados.length > 1 && (
+                {pendentesFiltradas.length > 1 && (
                   <Button
                     type="button"
                     variant="outline"
@@ -681,22 +528,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   </Button>
                 )}
               </div>
-              
+
               <div className="max-h-80 overflow-y-auto space-y-3">
-                {debitosFiltrados.map((debito, index) => {
-                  const isSelected = debitosSelecionadosResumo.includes(debito.id);
+                {pendentesFiltradas.map((p) => {
+                  const isSelected = debitosSelecionadosResumo.includes(p.id);
+                  const isRisco = p.status === 'risco_multa';
                   return (
-                    <div 
-                      key={debito.id} 
+                    <div
+                      key={p.id}
                       className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all select-none ${
-                        isSelected 
-                          ? 'bg-[#F4EFFB] border-[#8B5FFF]' 
+                        isSelected
+                          ? 'bg-[#F4EFFB] border-[#8B5FFF]'
                           : 'bg-[#F7F5FB] border-[#DCDDE3] hover:border-[#8B5FFF]'
                       }`}
                     >
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => toggleDebitoSelecionado(debito.id)}
+                        onCheckedChange={() => toggleDebitoSelecionado(p.id)}
                         className="mt-1 transition-all duration-200 hover:scale-110 flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
@@ -708,45 +556,65 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                             <h3 className={`font-semibold text-sm sm:text-base leading-tight transition-colors truncate ${
                               isSelected ? 'text-[#5B2E8C]' : 'text-[#1A1B23]'
                             }`}>
-                              {debito.praca}
+                              {p.local}
                             </h3>
+                            <TipoPassagemBadge tipo={p.tipo} />
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className={`font-bold text-base sm:text-lg whitespace-nowrap cursor-pointer transition-all duration-200 hover:scale-105 ${
                               isSelected ? 'text-[#5B2E8C] hover:text-[#8B5FFF]' : 'text-[#8B5FFF] hover:text-[#7142B8]'
                             }`}>
-                              {formatCurrency(debito.valor)}
+                              {formatCurrency(p.valor)}
                             </span>
-                            {debito.riscoDeMulta ? (
+                            {isRisco ? (
                               <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Vence em breve</Badge>
                             ) : (
                               <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs flex-shrink-0">Pendente</Badge>
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
-                          <div className="flex items-center gap-2 text-xs text-[#8A8B95]">
+                        {/* Linha 2: data · hora · concessionária — vence · placa */}
+                        <div className="flex flex-wrap items-center justify-between gap-y-1 gap-x-3 text-xs text-[#8A8B95]">
+                          <div className="flex items-center gap-2">
                             <Calendar className="h-3 w-3 flex-shrink-0" />
-                            <span>{debito.data} às {debito.hora || '14:30:00'}</span>
-                            {debito.concessionaria && (
+                            <span>{p.data} às {p.hora}</span>
+                            {p.concessionaria && (
                               <>
                                 <span className="text-[#DCDDE3]">·</span>
-                                <span>{debito.concessionaria}</span>
+                                <span>{p.concessionaria}</span>
                               </>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 text-xs flex-shrink-0">
-                            {debito.prazoVencimento && (
-                              <span className={`flex items-center gap-1 ${debito.riscoDeMulta ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
-                                <Shield className="h-3 w-3" />
-                                Vence: {debito.prazoVencimento}
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1 text-[#8A8B95]">
+                          <div className="flex items-center gap-3 flex-shrink-0">
+                            <span className={`flex items-center gap-1 ${isRisco ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
+                              <Shield className="h-3 w-3" />
+                              Vence: {p.prazoLimite}
+                            </span>
+                            <span className="flex items-center gap-1">
                               <Car className="h-3 w-3" />
-                              {debito.placa}
+                              {p.placa}
                             </span>
                           </div>
+                        </div>
+
+                        {/* Linha 3: ID · Rodovia · KM — numa linha só */}
+                        <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 flex flex-wrap gap-x-5 gap-y-1.5">
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">ID da Passagem</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Rodovia</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Quilômetro</span>
+                            <span className="text-xs font-semibold text-[#3A3B47]">km {p.km}</span>
+                          </span>
+                          <span className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Praça</span>
+                            <span className="text-xs font-semibold text-[#3A3B47] truncate max-w-[220px]">{p.local}</span>
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -762,18 +630,18 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 </div>
               )}
             </div>
-          ) : todosOsDebitos.length > 0 ? (
+          ) : passagensTodas.length > 0 ? (
             <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
               <p className="text-sm text-[#9A5B00] font-medium">
-                Nenhuma pendência encontrada para {filtroPlaca.includes('todas') ? 'os filtros selecionados' : `a(s) placa(s) "${filtroPlaca.join(', ')}"`}
+                Nenhuma pendência encontrada para os filtros selecionados
               </p>
               <Button
-                onClick={() => setFiltroPlaca(['todas'])}
+                onClick={() => { setFiltroTipo('todas'); setFiltroStatus('todas'); }}
                 variant="outline"
                 size="sm"
                 className="mt-2 text-xs"
               >
-                Ver todas as placas
+                Ver todas as passagens
               </Button>
             </div>
           ) : (
@@ -811,9 +679,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   {formatCurrency(calcularValorTotal())}
                 </span>
               </div>
-              {todosOsDebitos.length > 0 && (
+              {passagensTodas.length > 0 && (
                 <p className="text-xs sm:text-sm text-[#F7F5FB] opacity-90">
-                  {debitosSelecionadosResumo.length} de {todosOsDebitos.length} pendência{todosOsDebitos.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
+                  {debitosSelecionadosResumo.length} de {passagensTodas.length} pendência{passagensTodas.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
                 </p>
               )}
             </div>
@@ -821,7 +689,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
           {/* Botão de Prosseguir */}
           <div className="pt-4">
-            <Button 
+            <Button
               onClick={handleProsseguir}
               disabled={debitosSelecionadosResumo.length === 0}
               className={`w-full h-12 sm:h-14 text-sm sm:text-lg font-semibold rounded-lg transition-all ${
@@ -836,38 +704,122 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </Button>
           </div>
 
-          {/* Segurança */}
-          <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4 mt-2">
-            <div className="flex items-center gap-3 text-sm text-[#8A8B95]">
-              <Shield className="h-4 w-4 text-[#8B5FFF] flex-shrink-0" />
-              <span>Ambiente seguro · SSL · Conformidade PCI DSS · Antifraude 24h</span>
-            </div>
+          {/* Consultar outra placa — ação terciária */}
+          <div className="border-t border-[#ECECF1] pt-3">
+            {!mostrandoFormularioNovaPlaca ? (
+              <button
+                onClick={() => setMostrandoFormularioNovaPlaca(true)}
+                className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors group"
+              >
+                <Plus className="h-3 w-3 group-hover:text-[#5B2E8C]" />
+                Consultar outra placa
+              </button>
+            ) : (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
+                  <button
+                    onClick={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
+                    className="text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={novaPlaca}
+                    onChange={(e) => {
+                      let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
+                        value = value.slice(0, 3) + '-' + value.slice(3);
+                      }
+                      setNovaPlaca(value);
+                    }}
+                    placeholder="ABC-1234"
+                    className="flex-1 h-9 px-3 bg-[#F7F7F9] border border-[#E5E6EC] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#B0B1BB] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/15"
+                    maxLength={8}
+                  />
+                  <Button
+                    onClick={buscarDebitosNovaPlaca}
+                    disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
+                    size="sm"
+                    className="h-9 px-4 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs"
+                  >
+                    {consultandoNovaPlaca ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Buscar'}
+                  </Button>
+                </div>
+
+                {resultadoConsultaNovaPlaca && (
+                  <div className="rounded-lg border border-[#DCDDE3] bg-white p-3 mt-1">
+                    {resultadoConsultaNovaPlaca.success ? (
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-[#0E8B5A] flex-shrink-0" />
+                          <span className="text-xs text-[#1A1B23] font-medium">
+                            {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} · {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
+                          </span>
+                        </div>
+                        <Button onClick={adicionarDebitosNovaPlaca} size="sm" className="h-7 px-3 text-xs bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white flex-shrink-0">
+                          Adicionar
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                        <span className="text-xs text-[#8A8B95]">Nenhuma pendência encontrada</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
         </CardContent>
       </Card>
 
-      {/* Feed de atividade recente */}
-      <Card className="border border-[#DCDDE3]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base text-[#5B2E8C] flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Atividade recente
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 pt-0">
-          {atividadeRecente.map((item, i) => (
-            <div key={i} className={`flex items-start gap-3 p-3 rounded-lg border text-sm ${item.bg}`}>
-              <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                item.tipo === 'pagamento' ? 'bg-[#0E8B5A]' :
-                item.tipo === 'alerta' ? 'bg-[#C8324A]' : 'bg-[#C77700]'
-              }`} />
-              <div className="flex-1 min-w-0">
-                <p className={`font-medium leading-snug ${item.cor}`}>{item.texto}</p>
+      {/* Feed de atividade recente — colapsável */}
+      <Card className="border border-[#DCDDE3] overflow-hidden">
+        {/* Cabeçalho clicável */}
+        <button
+          onClick={() => setAtividadeAberta(v => !v)}
+          className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#F7F5FB] transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <Calendar className="h-4 w-4 text-[#5B2E8C]" />
+            <span className="text-sm font-semibold text-[#5B2E8C]">Atividade recente</span>
+            {/* Pílulas de resumo quando colapsado */}
+            {!atividadeAberta && (
+              <div className="flex items-center gap-1.5 ml-1">
+                {atividadeRecente.some(a => a.tipo === 'alerta') && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F8D7DD] text-[#C8324A]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8324A]" />
+                    Alerta
+                  </span>
+                )}
+                <span className="text-[11px] text-[#8A8B95]">{atividadeRecente.length} eventos</span>
               </div>
-              <span className="text-xs text-[#8A8B95] flex-shrink-0 mt-0.5">{item.data}</span>
-            </div>
-          ))}
-        </CardContent>
+            )}
+          </div>
+          <ChevronDown className={`h-4 w-4 text-[#8A8B95] transition-transform duration-200 ${atividadeAberta ? 'rotate-180' : ''}`} />
+        </button>
+
+        {/* Lista expansível */}
+        {atividadeAberta && (
+          <div className="px-4 pb-4 space-y-2 border-t border-[#ECECF1] pt-3">
+            {atividadeRecente.map((item, i) => (
+              <div key={i} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm ${item.bg}`}>
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                  item.tipo === 'pagamento' ? 'bg-[#0E8B5A]' :
+                  item.tipo === 'alerta' ? 'bg-[#C8324A]' : 'bg-[#C77700]'
+                }`} />
+                <p className={`flex-1 font-medium leading-snug text-xs sm:text-sm ${item.cor}`}>{item.texto}</p>
+                <span className="text-[11px] text-[#8A8B95] flex-shrink-0">{item.data}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
     </div>
@@ -889,17 +841,18 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5FB] md:pb-0 pb-20">
+    <div className="min-h-screen bg-[#F7F5FB] md:pb-0 pb-20 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-[#DCDDE3] sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#5B2E8C] rounded-lg flex items-center justify-center flex-shrink-0">
-                <Car className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <span className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
+            <div className="flex items-center">
+              <img
+                src={logoPedagioSimples}
+                alt="Pedágio Simples — by Move Mais"
+                className="h-8 sm:h-10 w-auto"
+              />
             </div>
             
             {/* User Info & Actions */}
@@ -962,9 +915,12 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="px-3 sm:px-4 py-4 sm:py-6">
+      <main className="px-3 sm:px-4 py-4 sm:py-6 flex-1">
         {renderContent()}
       </main>
+
+      {/* Footer — Desktop only */}
+      <FooterLogado />
 
       {/* Bottom Navigation - Mobile Only */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DCDDE3] z-50">

@@ -1,8 +1,11 @@
+import { useState } from "react";
 import logoFooterImg from "figma:asset/b4b61ea2aff4e0735f9cc375bc7a4846923c94d1.png";
-import { QrCode, CreditCard, Smartphone, Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
+import { QrCode, CreditCard, Instagram, Twitter, Linkedin, Youtube, Building2, ShieldCheck } from "lucide-react";
+import { CertificadosModal } from "./CertificadosModal";
 
 interface FooterProps {
   onNavigateToFAQ?: () => void;
+  onAcessoConcessionaria?: () => void;
 }
 
 const colunas = [
@@ -44,7 +47,9 @@ const redesSociais = [
   { icone: Youtube, label: "YouTube", href: "#" },
 ];
 
-export function Footer({ onNavigateToFAQ }: FooterProps) {
+export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps) {
+  const [modalCertificados, setModalCertificados] = useState(false);
+
   return (
     <footer className="bg-[#1A1B23]">
 
@@ -62,8 +67,44 @@ export function Footer({ onNavigateToFAQ }: FooterProps) {
               by Move Mais Meios de Pagamento
             </p>
 
-            {/* Redes sociais */}
+            {/* App store badges */}
             <div className="flex items-center gap-3 mt-6">
+              {[
+                {
+                  label: "App Store",
+                  sub: "Em breve",
+                  icon: (
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 text-white/70" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: "Google Play",
+                  sub: "Em breve",
+                  icon: (
+                    <svg viewBox="0 0 24 24" className="h-5 w-5 text-white/70" fill="currentColor">
+                      <path d="M3.18 23.76c.3.17.64.22.99.14l12.12-6.95-2.54-2.54-10.57 9.35zm-1.1-20.9C2.03 3.1 2 3.37 2 3.65v16.7c0 .28.03.55.08.8l10.88-10.88-10.88-10.41zM20.49 10.3l-2.76-1.58-2.87 2.87 2.87 2.87 2.79-1.6c.8-.45.8-1.11-.03-1.56zM4.17.25L16.29 7.2l-2.54 2.54L3.18.38c.31-.2.67-.27.99-.13z" />
+                    </svg>
+                  ),
+                },
+              ].map((store) => (
+                <div
+                  key={store.label}
+                  className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 opacity-60 cursor-default select-none"
+                  title="Em breve"
+                >
+                  {store.icon}
+                  <div className="flex flex-col leading-none">
+                    <span className="text-[9px] text-white/40 uppercase tracking-widest">{store.sub}</span>
+                    <span className="text-xs font-semibold text-white/70 mt-0.5">{store.label}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Redes sociais */}
+            <div className="flex items-center gap-3 mt-5">
               {redesSociais.map((r) => {
                 const Icon = r.icone;
                 return (
@@ -118,25 +159,35 @@ export function Footer({ onNavigateToFAQ }: FooterProps) {
                 <div className="flex items-center gap-1.5 bg-white/5 rounded-lg px-3 py-1.5">
                   <CreditCard className="h-4 w-4 text-[#8B5FFF]" />
                   <span className="text-xs font-semibold text-white/60">Cartão de crédito</span>
-                  <span className="text-[10px] font-bold text-white/30 border border-white/15 rounded px-1.5 py-0.5 ml-1">Cielo</span>
+                  {["Mastercard", "Visa", "Elo"].map((brand) => (
+                    <span key={brand} className="text-[10px] font-bold text-white/30 border border-white/15 rounded px-1.5 py-0.5 ml-1">{brand}</span>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Selos de segurança */}
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-[#0E8B5A]">PCI DSS</span>
-                <span className="text-[8px] text-white/30">Compliant</span>
-              </div>
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-[#5B2E8C]">SSL</span>
-                <span className="text-[8px] text-white/30">256-bit</span>
-              </div>
-              <div className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-[10px] font-bold text-white/50">LGPD</span>
-                <span className="text-[8px] text-white/30">Conformidade</span>
-              </div>
+            {/* Selos de segurança + trigger do modal */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {[
+                { label: "PCI DSS", sub: "Compliant", cor: "text-[#0E8B5A]" },
+                { label: "SSL", sub: "256-bit", cor: "text-[#8B5FFF]" },
+                { label: "LGPD", sub: "Conformidade", cor: "text-white/50" },
+              ].map((s) => (
+                <div key={s.label} className="flex flex-col items-center bg-white/5 rounded-lg px-3 py-2">
+                  <span className={`text-[10px] font-bold ${s.cor}`}>{s.label}</span>
+                  <span className="text-[8px] text-white/30">{s.sub}</span>
+                </div>
+              ))}
+              <button
+                onClick={() => setModalCertificados(true)}
+                className="flex items-center gap-1.5 bg-white/5 hover:bg-[#5B2E8C]/40 border border-white/10 hover:border-[#8B5FFF]/40 rounded-lg px-3 py-2 transition-colors group"
+                title="Ver todas as certificações"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-[#8B5FFF] group-hover:text-white transition-colors" />
+                <span className="text-[10px] font-semibold text-white/40 group-hover:text-white/80 transition-colors">
+                  Certificações & Selos
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -145,13 +196,25 @@ export function Footer({ onNavigateToFAQ }: FooterProps) {
       {/* Bottom bar */}
       <div className="border-t border-white/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/25">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/25">
             <p>© {new Date().getFullYear()} Pedágio Simples — Move Mais Meios de Pagamento. Todos os direitos reservados.</p>
-            <p>CNPJ 00.000.000/0001-00 · São Paulo, SP</p>
+            <div className="flex items-center gap-4">
+              {onAcessoConcessionaria && (
+                <button
+                  onClick={onAcessoConcessionaria}
+                  className="inline-flex items-center gap-1.5 text-white/40 hover:text-white transition-colors"
+                >
+                  <Building2 className="h-3.5 w-3.5" />
+                  Acesso Concessionária
+                </button>
+              )}
+              <p>CNPJ 00.000.000/0001-00 · São Paulo, SP</p>
+            </div>
           </div>
         </div>
       </div>
 
+      <CertificadosModal open={modalCertificados} onOpenChange={setModalCertificados} />
     </footer>
   );
 }

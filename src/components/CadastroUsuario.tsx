@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Progress } from "./ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { ArrowLeft, User, Mail, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
+import { ArrowLeft, User, Smartphone, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "../utils/placaValidation";
 
@@ -46,6 +46,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   const [tempoReenvio, setTempoReenvio] = useState(0);
   const [modalCodigoAberto, setModalCodigoAberto] = useState(false);
   const [cpfValido, setCpfValido] = useState<boolean | null>(null);
+  const [telefoneValido, setTelefoneValido] = useState<boolean | null>(null);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [forcaSenha, setForcaSenha] = useState<'fraca' | 'media' | 'forte' | null>(null);
@@ -103,8 +104,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       email: mockDados.email,
       telefone: mockDados.telefone,
     }));
-    // Mark email as pre-validated via CPF lookup
-    setEmailValido(true);
+    // Validate phone from CPF-returned data
+    const phoneNums = mockDados.telefone.replace(/\D/g, '');
+    const phoneOk = validarTelefoneBrasileiro(phoneNums);
+    setTelefoneValido(phoneOk);
     setErrors(prev => ({ ...prev, email: '', nome: '', dataNascimento: '', telefone: '' }));
     setCpfAutoPreenchido(['nome', 'dataNascimento', 'email', 'telefone']);
     setCpfBuscando(false);
@@ -177,6 +180,42 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
     }
     return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  /** Valida se é um celular brasileiro válido (11 dígitos, DDD 11-99, 9 como primeiro dígito) */
+  const validarTelefoneBrasileiro = (nums: string): boolean => {
+    if (nums.length !== 11) return false;
+    const ddd = parseInt(nums.substring(0, 2));
+    if (ddd < 11 || ddd > 99) return false;
+    if (nums[2] !== '9') return false; // celular exige 9 como primeiro dígito
+    return true;
+  };
+
+  const handleTelefoneChange = (raw: string) => {
+    const formatted = formatPhone(raw);
+    handleInputChange('telefone', formatted);
+
+    // Reset estados de validação do SMS ao alterar o telefone
+    setTelefoneValido(null);
+    setCodigoEnviado(false);
+    setCodigoValidacao('');
+    setCodigoCorreto('');
+    setCodigoValido(null);
+    setTempoReenvio(0);
+    setModalCodigoAberto(false);
+
+    const nums = raw.replace(/\D/g, '');
+    if (nums.length === 11) {
+      const valido = validarTelefoneBrasileiro(nums);
+      setTelefoneValido(valido);
+      if (!valido) {
+        setErrors(prev => ({ ...prev, telefone: 'Insira um celular válido com DDD (ex: (11) 98765-4321)' }));
+      } else {
+        setErrors(prev => ({ ...prev, telefone: '' }));
+      }
+    } else if (nums.length > 0) {
+      setErrors(prev => ({ ...prev, telefone: '' }));
+    }
   };
 
   const validarEmail = async (email: string) => {
@@ -257,50 +296,44 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const handleEmailChange = (email: string) => {
     handleInputChange('email', email);
-    
-    // Reset estados de validação
+
+    // Reset estados de validação de formato
     setEmailValido(null);
     setEmailValidando(false);
-    setCodigoEnviado(false);
-    setCodigoValidacao('');
-    setCodigoCorreto('');
-    setCodigoValido(null);
-    setTempoReenvio(0);
-    setModalCodigoAberto(false); // Fechar modal se estiver aberto
-    
+
     // Limpar timeout anterior
     if (emailTimeout) {
       clearTimeout(emailTimeout);
     }
-    
+
     // Se email estiver vazio, não validar
     if (!email.trim()) {
       setEmailValido(null);
       return;
     }
-    
-    // Debounce: aguardar 800ms após parar de digitar para validar
+
+    // Debounce: aguardar 800ms após parar de digitar para validar formato
     const newTimeout = setTimeout(() => {
       validarEmail(email);
     }, 800);
-    
+
     setEmailTimeout(newTimeout);
   };
 
-  // Função para enviar código de validação por email
+  // Função para enviar código de validação por SMS
   const enviarCodigoValidacao = async () => {
-    setEmailValidando(true);
-    
-    // Gerar código de 6 dígitos (fixo para facilitar testes)
+    setEmailValidando(true); // reutilizamos esse estado como "enviando"
+
+    // Gerar código de 6 dígitos (fixo para facilitar testes — em produção seria gerado no backend)
     const codigo = "123456";
     setCodigoCorreto(codigo);
-    
-    // Simular envio por email
+
+    // Simular envio por SMS
     setTimeout(() => {
       setEmailValidando(false);
       setCodigoEnviado(true);
-      setModalCodigoAberto(true); // Abrir modal
-      
+      setModalCodigoAberto(true);
+
       // Iniciar contagem regressiva para reenvio (60 segundos)
       setTempoReenvio(60);
       const interval = setInterval(() => {
@@ -325,9 +358,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     setTimeout(() => {
       const valido = codigoValidacao === codigoCorreto;
       setCodigoValido(valido);
-      // Importante: quando código é validado, o email também deve ser considerado válido
       if (valido) {
-        setEmailValido(true);
         setModalCodigoAberto(false); // Fechar modal quando válido
       }
       setValidandoCodigo(false);
@@ -419,8 +450,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         formData.aceitaTermos
       );
       const cpfValido_check = cpfValido === true;
-      const emailValido_check = (!codigoEnviado && emailValido === true) || (codigoEnviado && codigoValido === true);
-      return camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check;
+      // Email só precisa ter formato válido (não exige código)
+      const emailValido_check = emailValido !== false;
+      // Telefone precisa ter código SMS confirmado
+      const telefoneValido_check = (!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true);
+      return camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check && telefoneValido_check;
     } else if (etapaAtual === 2) {
       // Senha
       if (!formData.senha) return false;
@@ -450,10 +484,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (!formData.dataNascimento.trim()) newErrors.dataNascimento = 'Data de nascimento é obrigatória';
       else if (formData.dataNascimento.replace(/\D/g, '').length !== 8) newErrors.dataNascimento = 'Data inválida — use DD/MM/AAAA';
       if (!formData.email.trim()) newErrors.email = 'Email é obrigatório';
-      else if (!codigoEnviado && emailValido === false) newErrors.email = 'Email inválido ou não verificado';
-      else if (!codigoEnviado && emailValido === null && formData.email.trim()) newErrors.email = 'Aguarde a validação do e-mail';
-      else if (codigoEnviado && emailValido !== true) newErrors.email = 'Código de validação deve ser confirmado';
+      else if (emailValido === false) newErrors.email = 'Formato de e-mail inválido';
       if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
+      else if (telefoneValido === false) newErrors.telefone = 'Insira um celular válido com DDD (ex: (11) 98765-4321)';
+      else if (!codigoEnviado && telefoneValido !== true) newErrors.telefone = 'Aguarde a validação do telefone';
+      else if (codigoEnviado && codigoValido !== true) newErrors.telefone = 'Confirme o código enviado por SMS';
       if (!formData.cpf.trim()) newErrors.cpf = 'CPF é obrigatório';
       else if (cpfValido === false) newErrors.cpf = 'CPF inválido';
       else if (cpfValido === null && formData.cpf.trim()) newErrors.cpf = 'Aguarde a validação do CPF';
@@ -497,8 +532,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
       if (formData.dataNascimento.trim() && formData.dataNascimento.replace(/\D/g, '').length === 8) fieldsCompleted++;
       if (formData.nome.trim()) fieldsCompleted++;
-      if (formData.email.trim() && emailValido === true) fieldsCompleted++;
-      if (formData.telefone.trim()) fieldsCompleted++;
+      if (formData.email.trim() && emailValido !== false) fieldsCompleted++;
+      if (formData.telefone.trim() && (telefoneValido === true || codigoValido === true)) fieldsCompleted++;
       if (formData.aceitaTermos) fieldsCompleted++;
       progress = (fieldsCompleted / totalFields) * 33;
 
@@ -527,17 +562,17 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     }
 
     return Math.max(0, Math.min(100, progress));
-  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido, formData.dataNascimento]);
+  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido, telefoneValido, codigoValido, formData.dataNascimento]);
 
   const handleNextStep = () => {
-    // Aguardar validação do email se ainda estiver em progresso
+    // Aguardar envio/validação de SMS se ainda em progresso
     if (etapaAtual === 1 && (emailValidando || validandoCodigo)) {
-      setErrors(prev => ({ ...prev, email: 'Aguarde a validação do e-mail' }));
+      setErrors(prev => ({ ...prev, telefone: 'Aguarde a validação do telefone' }));
       return;
     }
 
-    // Se estiver na etapa 1 e o email for válido mas não enviou código ainda
-    if (etapaAtual === 1 && emailValido === true && !codigoEnviado) {
+    // Se estiver na etapa 1 e o telefone for válido mas ainda não enviou SMS
+    if (etapaAtual === 1 && telefoneValido === true && !codigoEnviado) {
       enviarCodigoValidacao();
       return;
     }
@@ -557,16 +592,25 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateCurrentStep()) return;
 
     setLoading(true);
-    
+
     // Simular criação de conta
     setTimeout(() => {
       setLoading(false);
       onCadastrar(formData);
     }, 2000);
+  };
+
+  const handleSubmitSemVeiculo = () => {
+    setLoading(true);
+    // Cria a conta sem vincular o veículo consultado
+    setTimeout(() => {
+      setLoading(false);
+      onCadastrar({ ...formData, placa: '', pularCadastroVeiculo: true });
+    }, 1500);
   };
 
   const getStepTitle = () => {
@@ -823,15 +867,44 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           </span>
                         )}
                       </Label>
-                      <Input
-                        id="telefone"
-                        placeholder="Seu telefone com DDD"
-                        value={formData.telefone}
-                        onChange={(e) => handleInputChange('telefone', formatPhone(e.target.value))}
-                        className={`text-lg py-3 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${errors.telefone ? 'border-[#C8324A]' : ''}`}
-                        maxLength={15}
-                      />
+                      <div className="relative">
+                        <Input
+                          id="telefone"
+                          type="tel"
+                          placeholder="(11) 98765-4321"
+                          value={formData.telefone}
+                          onChange={(e) => handleTelefoneChange(e.target.value)}
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.telefone ? 'border-[#C8324A]' :
+                            codigoValido === true ? 'border-[#0E8B5A]' :
+                            telefoneValido === true ? 'border-[#5B2E8C]' :
+                            telefoneValido === false ? 'border-[#C8324A]' : ''
+                          }`}
+                          maxLength={15}
+                          disabled={codigoValido === true}
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          {codigoValido === true && (
+                            <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
+                          )}
+                          {codigoValido !== true && telefoneValido === false && (
+                            <XCircle className="h-5 w-5 text-[#C8324A]" />
+                          )}
+                        </div>
+                      </div>
                       {errors.telefone && <p className="text-sm text-[#C8324A]">{errors.telefone}</p>}
+                      {codigoValido === true && !errors.telefone && (
+                        <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4" />
+                          Telefone validado por SMS
+                        </p>
+                      )}
+                      {telefoneValido === true && !codigoEnviado && !errors.telefone && (
+                        <p className="text-sm text-[#5B2E8C] flex items-center gap-1">
+                          <Smartphone className="h-4 w-4" />
+                          Celular válido — enviaremos um SMS para confirmar
+                        </p>
+                      )}
                     </div>
 
                     {/* Checkbox de Termos */}
@@ -1108,9 +1181,9 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                 {/* Botões de navegação */}
                 <div className="pt-6">
                   {etapaAtual < 3 ? (
-                    <Button 
+                    <Button
                       type="submit"
-                      size="lg" 
+                      size="lg"
                       disabled={
                         etapaAtual === 1
                           ? (
@@ -1123,17 +1196,19 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               !formData.aceitaTermos ||
                               // CPF inválido
                               cpfValido !== true ||
+                              // Email com formato inválido
+                              emailValido === false ||
                               // Estados de carregamento
-                              emailValidando || 
+                              emailValidando ||
                               validandoCodigo ||
-                              // Lógica do email: se não enviou código ainda, precisa email válido; se enviou código, precisa email válido (código validado)
-                              (!codigoEnviado && emailValido !== true) ||
+                              // Telefone não validado / SMS não confirmado
+                              (!codigoEnviado && telefoneValido !== true) ||
                               (codigoEnviado && codigoValido !== true)
                             )
                           : !isCurrentStepValid()
                       }
                       onClick={(e) => {
-                        if (etapaAtual === 1 && formData.email.trim() && emailValido === true && !codigoEnviado) {
+                        if (etapaAtual === 1 && telefoneValido === true && !codigoEnviado) {
                           e.preventDefault();
                           enviarCodigoValidacao();
                         }
@@ -1148,9 +1223,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               formData.cpf.trim() &&
                               formData.aceitaTermos &&
                               cpfValido === true &&
+                              emailValido !== false &&
                               !emailValidando &&
                               !validandoCodigo &&
-                              ((!codigoEnviado && emailValido === true) || (codigoEnviado && codigoValido === true))
+                              ((!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true))
                             )
                             ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
                             : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
@@ -1159,16 +1235,16 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                             : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                       }`}
                     >
-                      {etapaAtual === 1 && emailValido === true && !codigoEnviado 
+                      {etapaAtual === 1 && telefoneValido === true && !codigoEnviado
                         ? (emailValidando ? (
                             <>
                               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                              Enviando código...
+                              Enviando SMS...
                             </>
                           ) : (
                             <>
-                              <Mail className="h-5 w-5 mr-2" />
-                              Enviar código de validação
+                              <Smartphone className="h-5 w-5 mr-2" />
+                              Enviar código por SMS
                             </>
                           ))
                         : (
@@ -1179,24 +1255,41 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       }
                     </Button>
                   ) : (
-                    <Button 
-                      type="submit" 
-                      size="lg" 
-                      className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
-                      disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                          Criando conta...
-                        </>
-                      ) : (
-                        <>
-                          <Car className="h-5 w-5 mr-2" />
-                          Criar conta e prosseguir
-                        </>
-                      )}
-                    </Button>
+                    <>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
+                        disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
+                      >
+                        {loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                            Criando conta...
+                          </>
+                        ) : (
+                          <>
+                            <Car className="h-5 w-5 mr-2" />
+                            Criar conta e prosseguir
+                          </>
+                        )}
+                      </Button>
+
+                      {/* Alternativa: criar conta sem vincular este veículo */}
+                      <div className="mt-4 text-center">
+                        <button
+                          type="button"
+                          onClick={handleSubmitSemVeiculo}
+                          disabled={loading}
+                          className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#8A8B95]"
+                        >
+                          Criar conta sem vincular este veículo
+                        </button>
+                        <p className="text-xs text-[#C6C7CF] mt-1.5">
+                          Você poderá cadastrar veículos depois pelo dashboard
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
               </form>
@@ -1222,27 +1315,27 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         </div>
       </div>
 
-      {/* Modal para Validação do Código */}
+      {/* Modal para Validação do Código SMS */}
       <Dialog open={modalCodigoAberto} onOpenChange={setModalCodigoAberto}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-xl text-[#5B2E8C] flex items-center justify-center gap-2">
-              <Mail className="h-6 w-6" />
-              Validar E-mail
+              <Smartphone className="h-6 w-6" />
+              Validar Telefone
             </DialogTitle>
             <DialogDescription className="text-center text-sm text-[#8A8B95]">
-              Digite o código de 6 dígitos que enviamos para o seu e-mail para confirmar seu endereço eletrônico.
+              Digite o código de 6 dígitos enviado por SMS para confirmar seu número de celular.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 pt-4">
-            {/* Informação do e-mail */}
+            {/* Informação do telefone */}
             <div className="text-center space-y-2">
               <p className="text-sm text-[#8A8B95]">
-                Enviamos um código de 6 dígitos para
+                Enviamos um SMS com o código para
               </p>
               <p className="text-base font-medium text-[#5B2E8C]">
-                {formData.email}
+                {formData.telefone}
               </p>
             </div>
 
@@ -1276,11 +1369,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         setValidandoCodigo(false);
                         
                         if (valido) {
-                          setEmailValido(true);
                           setErrors(prev => {
                             const newErrors = { ...prev };
                             delete newErrors.codigoValidacao;
-                            delete newErrors.email;
+                            delete newErrors.telefone;
                             return newErrors;
                           });
                           // Fechar modal após validação bem-sucedida
@@ -1344,7 +1436,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
             {/* Botão de reenvio */}
             <div className="text-center">
               <p className="text-sm text-[#8A8B95] mb-3">
-                Não recebeu o código?
+                Não recebeu o SMS?
               </p>
               <Button
                 type="button"

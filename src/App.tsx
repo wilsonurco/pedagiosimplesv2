@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "./components/ui/button";
 import { Card, CardContent } from "./components/ui/card";
+import { Checkbox } from "./components/ui/checkbox";
 import { AnimatedHero } from "./components/ui/animated-hero-section-1";
 import { CheckCircle, Car, X, AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -18,10 +19,10 @@ import { PIXQRCode } from "./components/PIXQRCode";
 import { Footer } from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "./utils/placaValidation";
+import { gerarDebitos, agregarPorTipo, type Passagem } from "./utils/simulator";
 import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
-import { PartnerCarousel } from "./components/PartnerCarousel";
 import { LandingBeneficios } from "./components/LandingBeneficios";
 
 type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
@@ -44,6 +45,7 @@ export default function App() {
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [mostrandoResultados, setMostrandoResultados] = useState(false);
   const [carregandoConsulta, setCarregandoConsulta] = useState(false);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
 
   const handleConsultar = (dados: any) => {
     setDadosVeiculo(dados);
@@ -120,67 +122,11 @@ export default function App() {
   };
 
   const handleIrParaPagamentoDireto = (placa: string) => {
-    // Verificar se são múltiplas placas (separadas por vírgula)
-    const placas = placa.includes(',') ? placa.split(',') : [placa];
-    
-    // Simular débitos para cada placa
-    const debitosSimulados = [];
-    
-    if (placas.length > 1) {
-      // Múltiplos veículos - criar débitos apenas para ABC-1234 e XYZ-5678
-      placas.forEach((p) => {
-        const placaTrim = p.trim();
-        
-        if (placaTrim === 'ABC-1234') {
-          // ABC-1234: 2 pendências de R$ 50,00 cada = R$ 100,00
-          debitosSimulados.push({
-            id: `abc-1`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "15/03/2026",
-            hora: "14:30:00",
-            placa: placaTrim
-          });
-          debitosSimulados.push({
-            id: `abc-2`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "16/03/2026",
-            hora: "15:30:00",
-            placa: placaTrim
-          });
-        } else if (placaTrim === 'XYZ-5678') {
-          // XYZ-5678: 1 pendência de R$ 50,00
-          debitosSimulados.push({
-            id: `xyz-1`,
-            praca: "Pedágio não identificado",
-            valor: 50.00,
-            data: "17/03/2026",
-            hora: "16:30:00",
-            placa: placaTrim
-          });
-        }
-        // DEF-9012 não tem pendências, então não adiciona nada
-      });
-    } else {
-      // Um único veículo
-      debitosSimulados.push({
-        id: "1",
-        praca: "Pedágio não identificado",
-        valor: 89.40,
-        data: "15/03/2026",
-        hora: "14:30:00",
-        placa: placa
-      });
-    }
-    
-    const valorTotal = debitosSimulados.reduce((acc, d) => acc + d.valor, 0);
-    
-    // Setar os débitos e valor total
-    setDebitosSelecionados(debitosSimulados);
+    const placas = placa.includes(',') ? placa.split(',').map(p => p.trim()) : [placa];
+    const todasPassagens: Passagem[] = placas.flatMap(p => gerarDebitos(p));
+    const valorTotal = todasPassagens.reduce((acc, d) => acc + d.valor, 0);
+    setDebitosSelecionados(todasPassagens);
     setValorTotalSelecionado(valorTotal);
-    
-    // Ir direto para resumo do pedido
     setTelaAtual('resumo-pedido');
   };
 
@@ -228,13 +174,14 @@ export default function App() {
     setPlacaError('');
     setTurnstileToken(null);
     setTurnstileKey(k => k + 1);
+    setAceitouTermos(false);
   };
 
   // Validação da placa
   const placaValida = isPlacaCompleta(placaValue);
 
   // Lógica do formulário da landing page
-  const isFormValid = placaValida && !!turnstileToken;
+  const isFormValid = placaValida && !!turnstileToken && aceitouTermos;
 
   const handleBuscarDebitos = () => {
     if (!isFormValid) return;
@@ -266,6 +213,7 @@ export default function App() {
     setPlacaError('');
     setTurnstileToken(null);
     setTurnstileKey(k => k + 1);
+    setAceitouTermos(false);
   };
 
   // Renderizar a tela baseada no estado atual
@@ -466,7 +414,7 @@ export default function App() {
   // Landing Page (tela padrão)
   const formCard = (
     <div className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
-      <Card className="bg-white/95 border border-[#DCDDE3] shadow-xl rounded-xl overflow-hidden backdrop-blur-sm">
+      <Card className="bg-white border-0 shadow-[0_8px_40px_rgba(0,0,0,0.18)] rounded-2xl overflow-hidden">
         <CardContent className="p-4 sm:p-6">
           {!mostrandoResultados && (
             <>
@@ -476,9 +424,8 @@ export default function App() {
                   Consulta gratuita
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl text-[#1A1B23] leading-relaxed mb-2">
-                  <strong className="text-[#5B2E8C]">Verifique suas passagens</strong>{" "}
-                  em pórticos Free Flow{" "}
-                  <strong className="text-[#5B2E8C]">e regularize agora</strong>.
+                  <strong className="text-[#5B2E8C]">Consulte suas pendências</strong>{" "}
+                  de pedágio e <strong className="text-[#5B2E8C]">pague com zero complicações</strong>.
                 </h3>
                 <div className="w-12 h-1 bg-[#8B5FFF] rounded-full mx-auto" />
               </div>
@@ -507,12 +454,12 @@ export default function App() {
                     }
                   }}
                   placeholder="ABC-1234 ou ABC1D23"
-                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-white border-2 rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#8A8B95] focus:outline-none transition-all duration-300 shadow-inner ${
+                  className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-[#F7F7F9] border rounded-xl text-[#1A1B23] text-base sm:text-lg text-center font-mono font-semibold tracking-[0.05em] uppercase placeholder-[#B0B1BB] focus:outline-none transition-all duration-200 ${
                     placaError
-                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/20 bg-[#F8D7DD]'
+                      ? 'border-[#C8324A] focus:border-[#C8324A] focus:ring-2 focus:ring-red-500/15 bg-[#FDF2F4]'
                       : placaValida
-                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/20 bg-[#D4F0E2]'
-                        : 'border-[#DCDDE3] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/20'
+                        ? 'border-[#0E8B5A] focus:border-[#0E8B5A] focus:ring-2 focus:ring-green-500/15 bg-[#F0FAF5]'
+                        : 'border-[#E5E6EC] focus:border-[#5B2E8C] focus:ring-2 focus:ring-[#5B2E8C]/10'
                   }`}
                   maxLength={8}
                 />
@@ -530,12 +477,35 @@ export default function App() {
               </div>
 
               <div className="mb-4 sm:mb-5">
-                <div className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed text-center">
-                  Ao consultar, você concorda com os{' '}
-                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Termos de Uso</a>
-                  {' '}e o{' '}
-                  <a href="#" className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors">Aviso de Privacidade</a>.
-                </div>
+                <label
+                  htmlFor="aceite-termos"
+                  className="flex items-start gap-2.5 cursor-pointer group"
+                >
+                  <Checkbox
+                    id="aceite-termos"
+                    checked={aceitouTermos}
+                    onCheckedChange={(v) => setAceitouTermos(v === true)}
+                    className="mt-0.5 flex-shrink-0 border-[#8A8B95] data-[state=checked]:bg-[#5B2E8C] data-[state=checked]:border-[#5B2E8C]"
+                  />
+                  <span className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed">
+                    Li e concordo com os{' '}
+                    <a
+                      href="#"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors"
+                    >
+                      Termos de Uso
+                    </a>
+                    {' '}e o{' '}
+                    <a
+                      href="#"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#5B2E8C] underline font-medium hover:text-[#8B5FFF] transition-colors"
+                    >
+                      Aviso de Privacidade
+                    </a>.
+                  </span>
+                </label>
               </div>
 
               <div className="mb-4 sm:mb-6 flex justify-center">
@@ -568,7 +538,7 @@ export default function App() {
                   ) : (
                     <>
                       <Car className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      Consultar passagens Free Flow
+                      Consultar passagens
                     </>
                   )}
                 </Button>
@@ -617,20 +587,27 @@ export default function App() {
                     <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-[#5B2E8C] mb-1 text-sm sm:text-base">4 passagens em pórtico encontradas</h4>
+                    {(() => {
+                      const r = agregarPorTipo(gerarDebitos(dadosVeiculo.placa));
+                      return (
+                        <h4 className="font-semibold text-[#5B2E8C] mb-1 text-sm sm:text-base">
+                          {r.countPraca > 0 && `${r.countPraca} praça${r.countPraca > 1 ? 's' : ''}`}
+                          {r.countPraca > 0 && r.countPortico > 0 && ' e '}
+                          {r.countPortico > 0 && `${r.countPortico} pórtico${r.countPortico > 1 ? 's' : ''}`}
+                          {r.countTotal === 0 && 'Nenhuma passagem em aberto'}
+                          {r.countTotal > 0 && ' encontrad' + (r.countTotal > 1 ? 'os' : 'o')}
+                        </h4>
+                      );
+                    })()}
                     <p className="text-xs sm:text-sm text-[#8A8B95] leading-tight">Faça um cadastro rápido para ver os detalhes e pagar antes do prazo.</p>
                   </div>
                 </div>
               </div>
               <Button
                 onClick={() => {
-                  const debitosSimulados = [
-                    { id: "1", praca: "Pórtico Free Flow SP-330 — KM 45", valor: 4.30, data: "14/04/2026", hora: "07:42:00:00", placa: dadosVeiculo.placa },
-                    { id: "2", praca: "Pórtico Free Flow SP-021 — KM 18", valor: 6.80, data: "20/04/2026", hora: "14:15:00:00", placa: dadosVeiculo.placa },
-                    { id: "3", praca: "Pórtico Free Flow SP-270 — KM 33", valor: 5.10, data: "28/04/2026", hora: "18:50:00:00", placa: dadosVeiculo.placa },
-                    { id: "4", praca: "Pórtico Free Flow BR-116 — KM 312", valor: 9.20, data: "02/05/2026", hora: "10:05:00:00", placa: dadosVeiculo.placa },
-                  ];
-                  handleIrParaPagamento(debitosSimulados, 25.40);
+                  const passagens = gerarDebitos(dadosVeiculo.placa);
+                  const total = passagens.reduce((s, p) => s + p.valor, 0);
+                  handleIrParaPagamento(passagens, total);
                 }}
                 className="w-full h-10 sm:h-12 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white rounded-lg font-semibold text-sm sm:text-base"
               >
@@ -653,21 +630,21 @@ export default function App() {
             <LogoCinza />
           </div>
         }
-        navLinks={[
-          { label: "Acesso Concessionária", onClick: () => setTelaAtual('login-concessionaria') },
-        ]}
+        navLinks={[]}
         topRightAction={
           usuarioLogado ? (
             <Button
               onClick={handleIrParaDashboard}
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-colors"
+              size="sm"
+              className="h-9 px-4 text-sm font-semibold bg-white/15 backdrop-blur-sm border border-white/25 text-white hover:bg-white/25 transition-colors rounded-full"
             >
               Minha Conta
             </Button>
           ) : (
             <Button
               onClick={() => setTelaAtual('login')}
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-colors"
+              size="sm"
+              className="h-9 px-4 text-sm font-semibold bg-white/15 backdrop-blur-sm border border-white/25 text-white hover:bg-white/25 transition-colors rounded-full"
             >
               Entrar
             </Button>
@@ -675,17 +652,28 @@ export default function App() {
         }
         title={
           <>
-            Passou por um pórtico{" "}
-            <span className="text-[#8B5FFF]">sem TAG?</span>
+            Pendências de pedágio{" "}
+            <span className="text-[#8B5FFF]">resolvidas em minutos</span>
           </>
         }
-        description="Regularize suas passagens Free Flow antes que virem multa de evasão. Consulta gratuita por placa — pague em minutos, sem burocracia."
+        description={
+          <>
+            A única plataforma que{" "}
+            <strong className="text-[#F4C97A]">garante</strong>{" "}
+            a quitação de suas pendências de pedágio em{" "}
+            <strong className="text-[#8B5FFF]">tempo real</strong>
+            , sem burocracia e com{" "}
+            <strong className="text-[#F4C97A]">zero complicações</strong>.
+          </>
+        }
         rightContent={formCard}
         notice={null}
       />
       <LandingBeneficios />
-      <PartnerCarousel />
-      <Footer onNavigateToFAQ={() => setTelaAtual('faq')} />
+      <Footer
+        onNavigateToFAQ={() => setTelaAtual('faq')}
+        onAcessoConcessionaria={() => setTelaAtual('login-concessionaria')}
+      />
 
       {/* #8 — Botão flutuante de suporte */}
       <a

@@ -1,23 +1,23 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
-  Radio, CreditCard, ShieldCheck, Building2, Search, AlertTriangle, CheckCircle,
-  ChevronDown, ChevronUp, Smartphone, Zap, MapPin, Users,
-  ArrowRight, Star, Shield, Wifi
+  CreditCard, Search, CheckCircle,
+  ChevronDown, ChevronUp, Smartphone, Zap,
+  ArrowRight
 } from "lucide-react";
 
 // ─── Dados ────────────────────────────────────────────────────────────────────
 
 const parceiros = [
-  { nome: "CCR",                estilo: "font-black tracking-tighter" },
-  { nome: "Arteris",            estilo: "font-black tracking-tight" },
-  { nome: "EcoRodovias",        estilo: "font-black tracking-tight" },
-  { nome: "Autoban",            estilo: "font-bold tracking-wide" },
-  { nome: "Ecovias",            estilo: "font-black tracking-tight" },
-  { nome: "Rota das Bandeiras", estilo: "font-bold tracking-tight" },
-  { nome: "Intervias",          estilo: "font-bold tracking-tight" },
-  { nome: "Autopista",          estilo: "font-black tracking-widest" },
-  { nome: "SPMAR",              estilo: "font-black tracking-widest" },
-  { nome: "Concebra",           estilo: "font-bold tracking-tight" },
+  { nome: "Arteris",            estilo: "font-medium tracking-tight" },
+  { nome: "Autoban",            estilo: "font-medium tracking-wide" },
+  { nome: "Autopista",          estilo: "font-medium tracking-widest" },
+  { nome: "CCR",                estilo: "font-medium tracking-tighter" },
+  { nome: "Concebra",           estilo: "font-medium tracking-tight" },
+  { nome: "EcoRodovias",        estilo: "font-medium tracking-tight" },
+  { nome: "Ecovias",            estilo: "font-medium tracking-tight" },
+  { nome: "Intervias",          estilo: "font-medium tracking-tight" },
+  { nome: "Rota das Bandeiras", estilo: "font-medium tracking-tight" },
+  { nome: "Entrevias",           estilo: "font-medium tracking-widest" },
 ];
 
 const passosPagamento = [
@@ -43,89 +43,7 @@ const passosPagamento = [
   },
 ];
 
-const beneficios = [
-  {
-    icone: AlertTriangle,
-    cor: "text-[#C77700]",
-    bg: "bg-[#FBE8C5]",
-    destaque: "Multa de R$195,23",
-    titulo: "Evite a multa de evasão",
-    descricao: "Passagens Free Flow não pagas no prazo viram multa. Regularize antes que isso aconteça.",
-  },
-  {
-    icone: Building2,
-    cor: "text-[#5B2E8C]",
-    bg: "bg-[#F4EFFB]",
-    destaque: "+12 concessionárias",
-    titulo: "Todas as concessionárias",
-    descricao: "CCR, Arteris, Ecovias, Autoban e mais. Um único lugar para resolver tudo.",
-  },
-  {
-    icone: ShieldCheck,
-    cor: "text-[#0E8B5A]",
-    bg: "bg-[#D4F0E2]",
-    destaque: "PCI DSS Level 1",
-    titulo: "100% seguro e confiável",
-    descricao: "Ambiente criptografado, conformidade PCI DSS e antifraude 24 horas.",
-  },
-  {
-    icone: CheckCircle,
-    cor: "text-[#8B5FFF]",
-    bg: "bg-[#F4EFFB]",
-    destaque: "Confirmado em <30s",
-    titulo: "Quitação em tempo real",
-    descricao: "Pagamento processado e confirmado imediatamente junto às concessionárias.",
-  },
-];
 
-
-const timelineFreeFlow = [
-  {
-    icone: Wifi,
-    cor: "text-[#8B5FFF]",
-    bg: "bg-[#F4EFFB]",
-    titulo: "Tecnologia Avançada",
-    descricao: "Pórticos com sensores ópticos, RFID e câmeras de reconhecimento de placa (OCR) identificam cada veículo em até 50ms.",
-  },
-  {
-    icone: Radio,
-    cor: "text-[#5B2E8C]",
-    bg: "bg-[#EDE7F6]",
-    titulo: "Passagem Fluida",
-    descricao: "Sem redução de velocidade, sem cabine, sem fila. O veículo é identificado e a cobrança gerada automaticamente.",
-  },
-  {
-    icone: Shield,
-    cor: "text-[#0E8B5A]",
-    bg: "bg-[#D4F0E2]",
-    titulo: "Segurança Garantida",
-    descricao: "Todos os dados são criptografados e o processo segue os padrões da ANTT, com imagem armazenada por 90 dias.",
-  },
-];
-
-const artigosEducativos = [
-  {
-    tag: "Tutorial",
-    tagCor: "bg-[#F4EFFB] text-[#5B2E8C]",
-    titulo: "Free Flow Significado: Entenda o sistema em detalhes",
-    descricao: "Saiba como funciona a cobrança eletrônica nas rodovias brasileiras e o que muda para quem não tem TAG.",
-    tempo: "5 min de leitura",
-  },
-  {
-    tag: "Dicas",
-    tagCor: "bg-[#D4F0E2] text-[#0E8B5A]",
-    titulo: "Principais Benefícios do Pedágio Free Flow",
-    descricao: "Menos trânsito nas praças, mais fluidez e segurança nas rodovias. Entenda as vantagens do sistema.",
-    tempo: "4 min de leitura",
-  },
-  {
-    tag: "Tecnologia",
-    tagCor: "bg-[#FBE8C5] text-[#C77700]",
-    titulo: "Tecnologia OCR e Inteligência Artificial",
-    descricao: "Como câmeras de alta resolução e IA identificam milhões de veículos por dia com precisão de 99,9%.",
-    tempo: "6 min de leitura",
-  },
-];
 
 const faqItens = [
   {
@@ -189,7 +107,7 @@ function PhoneMockup() {
         <div className="bg-[#F7F5FB] rounded-[2rem] overflow-hidden min-h-[420px]">
           <div className="bg-[#5B2E8C] px-4 pt-6 pb-4">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-white/70 text-[9px] font-mono">09:41</div>
+              <div className="text-white/70 text-[9px]">09:41</div>
               <div className="flex gap-1">
                 <div className="w-3 h-1.5 bg-white/60 rounded-sm" />
                 <div className="w-3 h-1.5 bg-white/60 rounded-sm" />
@@ -203,7 +121,7 @@ function PhoneMockup() {
           <div className="bg-[#5B2E8C] px-4 pb-5">
             <div className="bg-white/10 rounded-xl p-3">
               <p className="text-white/60 text-[9px] uppercase tracking-wide">Débito em aberto</p>
-              <p className="text-white text-xl font-bold font-mono mt-0.5">R$ 25,40</p>
+              <p className="text-white text-xl font-bold mt-0.5">R$ 25,40</p>
               <p className="text-white/60 text-[9px] mt-0.5">4 passagens • MOV-1234</p>
             </div>
           </div>
@@ -221,7 +139,7 @@ function PhoneMockup() {
                   <p className="text-[8px] text-[#8A8B95]">{p.data}</p>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-mono font-semibold text-[#C77700]">{p.valor}</span>
+                  <span className="text-[9px] font-semibold text-[#C77700]">{p.valor}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C77700]" />
                 </div>
               </div>
@@ -261,47 +179,47 @@ export function LandingBeneficios() {
     <div className="bg-white">
 
       {/* ── 1. Parceiros strip ─────────────────────────────────────── */}
-      <div className="border-y border-[#ECECF1] bg-[#F7F5FB]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
-            <span className="flex-shrink-0 text-xs font-semibold text-[#8A8B95] uppercase tracking-widest sm:pr-6 sm:border-r sm:border-[#DCDDE3]">
-              Concessionárias<br className="hidden sm:block" /> parceiras
-            </span>
-            <div className="flex items-center gap-x-6 gap-y-3 sm:pl-6 flex-wrap">
-              {parceiros.map((p) => (
-                <span
-                  key={p.nome}
-                  className={`text-sm leading-none select-none text-[#1A1B23] opacity-50 hover:opacity-80 transition-opacity ${p.estilo}`}
-                >
+      <div className="border-y border-white/5 bg-[#1A1B23] py-4 overflow-hidden">
+        <style>{`
+          @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+          .marquee-track {
+            animation: marquee-scroll 28s linear infinite;
+          }
+          .marquee-track:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
+
+        {/* Label centralizado */}
+        <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest text-center mb-3">
+          Concessionárias parceiras
+        </p>
+
+        {/* Faixa com fade nas bordas */}
+        <div className="relative [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+          <div className="marquee-track flex items-center gap-x-6 whitespace-nowrap w-max">
+            {/* primeira cópia */}
+            {parceiros.map((p, i) => (
+              <Fragment key={`a-${p.nome}`}>
+                <span className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}>
                   {p.nome}
                 </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2. Banner "1° portal integrado" ────────────────────────── */}
-      <div className="bg-gradient-to-r from-[#2E1547] to-[#5B2E8C]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-            <Star className="h-3.5 w-3.5 text-[#F4C97A]" fill="currentColor" />
-            Lançamento
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-2xl mx-auto">
-            Você está no{" "}
-            <span className="text-[#C9AEEA]">1° portal integrado</span>{" "}
-            de pagamentos de pedágio das Rodovias do Brasil
-          </h2>
-          <p className="mt-4 text-white/70 max-w-xl mx-auto text-sm sm:text-base">
-            Pedágio Simples — by Move Mais. Uma plataforma única para consultar e quitar débitos de pedágio Free Flow em todas as concessionárias do país.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            {["Sem mensalidade", "Pagamento imediato", "Controle total", "Comprovante incluso"].map((f) => (
-              <span key={f} className="flex items-center gap-1.5 bg-white/10 text-white/90 rounded-full px-3 py-1 text-xs font-medium">
-                <CheckCircle className="h-3.5 w-3.5 text-[#C9AEEA]" />
-                {f}
-              </span>
+                <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
+              </Fragment>
+            ))}
+            {/* segunda cópia — loop seamless */}
+            {parceiros.map((p, i) => (
+              <Fragment key={`b-${p.nome}`}>
+                <span className={`text-sm leading-none select-none text-white/40 hover:text-white/70 transition-colors ${p.estilo}`}>
+                  {p.nome}
+                </span>
+                {i < parceiros.length - 1 && (
+                  <span aria-hidden="true" className="text-white/15 text-sm leading-none select-none">|</span>
+                )}
+              </Fragment>
             ))}
           </div>
         </div>
@@ -316,8 +234,7 @@ export function LandingBeneficios() {
               Passo a passo
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-3 leading-tight">
-              É como você pode pagar o{" "}
-              <span className="text-[#5B2E8C]">pedágio Free Flow</span>
+              E como eu posso pagar o <span className="text-[#5B2E8C]">pedágio</span>?
             </h2>
             <p className="text-[#8A8B95] mb-8 leading-relaxed">
               Sem precisar ir a nenhuma praça ou concessionária. Resolva pelo celular ou computador em menos de 3 minutos.
@@ -355,259 +272,7 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 4. RPV ─────────────────────────────────────────────────── */}
-      <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-[#D4F0E2] text-[#0E8B5A] rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Documento oficial
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-4 leading-tight">
-                Registro de Passagem Veicular{" "}
-                <span className="text-[#5B2E8C]">(RPV)</span>
-              </h2>
-              <p className="text-[#8A8B95] leading-relaxed mb-6">
-                O RPV é o comprovante oficial emitido pelas concessionárias confirmando que a PNU foi quitada. Ele protege o motorista de autuações indevidas e é aceito pelo DETRAN em qualquer recurso de infração.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "Cancela automaticamente o processo de autuação em andamento",
-                  "Aceito pelo DETRAN como comprovante de pagamento",
-                  "Emitido em PDF imediatamente após a confirmação",
-                  "Válido para recursos de multa junto às autoridades",
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-[#5B5C68]">
-                    <CheckCircle className="h-5 w-5 text-[#0E8B5A] flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-[#DCDDE3] shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-r from-[#5B2E8C] to-[#8B5FFF] px-6 py-4 flex items-center justify-between">
-                <div>
-                  <p className="text-white/70 text-xs uppercase tracking-wide">Comprovante</p>
-                  <p className="text-white font-bold">Registro de Passagem Veicular</p>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                {[
-                  { label: "Placa", valor: "MOV·1234", mono: true },
-                  { label: "Pórtico", valor: "Free Flow SP-330 — KM 45" },
-                  { label: "Concessionária", valor: "Ecovias do Imigrantes" },
-                  { label: "Data da passagem", valor: "14/04/2026 — 07:42:00" },
-                  { label: "Valor quitado", valor: "R$ 4,30", mono: true },
-                  { label: "Status", valor: "✓ Quitado em 14/04/2026" },
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm border-b border-[#F7F5FB] pb-3 last:border-0 last:pb-0">
-                    <span className="text-[#8A8B95]">{f.label}</span>
-                    <span className={`font-medium text-[#1A1B23] ${f.mono ? "font-mono tracking-wide" : ""}`}>
-                      {f.valor}
-                    </span>
-                  </div>
-                ))}
-                <div className="mt-4 pt-2">
-                  <div className="bg-[#D4F0E2] rounded-lg py-2.5 px-4 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
-                    <span className="text-xs font-semibold text-[#0E8B5A]">RPV emitido — autuação cancelada</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 5. Por que usar o Pedágio Simples? ─────────────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#5B2E8C]">
-            Por que usar o Pedágio Simples?
-          </h2>
-          <p className="mt-3 text-[#8A8B95] max-w-lg mx-auto text-sm sm:text-base">
-            A única plataforma pensada especificamente para quem não tem TAG e precisa regularizar passagens Free Flow.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          {beneficios.map((b, i) => {
-            const Icon = b.icone;
-            return (
-              <div
-                key={i}
-                className="flex flex-col items-start p-5 rounded-xl border border-[#DCDDE3] bg-white hover:border-[#8B5FFF]/40 hover:shadow-md transition-all"
-              >
-                <div className={`w-10 h-10 rounded-lg ${b.bg} flex items-center justify-center mb-3`}>
-                  <Icon className={`h-5 w-5 ${b.cor}`} />
-                </div>
-                <p className={`text-base font-bold mb-1 ${b.cor}`}>{b.destaque}</p>
-                <h3 className="font-semibold text-[#5B2E8C] text-sm mb-1">{b.titulo}</h3>
-                <p className="text-xs text-[#8A8B95] leading-relaxed">{b.descricao}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-{/* ── 7. O que é Free Flow ────────────────────────────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div className="order-2 lg:order-1">
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#2E1547] to-[#5B2E8C] p-8 min-h-64">
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-48 h-24 border-b-0 border-4 border-white/30 rounded-t-full flex items-end justify-center pb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-20 bg-white/20 rounded" />
-                      <div className="flex-1 flex flex-col items-center gap-1.5">
-                        <Radio className="h-5 w-5 text-[#C9AEEA]" />
-                        <div className="flex gap-0.5">
-                          {[1, 2, 3].map(n => (
-                            <div key={n} className="w-0.5 rounded-full bg-[#8B5FFF] animate-pulse"
-                              style={{ height: `${n * 8}px`, animationDelay: `${n * 0.2}s` }} />
-                          ))}
-                        </div>
-                      </div>
-                      <div className="w-1.5 h-20 bg-white/20 rounded" />
-                    </div>
-                  </div>
-                  <div className="flex justify-center mt-2">
-                    <div className="bg-white/10 rounded-lg px-4 py-2 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#0E8B5A] animate-pulse" />
-                      <span className="text-white/80 text-xs font-mono">MOV·1234</span>
-                      <span className="text-[#C9AEEA] text-xs">→</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                {[
-                  { val: "50ms", label: "Leitura" },
-                  { val: "99.9%", label: "Precisão" },
-                  { val: "24/7", label: "Operação" },
-                ].map((s, i) => (
-                  <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
-                    <p className="text-white font-bold text-lg font-mono">{s.val}</p>
-                    <p className="text-white/60 text-xs mt-0.5">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="order-1 lg:order-2">
-            <div className="inline-flex items-center gap-2 bg-[#F4EFFB] text-[#8B5FFF] border border-[#8B5FFF]/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
-              <Radio className="h-4 w-4" />
-              Entenda o sistema
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23] mb-4 leading-tight">
-              O que é{" "}
-              <span className="text-[#5B2E8C]">Free Flow?</span>
-            </h2>
-            <p className="text-[#8A8B95] leading-relaxed mb-4">
-              Free Flow é o modelo de pedágio eletrônico sem praças de cobrança. Pórticos sobre a pista identificam automaticamente todos os veículos por câmeras OCR e leitores RFID, sem que nenhum veículo precise parar ou reduzir a velocidade.
-            </p>
-            <p className="text-[#8A8B95] leading-relaxed mb-6">
-              Quem tem TAG, o valor é debitado automaticamente. Quem não tem, recebe uma PNU (Passagem por Não Usuário) que deve ser paga em até 30 dias — caso contrário, vira multa de evasão.
-            </p>
-            <a href="#" className="inline-flex items-center gap-2 text-[#5B2E8C] font-semibold hover:text-[#8B5FFF] transition-colors text-sm">
-              Saiba mais sobre o Free Flow
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 8. Como funciona a Free Flow — timeline ─────────────────── */}
-      <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#F4EFFB] text-[#8B5FFF] border border-[#8B5FFF]/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-4">
-              <Radio className="h-4 w-4" />
-              Tecnologia
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#5B2E8C]">
-              Como Funciona a Free Flow
-            </h2>
-            <p className="mt-3 text-[#8A8B95] max-w-lg mx-auto text-sm sm:text-base">
-              Uma das infraestruturas mais avançadas do mundo para cobrança eletrônica de pedágio.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {timelineFreeFlow.map((t, i) => {
-              const Icon = t.icone;
-              return (
-                <div key={i} className="relative flex flex-col items-center text-center">
-                  {i < timelineFreeFlow.length - 1 && (
-                    <div className="hidden md:block absolute top-7 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-[#8B5FFF]/40 to-[#5B2E8C]/20" />
-                  )}
-                  <div className={`w-14 h-14 rounded-2xl ${t.bg} flex items-center justify-center mb-4 relative z-10`}>
-                    <Icon className={`h-6 w-6 ${t.cor}`} />
-                  </div>
-                  <h3 className="font-bold text-[#1A1B23] mb-2 text-sm sm:text-base">{t.titulo}</h3>
-                  <p className="text-xs sm:text-sm text-[#8A8B95] leading-relaxed">{t.descricao}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── 9. Blog ──────────────────────────────────────────────────── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#F4EFFB] text-[#8B5FFF] border border-[#8B5FFF]/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-3">
-              Blog
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1A1B23]">Saiba mais sobre Free Flow</h2>
-          </div>
-          <a href="#" className="inline-flex items-center gap-1.5 text-[#5B2E8C] font-semibold hover:text-[#8B5FFF] transition-colors text-sm flex-shrink-0">
-            Ver todos os artigos <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {artigosEducativos.map((a, i) => (
-            <a
-              key={i}
-              href="#"
-              className="group flex flex-col rounded-xl border border-[#DCDDE3] overflow-hidden hover:border-[#8B5FFF]/40 hover:shadow-md transition-all"
-            >
-              <div className="h-40 bg-gradient-to-br from-[#2E1547] to-[#8B5FFF] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                  {[...Array(3)].map((_, n) => (
-                    <div key={n} className="absolute border border-white/20 rounded-full"
-                      style={{ width: `${(n + 1) * 80}px`, height: `${(n + 1) * 80}px`,
-                        top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-                  ))}
-                </div>
-                <Radio className="h-10 w-10 text-white/40" />
-              </div>
-              <div className="p-5 flex flex-col flex-1">
-                <span className={`inline-flex text-xs font-semibold rounded-full px-2.5 py-0.5 mb-3 w-fit ${a.tagCor}`}>
-                  {a.tag}
-                </span>
-                <h3 className="font-semibold text-[#1A1B23] text-sm leading-snug mb-2 group-hover:text-[#5B2E8C] transition-colors">
-                  {a.titulo}
-                </h3>
-                <p className="text-xs text-[#8A8B95] leading-relaxed flex-1">{a.descricao}</p>
-                <p className="text-xs text-[#C6C7CF] mt-4">{a.tempo}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* ── 10. FAQ ──────────────────────────────────────────────────── */}
+      {/* ── 9. FAQ ──────────────────────────────────────────────────── */}
       <div className="bg-[#F7F5FB] border-y border-[#ECECF1]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -636,70 +301,6 @@ export function LandingBeneficios() {
         </div>
       </div>
 
-      {/* ── 11. CTA final ────────────────────────────────────────────── */}
-      <div className="bg-gradient-to-br from-[#1A1B23] via-[#2E1547] to-[#5B2E8C]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-            <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 rounded-full px-3 py-1 text-xs font-semibold mb-4 uppercase tracking-wide">
-                <Zap className="h-3.5 w-3.5 text-[#F4C97A]" />
-                Sem mensalidade
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
-                Diga adeus às{" "}
-                <span className="text-[#C9AEEA]">multas de evasão</span>{" "}
-                de pedágio
-              </h2>
-              <p className="text-white/70 leading-relaxed mb-8 max-w-md">
-                Consulte, pague e receba o comprovante RPV em minutos. Seu veículo regularizado, sem burocracia, sem fila e sem sair de casa.
-              </p>
-
-              {/* CTA primário único */}
-              <a
-                href="#"
-                className="inline-flex items-center justify-center gap-2 bg-white text-[#5B2E8C] font-semibold rounded-xl px-8 py-4 hover:bg-[#F4EFFB] transition-colors text-base shadow-lg w-full sm:w-auto"
-              >
-                Consultar minha placa agora
-                <ArrowRight className="h-4 w-4" />
-              </a>
-
-              {/* Link secundário discreto */}
-              <p className="mt-4 text-white/50 text-sm">
-                Ou{" "}
-                <a href="#" className="text-white/70 hover:text-white underline underline-offset-2 transition-colors">
-                  crie sua conta grátis e acompanhe todas as suas passagens em um só lugar →
-                </a>
-              </p>
-
-              {/* Micro-copy de segurança */}
-              <p className="mt-5 text-white/35 text-xs flex items-center gap-1.5">
-                <span>🔒</span>
-                Consulta gratuita · Sem cadastro · Dados protegidos por SSL 256-bit
-              </p>
-            </div>
-
-            {/* Trust cards */}
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icone: ShieldCheck, titulo: "PCI DSS Compliant", sub: "Dados criptografados" },
-                { icone: Zap, titulo: "Quitação imediata", sub: "Confirmação em tempo real" },
-                { icone: Users, titulo: "+500k usuários", sub: "Conta ativa na plataforma" },
-                { icone: MapPin, titulo: "+30 rodovias", sub: "SP, RJ, MG, PR e mais" },
-              ].map((c, i) => {
-                const Icon = c.icone;
-                return (
-                  <div key={i} className="bg-white/10 rounded-xl p-4">
-                    <Icon className="h-5 w-5 text-[#C9AEEA] mb-2" />
-                    <p className="text-white font-semibold text-sm">{c.titulo}</p>
-                    <p className="text-white/60 text-xs mt-0.5">{c.sub}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   );

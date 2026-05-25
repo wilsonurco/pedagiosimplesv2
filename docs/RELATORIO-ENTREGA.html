@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório de Entrega — Pedágio Simples</title>
+  <style>
+    :root {
+      --roxo-primario: #5B2E8C;
+      --roxo-claro: #8B5FFF;
+      --roxo-escuro: #2E1547;
+      --roxo-bg: #F4EFFB;
+      --verde-primario: #0E8B5A;
+      --verde-bg: #DFF4EA;
+      --vermelho: #C8324A;
+      --vermelho-bg: #F8D7DD;
+      --amarelo: #C77700;
+      --amarelo-bg: #FBE8C5;
+      --cinza-1: #1A1B23;
+      --cinza-2: #8A8B95;
+      --cinza-3: #C6C7CF;
+      --cinza-4: #DCDDE3;
+      --cinza-bg: #F7F5FB;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Helvetica, Arial, sans-serif;
+      color: var(--cinza-1);
+      line-height: 1.6;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      background: #fff;
+    }
+    h1, h2, h3, h4 { line-height: 1.25; color: var(--cinza-1); }
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 0.5rem;
+      color: var(--roxo-primario);
+      border-bottom: 3px solid var(--roxo-claro);
+      padding-bottom: 0.75rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin: 2.5rem 0 1rem;
+      color: var(--roxo-primario);
+      border-bottom: 1px solid var(--cinza-4);
+      padding-bottom: 0.5rem;
+    }
+    h3 { font-size: 1.15rem; margin: 1.5rem 0 0.5rem; color: var(--roxo-escuro); }
+    h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: var(--cinza-1); }
+    a { color: var(--roxo-primario); }
+    a:hover { color: var(--roxo-claro); }
+    code {
+      background: var(--cinza-bg);
+      border: 1px solid var(--cinza-4);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-family: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      color: var(--roxo-primario);
+    }
+    pre {
+      background: var(--cinza-1);
+      color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+    th, td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--cinza-4);
+      vertical-align: top;
+    }
+    th {
+      background: var(--roxo-bg);
+      color: var(--roxo-primario);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:hover td { background: var(--cinza-bg); }
+    .meta {
+      background: var(--cinza-bg);
+      border: 1px solid var(--cinza-4);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 2rem;
+      font-size: 0.92rem;
+    }
+    .meta div { margin: 0.25rem 0; }
+    .meta strong { color: var(--roxo-primario); display: inline-block; min-width: 140px; }
+    .toc {
+      background: var(--roxo-bg);
+      border: 1px solid var(--roxo-claro);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0 2.5rem;
+    }
+    .toc h3 { margin-top: 0; color: var(--roxo-primario); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .toc ol { margin: 0; padding-left: 1.25rem; }
+    .toc li { margin: 0.25rem 0; }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success { background: var(--verde-bg); color: var(--verde-primario); }
+    .badge-error { background: var(--vermelho-bg); color: var(--vermelho); }
+    .badge-info { background: var(--roxo-bg); color: var(--roxo-primario); }
+    .badge-warn { background: var(--amarelo-bg); color: var(--amarelo); }
+    .callout {
+      border-left: 4px solid var(--roxo-claro);
+      background: var(--roxo-bg);
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.95rem;
+    }
+    .callout-success {
+      border-left-color: var(--verde-primario);
+      background: var(--verde-bg);
+    }
+    .callout-warn {
+      border-left-color: var(--amarelo);
+      background: var(--amarelo-bg);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    @media (max-width: 640px) {
+      body { padding: 1rem 0.75rem; }
+      h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.25rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+      table { font-size: 0.85rem; }
+      th, td { padding: 0.5rem; }
+    }
+    @media print {
+      body { max-width: none; padding: 1rem; }
+      .toc { page-break-after: always; }
+      h2 { page-break-after: avoid; }
+      table { page-break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      pre { font-size: 0.75rem; }
+    }
+    .creds-card {
+      background: var(--cinza-1);
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      font-family: ui-monospace, "SF Mono", Monaco, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+    }
+    .creds-card h4 {
+      color: var(--roxo-claro);
+      margin-top: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .creds-card .row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .creds-card .row:last-child { border-bottom: none; }
+    .creds-card .row span:first-child { color: rgba(255,255,255,0.6); }
+    footer.report-footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--cinza-4);
+      font-size: 0.85rem;
+      color: var(--cinza-2);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Relatório de Entrega — Refatoração Pedágio Simples</h1>
+
+<div class="meta">
+  <div><strong>Data:</strong> 2026-05-17</div>
+  <div><strong>Branch:</strong> <code>claude/elated-noether-400841</code></div>
+  <div><strong>Pull Request:</strong> <a href="https://github.com/wilsonurco/pedagiosimplesv2/pull/1" target="_blank">github.com/wilsonurco/pedagiosimplesv2/pull/1</a></div>
+  <div><strong>Linear:</strong> <a href="https://linear.app/zero2design/project/pedagio-simples-fluxo-unificado-spmar-free-flow-cartao-ef5dc7ce95e7" target="_blank">Pedágio Simples — Fluxo unificado</a> <span class="badge badge-success">Completed</span></div>
+  <div><strong>Commits:</strong> 25 desde <code>main</code></div>
+  <div><strong>Testes:</strong> <span class="badge badge-success">34/34 verdes</span> · Build <span class="badge badge-success">OK</span></div>
+</div>
+
+<div class="toc">
+  <h3>Índice</h3>
+  <ol>
+    <li><a href="#visao-geral">Visão geral da refatoração</a></li>
+    <li><a href="#implementacoes">Implementações por área</a></li>
+    <li><a href="#credenciais">Credenciais e dados de teste</a></li>
+    <li><a href="#cenarios">Cenários de teste end-to-end</a></li>
+    <li><a href="#rodar">Como rodar localmente</a></li>
+    <li><a href="#docs">Documentos relacionados</a></li>
+    <li><a href="#commits">Histórico de commits</a></li>
+    <li><a href="#proximos">Próximos passos sugeridos</a></li>
+  </ol>
+</div>
+
+<h2 id="visao-geral">1. Visão geral da refatoração</h2>
+<p>O projeto foi rebalanceado para tratar <strong>praça física SPMAR</strong> e <strong>pórtico Free Flow</strong> como <strong>dois canais do mesmo serviço</strong> num único fluxo de consulta e pagamento. Foi adicionado pagamento por <strong>cartão de crédito</strong> (ELO em destaque + Visa + Mastercard) ao lado do PIX existente. A comunicação resgata o propósito original da parceria Movemais ↔ SPMAR sem perder o suporte ao Free Flow.</p>
+
+<h2 id="implementacoes">2. Implementações por área</h2>
+
+<h3>2.1 Utilities centrais (TDD com Vitest)</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/utils/simulator.ts</code></td><td>Geração centralizada de débitos por placa: cenários fixos nomeados + random determinístico via Mulberry32 + helpers (<code>agregarPorTipo</code>, <code>filtrarPorTipo</code>, <code>filtrarPorStatus</code>, <code>proximoVencimento</code>)</td></tr>
+    <tr><td><code>src/utils/simulator.test.ts</code></td><td>18 testes cobrindo cenários, determinismo e helpers</td></tr>
+    <tr><td><code>src/utils/cartaoValidation.ts</code></td><td>Detecção de bandeira por BIN (ELO/Visa/Master), validação Luhn, máscaras de número e validade</td></tr>
+    <tr><td><code>src/utils/cartaoValidation.test.ts</code></td><td>16 testes cobrindo bandeiras, Luhn e máscaras</td></tr>
+    <tr><td><code>vitest.config.ts</code></td><td>Setup do test runner</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 Componentes novos</h3>
+<table>
+  <thead><tr><th>Componente</th><th>Função</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/components/ui/tipo-passagem-badge.tsx</code></td><td>Chip reutilizável: <span class="badge badge-info">Praça SPMAR</span> / <span class="badge badge-success">Pórtico Free Flow</span>, usando ícones <code>Building2</code> e <code>Radio</code> do lucide-react</td></tr>
+    <tr><td><code>src/components/CartaoCreditoForm.tsx</code></td><td>Form de cartão com 4 campos (número, validade, CVV, nome), detecção de bandeira em tempo real, microcopy "Parceiro Pedágio Simples" quando ELO</td></tr>
+  </tbody>
+</table>
+
+<h3>2.3 Área pública refatorada</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Mudanças</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/App.tsx</code></td><td>Hero copy nova ("Pagou o pedágio? Consulte e regularize em 2 minutos"), CTA genérico ("Consultar passagens"), mocks substituídos por <code>gerarDebitos()</code>, subhead com breakdown via <code>agregarPorTipo()</code>. <strong>"Acesso Concessionária" removido do header.</strong></td></tr>
+    <tr><td><code>LandingBeneficios.tsx</code></td><td>Copy dos cards mencionando praça SPMAR + pórtico Free Flow. Imagens dos cards do blog substituídas por fotos reais de rodovias brasileiras (Pexels)</td></tr>
+    <tr><td><code>ResultadosDebitos.tsx</code></td><td>Migra de <code>PassagemFreeFlow</code> para <code>Passagem</code>, chip de tipo em cada linha, breakdown no topo, estado vazio com <code>CheckCircle</code> verde quando não há débitos</td></tr>
+    <tr><td><code>ResumoPedido.tsx</code></td><td>Tipagem para <code>Passagem[]</code>, chip de tipo em cada item</td></tr>
+    <tr><td><code>Footer.tsx</code></td><td>Botão "Acesso Concessionária" adicionado na bottom bar com ícone <code>Building2</code>, ao lado do CNPJ</td></tr>
+  </tbody>
+</table>
+
+<h3>2.4 Pagamento</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Mudanças</th></tr></thead>
+  <tbody>
+    <tr><td><code>FormaPagamento.tsx</code></td><td>Adiciona segunda opção (Cartão) ao lado de PIX. Selecionar cartão expande o form inline. Botão Pagar habilita só com cartão válido. Simulação: cartão terminado em <code>0000</code> recusa inline com retry; outros aprovam após 2s</td></tr>
+    <tr><td><code>ConfirmacaoPagamento.tsx</code></td><td>Mostra "Pago via PIX" ou "Cartão {bandeira} terminado em {últimos 4}" conforme o método. PDF de comprovante também ajustado</td></tr>
+  </tbody>
+</table>
+
+<h3>2.5 Área logada (dashboard)</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Mudanças</th></tr></thead>
+  <tbody>
+    <tr><td><code>DashboardUsuario.tsx</code></td><td>4 KPIs no topo (Total em aberto / Praças SPMAR / Pórticos Free Flow / Próximo vencimento). Filtros tipo (Todas/Praça/Pórtico) e status (Todas/Em prazo/Risco de multa) acima da lista. Lista migrada de mock hardcoded para <code>pendentesFiltradas</code> do simulator com ordenação por prazo mais próximo. Cada linha com <code>TipoPassagemBadge</code></td></tr>
+    <tr><td><code>HistoricoPagamentos.tsx</code></td><td>Campos <code>tipo</code> e <code>formaPagamento</code> adicionados em cada registro mock. Chip de tipo em cada linha. Dois filtros novos: Tipo e Forma de pagamento (PIX / Cartão ELO / Cartão Visa / Cartão Master). Labels nos PDFs ajustados</td></tr>
+    <tr><td><code>VeiculosCadastrados.tsx</code></td><td>Mini-resumo por veículo: "X praças · Y pórticos · R$ Z em aberto"</td></tr>
+  </tbody>
+</table>
+
+<h3>2.6 Mídia</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Mudanças</th></tr></thead>
+  <tbody>
+    <tr><td><code>public/hero.mp4</code></td><td>Vídeo do hero atualizado: 1920×1080 (16:9), 39.7s, <strong>11 MB</strong> (otimizado via ffmpeg de 27 MB original, 60% menor)</td></tr>
+    <tr><td><code>LandingBeneficios.tsx</code> (blog)</td><td>Cards de blog ganharam fotos reais de rodovias brasileiras: ponte de Florianópolis, rodovia com tráfego urbano, rodovia ao entardecer com rastros de luz (Pexels, licença livre)</td></tr>
+  </tbody>
+</table>
+
+<h3>2.7 Tooling</h3>
+<table>
+  <thead><tr><th>Arquivo</th><th>Mudanças</th></tr></thead>
+  <tbody>
+    <tr><td><code>package.json</code></td><td>Scripts <code>test</code> (<code>vitest run</code>) e <code>test:watch</code> (<code>vitest</code>) adicionados</td></tr>
+    <tr><td><code>.claude/launch.json</code></td><td>Configuração do dev server (vite-dev, porta 3000) para <code>preview_start</code></td></tr>
+    <tr><td><code>vitest.config.ts</code></td><td>Novo</td></tr>
+  </tbody>
+</table>
+
+<h2 id="credenciais">3. Credenciais e dados de teste</h2>
+
+<div class="callout">
+  <strong>Importante:</strong> todos os mocks abaixo geram resultados <strong>determinísticos</strong> — mesma placa/cartão sempre produz o mesmo resultado. Ideal para demos consistentes.
+</div>
+
+<h3>3.1 Placas de teste (cenários reproduzíveis)</h3>
+<table>
+  <thead><tr><th>Placa</th><th>Cenário</th><th>Total</th></tr></thead>
+  <tbody>
+    <tr><td><code>ABC-1234</code></td><td>Mix realista: 2 praças SPMAR + 3 pórticos Free Flow</td><td>~R$ 65</td></tr>
+    <tr><td><code>XYZ-5678</code></td><td>Só praça física SPMAR (Itanhaém)</td><td>~R$ 22</td></tr>
+    <tr><td><code>DEF-9012</code></td><td>Só Free Flow: 4 pórticos da SP-330</td><td>~R$ 25</td></tr>
+    <tr><td><code>GHI-3456</code></td><td>Caso pesado: 8 passagens mistas em risco de multa</td><td>~R$ 180</td></tr>
+    <tr><td><code>JKL-7890</code></td><td><strong>Sem débitos</strong> — happy path / estado vazio</td><td>R$ 0</td></tr>
+    <tr><td>Qualquer outra placa válida<br><small>(ex: <code>MOV-1234</code>, <code>ZZZ-9999</code>)</small></td><td>Random determinístico (mesma placa = mesmo resultado)</td><td>1–5 passagens</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 Cartões de teste</h3>
+<table>
+  <thead><tr><th>Número</th><th>Bandeira</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td><code>6362 9700 0045 7013</code></td><td>ELO</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+    <tr><td><code>4111 1111 1111 1111</code></td><td>Visa</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+    <tr><td><code>5555 5555 5555 4444</code></td><td>Mastercard</td><td><span class="badge badge-success">Aprovado</span></td></tr>
+    <tr><td>Qualquer cartão com final <code>0000</code><br><small>(ex: <code>4111 1111 1111 0000</code>)</small></td><td>Qualquer</td><td><span class="badge badge-error">Recusado</span></td></tr>
+  </tbody>
+</table>
+
+<div class="creds-card">
+  <h4>🔑 Credenciais rápidas — copia &amp; cola</h4>
+  <div class="row"><span>Validade do cartão:</span><span>12/30</span></div>
+  <div class="row"><span>CVV:</span><span>123</span></div>
+  <div class="row"><span>Nome impresso:</span><span>JOÃO DA SILVA</span></div>
+  <div class="row"><span>Login usuário:</span><span>qualquer email + senha de 6+ chars</span></div>
+  <div class="row"><span>Login concessionária:</span><span>qualquer email + senha (botão no footer)</span></div>
+</div>
+
+<h3>3.3 Login do usuário</h3>
+<ul>
+  <li><strong>Cadastro novo:</strong> qualquer email + senha de 6+ caracteres. O fluxo é mock — aceita tudo.</li>
+  <li><strong>Login existente:</strong> qualquer email + qualquer senha. Sem validação real.</li>
+</ul>
+
+<h3>3.4 Login de concessionária</h3>
+<ul>
+  <li>Acesso via <strong>botão "Acesso Concessionária"</strong> no footer (bottom bar, à direita).</li>
+  <li>Mock: qualquer email/senha funciona.</li>
+</ul>
+
+<h2 id="cenarios">4. Cenários de teste end-to-end</h2>
+
+<h3>Cenário 1 — Mix completo + PIX</h3>
+<ol>
+  <li>Landing → digitar <code>ABC-1234</code> → completar Turnstile → "Consultar passagens"</li>
+  <li>Card mostra "<strong>2 praças e 3 pórticos</strong> encontrados"</li>
+  <li>"Ver passagens e pagar agora" → cadastro/login → Resumo (chips por item) → Forma de Pagamento</li>
+  <li>Escolher PIX → "Gerar QR Code PIX" → simular "Já paguei" → Confirmação mostra "<strong>Pago via PIX</strong>"</li>
+</ol>
+
+<h3>Cenário 2 — Praça SPMAR + Cartão ELO</h3>
+<ol>
+  <li>Landing → <code>XYZ-5678</code> → consultar → 1 praça SPMAR</li>
+  <li>Pagamento → Cartão → <code>6362 9700 0045 7013</code> (badge ELO + microcopy "Parceiro Pedágio Simples")</li>
+  <li>Validade <code>12/30</code>, CVV <code>123</code>, nome <code>JOÃO DA SILVA</code> → Pagar</li>
+  <li>Confirmação mostra "<strong>Cartão ELO terminado em 7013</strong>"</li>
+</ol>
+
+<h3>Cenário 3 — Pórticos + Visa</h3>
+<ol>
+  <li><code>DEF-9012</code> → 4 pórticos da SP-330</li>
+  <li>Pagamento com <code>4111 1111 1111 1111</code> → badge VISA</li>
+  <li>Confirmação: "<strong>Cartão Visa terminado em 1111</strong>"</li>
+</ol>
+
+<h3>Cenário 4 — Caso pesado + Mastercard</h3>
+<ol>
+  <li><code>GHI-3456</code> → 8 passagens, todas com badge vermelho "Próx. venc." + alerta de risco</li>
+  <li>Pagamento <code>5555 5555 5555 4444</code> → badge MASTER</li>
+  <li>Confirmação: "<strong>Cartão Mastercard terminado em 4444</strong>"</li>
+</ol>
+
+<h3>Cenário 5 — Placa sem débitos</h3>
+<ol>
+  <li><code>JKL-7890</code> → estado vazio: <code>CheckCircle</code> verde, "<strong>Nenhuma passagem em aberto</strong>", subtexto "Sua placa está em dia"</li>
+  <li>CTA "Cadastrar veículo e monitorar"</li>
+</ol>
+
+<h3>Cenário 6 — Cartão recusado</h3>
+<ol>
+  <li>Qualquer placa válida com débitos</li>
+  <li>Pagamento por cartão com final <code>0000</code> (ex: <code>4111 1111 1111 0000</code>)</li>
+  <li>Após 2s: erro inline "<strong>Pagamento recusado pela operadora. Tente outro cartão.</strong>"</li>
+  <li>Pode editar o número e tentar de novo</li>
+</ol>
+
+<h3>Cenário 7 — Dashboard logado</h3>
+<ol>
+  <li>Login com qualquer email/senha → Dashboard</li>
+  <li><strong>4 KPIs no topo:</strong> Total em aberto, Em praças SPMAR, Em pórticos Free Flow, Próximo vencimento</li>
+  <li><strong>Filtros funcionais:</strong>
+    <ul>
+      <li>Tipo: Todas / Praça SPMAR / Pórtico Free Flow</li>
+      <li>Status: Todas / Em prazo / Risco de multa</li>
+    </ul>
+  </li>
+  <li>Aba <strong>Histórico</strong>: coluna Tipo + filtros (Tipo, Forma de pagamento)</li>
+  <li>Aba <strong>Veículos</strong>: mini-resumo "X praças · Y pórticos · R$ Z em aberto" por veículo</li>
+</ol>
+
+<h3>Cenário 8 — Acesso concessionária</h3>
+<ol>
+  <li>Footer → bottom bar → botão "<strong>🏢 Acesso Concessionária</strong>"</li>
+  <li>Login (mock) → Dashboard da concessionária</li>
+</ol>
+
+<h2 id="rodar">5. Como rodar localmente</h2>
+<pre><code>cd /Users/wilsonjoao/workspace/pedagio-simples-v2/.claude/worktrees/elated-noether-400841
+
+npm install        # se ainda não rodou
+npm test           # 34 testes (simulator + cartaoValidation)
+npm run build      # verificação de build
+npm run dev        # http://localhost:3000/</code></pre>
+<p>Ou via Claude: <code>preview_start</code> com <code>vite-dev</code> (já configurado em <code>.claude/launch.json</code>).</p>
+
+<h2 id="docs">6. Documentos relacionados</h2>
+<table>
+  <thead><tr><th>Documento</th><th>Local</th></tr></thead>
+  <tbody>
+    <tr><td>Spec da refatoração</td><td><code>docs/superpowers/specs/2026-05-16-refatoracao-fluxo-unificado-cartao-design.md</code></td></tr>
+    <tr><td>Plano de implementação</td><td><code>docs/superpowers/plans/2026-05-16-refatoracao-fluxo-unificado-cartao.md</code></td></tr>
+    <tr><td>Este relatório (Markdown)</td><td><code>docs/RELATORIO-ENTREGA.md</code></td></tr>
+    <tr><td>Este relatório (HTML)</td><td><code>docs/RELATORIO-ENTREGA.html</code></td></tr>
+    <tr><td>Pull Request</td><td><a href="https://github.com/wilsonurco/pedagiosimplesv2/pull/1" target="_blank">github.com/wilsonurco/pedagiosimplesv2/pull/1</a></td></tr>
+    <tr><td>Linear</td><td><a href="https://linear.app/zero2design/project/pedagio-simples-fluxo-unificado-spmar-free-flow-cartao-ef5dc7ce95e7" target="_blank">linear.app — projeto</a></td></tr>
+    <tr><td>Vault Obsidian — projeto</td><td><code>~/Documents/MeuSegundoCerebro/01 - Profissional/Projetos/Pedágio Simple.md</code></td></tr>
+    <tr><td>Vault Obsidian — contexto técnico</td><td><code>~/Documents/MeuSegundoCerebro/03 - Memoria da IA/Projetos de Codigo/Pedágio Simples/Contexto.md</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="commits">7. Histórico de commits</h2>
+<table>
+  <thead><tr><th>SHA</th><th>Mensagem</th></tr></thead>
+  <tbody>
+    <tr><td><code>11d0d4c</code></td><td>docs: relatório de entrega com implementações, credenciais e cenários de teste</td></tr>
+    <tr><td><code>ee3f969</code></td><td>refactor: move 'Acesso Concessionária' do header para o footer</td></tr>
+    <tr><td><code>15c903c</code></td><td>perf: comprime hero.mp4 de 27MB para 11MB (~60% menor)</td></tr>
+    <tr><td><code>c528de6</code></td><td>feat: troca hero.mp4 por vídeo 16:9 (1920x1080, ~40s)</td></tr>
+    <tr><td><code>18ecd93</code></td><td>feat: substitui hero.mp4 por vídeo 9:16 da praça SPMAR ao pôr-do-sol</td></tr>
+    <tr><td><code>f1aed2f</code></td><td>feat: usa fotos de rodovias brasileiras nos cards do blog</td></tr>
+    <tr><td><code>0464c43</code></td><td>feat: usa fotos reais de pórtico/rodovia/câmera nos cards do blog</td></tr>
+    <tr><td><code>533675c</code></td><td>feat: mini-resumo por veículo (praças, pórticos, total em aberto)</td></tr>
+    <tr><td><code>1098b14</code></td><td>feat: histórico com coluna Tipo e filtros (Tipo + Forma de pagamento)</td></tr>
+    <tr><td><code>25515c8</code></td><td>feat: filtros de tipo e status na lista de pendentes do dashboard</td></tr>
+    <tr><td><code>a1b1bf4</code></td><td>feat: 4 KPIs no dashboard</td></tr>
+    <tr><td><code>1fbe046</code></td><td>feat: ConfirmacaoPagamento exibe bandeira e últimos 4</td></tr>
+    <tr><td><code>0d3c196</code></td><td>feat: FormaPagamento aceita cartão ao lado do PIX</td></tr>
+    <tr><td><code>50e7583</code></td><td>feat: CartaoCreditoForm com validação real</td></tr>
+    <tr><td><code>92df442</code></td><td>refactor: ResumoPedido mostra chip de tipo</td></tr>
+    <tr><td><code>5705c27</code></td><td>refactor: ResultadosDebitos com chip, breakdown e estado vazio</td></tr>
+    <tr><td><code>b16fd4c</code></td><td>refactor: copy dos benefícios cita praça SPMAR e pórtico Free Flow</td></tr>
+    <tr><td><code>eb8141f</code></td><td>refactor: hero e fluxo de consulta abraçam praça SPMAR + Free Flow</td></tr>
+    <tr><td><code>46758f1</code></td><td>feat: TipoPassagemBadge</td></tr>
+    <tr><td><code>d7d00d3</code></td><td>docs: usa cartão ELO 6362 9700 0045 7013 (passa Luhn, não termina em 0000)</td></tr>
+    <tr><td><code>6e2b2ea</code></td><td>feat: validação de cartão (BIN + Luhn + máscaras)</td></tr>
+    <tr><td><code>b949f07</code></td><td>feat: simulator com random determinístico e helpers</td></tr>
+    <tr><td><code>eb7da47</code></td><td>feat: simulator com cenários nomeados</td></tr>
+    <tr><td><code>07742cc</code></td><td>chore: adiciona vitest</td></tr>
+    <tr><td><code>a459966</code></td><td>docs: plano de implementação</td></tr>
+    <tr><td><code>272fe68</code></td><td>docs: spec de refatoração</td></tr>
+  </tbody>
+</table>
+
+<h2 id="proximos">8. Próximos passos sugeridos</h2>
+<p>Itens fora do escopo desta refatoração que valem como próxima evolução:</p>
+<ol>
+  <li><strong>Migrar para react-router</strong> — URLs reais e compartilháveis (<code>/consulta</code>, <code>/pagamento</code>, etc), navegação nativa do browser</li>
+  <li><strong>Integrar gateway de pagamento real</strong> — Cielo, Pagar.me ou Mercado Pago (PIX e cartão)</li>
+  <li><strong>Persistência de débitos pagos</strong> — localStorage inicial, backend depois</li>
+  <li><strong>App mobile</strong> — Fase 2 do roadmap estratégico (já documentado em <code>memory/project_fase2.md</code>)</li>
+  <li><strong>Multi-veículos</strong> com gestão familiar/profissional</li>
+  <li><strong>Alertas inteligentes</strong> — push, email, WhatsApp para novos débitos / proximidade de vencimento</li>
+  <li><strong>Code-splitting</strong> do bundle (atual: 2 MB minified / 593 KB gzip — warning do Vite)</li>
+</ol>
+
+<footer class="report-footer">
+  <p>Gerado em 2026-05-17 · <a href="https://github.com/wilsonurco/pedagiosimplesv2" target="_blank">Pedágio Simples v2</a> · Movemais &amp; SPMAR</p>
+</footer>
+
+</body>
+</html>

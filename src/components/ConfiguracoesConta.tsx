@@ -370,69 +370,83 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
   return (
     <div className="space-y-6">
       {/* Informações da Conta */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+      <Card className="border border-[#DCDDE3]">
+        <CardHeader className="pb-3 px-4 pt-4">
+          <CardTitle className="text-sm font-semibold text-[#5B2E8C] flex items-center gap-2">
+            <User className="h-4 w-4" />
             Informações da Conta
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          {/* Layout Mobile Otimizado */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            {/* Avatar responsivo */}
-            <div className="flex-shrink-0">
-              <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-                <AvatarFallback className="bg-[#5B2E8C]/10 text-[#5B2E8C] text-lg sm:text-xl">
-                  {getInitials(dadosPessoais.nome)}
-                </AvatarFallback>
-              </Avatar>
+        <CardContent className="px-4 pb-5">
+
+          {/* Avatar + nome + badge */}
+          <div className="flex flex-col items-center text-center pb-5 mb-5 border-b border-[#ECECF1]">
+            <Avatar className="h-16 w-16 mb-3">
+              <AvatarFallback className="bg-[#5B2E8C]/10 text-[#5B2E8C] text-xl font-bold">
+                {getInitials(dadosPessoais.nome)}
+              </AvatarFallback>
+            </Avatar>
+            <h3 className="text-lg font-bold text-[#1A1B23] mb-2 leading-tight">
+              {dadosPessoais.nome}
+            </h3>
+            <Badge className="bg-[#0E8B5A] hover:bg-[#0E8B5A] text-white text-xs px-3 py-1 rounded-full">
+              <CheckCircle className="h-3 w-3 mr-1.5" />
+              Verificado
+            </Badge>
+          </div>
+
+          {/* Grid de dados: label small-caps + valor */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+
+            {/* E-mail */}
+            <div className="col-span-2">
+              <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none flex items-center gap-1 mb-1">
+                <Mail className="h-3 w-3" />
+                E-mail
+              </p>
+              <p className="text-sm font-medium text-[#1A1B23] truncate">{dadosPessoais.email || '—'}</p>
             </div>
-            
-            {/* Informações do usuário */}
-            <div className="flex-1 w-full min-w-0 text-center sm:text-left">
-              {/* Nome e badge */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <h3 className="text-lg sm:text-xl font-bold text-[#1A1B23] leading-tight">{dadosPessoais.nome}</h3>
-                <Badge variant="default" className="text-xs bg-[#0E8B5A] text-white">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Verificado
-                </Badge>
-              </div>
-              
-              {/* Grid de informações responsivo */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
-                {/* Email */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <Mail className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                  <span className="text-[#1A1B23] truncate">{dadosPessoais.email}</span>
-                </div>
-                
-                {/* Telefone */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <Phone className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                  <span className="text-[#1A1B23]">{dadosPessoais.telefone}</span>
-                </div>
-                
-                {/* CPF */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <User className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                  <span className="text-[#1A1B23]">CPF: {dadosPessoais.cpf}</span>
-                </div>
-                
-                {/* Localização */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none">
-                  <MapPin className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                  <span className="text-[#1A1B23] truncate">{dadosPessoais.cidade}, {dadosPessoais.estado}</span>
-                </div>
-                
-                {/* Membro desde - ocupa toda a largura */}
-                <div className="flex items-center justify-center sm:justify-start gap-2 p-2 sm:p-0 bg-[#F7F5FB] sm:bg-transparent rounded-lg sm:rounded-none sm:col-span-2">
-                  <Shield className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                  <span className="text-[#1A1B23]">Membro desde: 16/10/2024</span>
-                </div>
-              </div>
+
+            {/* Telefone */}
+            <div>
+              <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none flex items-center gap-1 mb-1">
+                <Phone className="h-3 w-3" />
+                Telefone
+              </p>
+              <p className="text-sm font-medium text-[#1A1B23]">{dadosPessoais.telefone || '—'}</p>
             </div>
+
+            {/* CPF */}
+            <div>
+              <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none flex items-center gap-1 mb-1">
+                <User className="h-3 w-3" />
+                CPF
+              </p>
+              <p className="text-sm font-medium text-[#1A1B23]">{dadosPessoais.cpf || '—'}</p>
+            </div>
+
+            {/* Localização — só exibe se tiver dado */}
+            {(dadosPessoais.cidade || dadosPessoais.estado) && (
+              <div className="col-span-2">
+                <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none flex items-center gap-1 mb-1">
+                  <MapPin className="h-3 w-3" />
+                  Localização
+                </p>
+                <p className="text-sm font-medium text-[#1A1B23]">
+                  {[dadosPessoais.cidade, dadosPessoais.estado].filter(Boolean).join(', ')}
+                </p>
+              </div>
+            )}
+
+            {/* Membro desde */}
+            <div className="col-span-2 pt-4 border-t border-[#ECECF1]">
+              <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none flex items-center gap-1 mb-1">
+                <Shield className="h-3 w-3" />
+                Membro desde
+              </p>
+              <p className="text-sm font-medium text-[#1A1B23]">16/10/2024</p>
+            </div>
+
           </div>
         </CardContent>
       </Card>

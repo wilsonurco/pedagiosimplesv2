@@ -17,7 +17,7 @@ interface AnimatedHeroProps {
   navLinks: NavLink[];
   topRightAction?: React.ReactNode;
   title: React.ReactNode;
-  description: string;
+  description: React.ReactNode;
   ctaButton?: {
     text: string;
     onClick: () => void;
@@ -103,7 +103,7 @@ export const AnimatedHero = ({
             style={{ backgroundImage: `url(${backgroundImageUrl})` }}
           />
         ) : null}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/55" />
       </div>
 
       {/* Header */}
@@ -111,45 +111,53 @@ export const AnimatedHero = ({
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20 flex h-20 w-full items-center justify-between px-6 md:px-12 text-white flex-shrink-0"
+        className="relative z-20 flex h-16 sm:h-20 w-full items-center justify-between px-4 sm:px-6 md:px-12 text-white flex-shrink-0"
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)' }}
       >
         <div className="flex items-center gap-2">{logo}</div>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href ?? "#"}
-              onClick={(e) => {
-                if (link.onClick) {
-                  e.preventDefault();
-                  link.onClick();
-                }
-              }}
-              className="text-sm font-medium text-white/80 transition-colors hover:text-white"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+        {navLinks.length > 0 && (
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href ?? "#"}
+                onClick={(e) => {
+                  if (link.onClick) {
+                    e.preventDefault();
+                    link.onClick();
+                  }
+                }}
+                className="text-sm font-medium text-white/80 transition-colors hover:text-white"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        )}
 
-        <div className="hidden md:block">{topRightAction}</div>
+        {/* topRightAction — sempre visível em todos os tamanhos */}
+        {topRightAction && (
+          <div>{topRightAction}</div>
+        )}
 
-        {/* Mobile menu button */}
-        <button
-          aria-label="Abrir menu"
-          onClick={() => setMobileMenuOpen((v) => !v)}
-          className="md:hidden p-2 text-white"
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Hambúrguer — só aparece quando há navLinks */}
+        {navLinks.length > 0 && (
+          <button
+            aria-label="Abrir menu"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="md:hidden p-2 text-white"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        )}
       </motion.header>
 
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
+      {/* Mobile menu overlay — só quando há navLinks */}
+      {mobileMenuOpen && navLinks.length > 0 && (
         <div
-          className="fixed inset-0 z-30 bg-black/80 flex flex-col pt-20 px-6 md:hidden"
+          className="fixed inset-0 z-30 bg-black/80 flex flex-col pt-16 px-6 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         >
           <nav className="flex flex-col gap-6 mt-6" onClick={(e) => e.stopPropagation()}>
@@ -169,9 +177,6 @@ export const AnimatedHero = ({
                 {link.label}
               </a>
             ))}
-            {topRightAction && (
-              <div onClick={() => setMobileMenuOpen(false)}>{topRightAction}</div>
-            )}
           </nav>
         </div>
       )}
@@ -191,13 +196,13 @@ export const AnimatedHero = ({
               >
                 <motion.h1
                   variants={itemVariants}
-                  className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+                  className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl [text-shadow:0_2px_6px_rgba(0,0,0,0.5)]"
                 >
                   {title}
                 </motion.h1>
                 <motion.p
                   variants={itemVariants}
-                  className="mt-6 max-w-xl text-lg leading-8 text-white/80"
+                  className="mt-6 max-w-xl text-lg leading-8 text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]"
                 >
                   {description}
                 </motion.p>
@@ -241,13 +246,13 @@ export const AnimatedHero = ({
           >
             <motion.h1
               variants={itemVariants}
-              className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+              className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl [text-shadow:0_2px_6px_rgba(0,0,0,0.5)]"
             >
               {title}
             </motion.h1>
             <motion.p
               variants={itemVariants}
-              className="mt-6 max-w-2xl text-lg leading-8 text-white/80"
+              className="mt-6 max-w-2xl text-lg leading-8 text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.6)]"
             >
               {description}
             </motion.p>
