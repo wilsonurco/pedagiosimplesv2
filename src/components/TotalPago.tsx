@@ -469,29 +469,29 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                         </div>
                       </div>
                     </div>
-                    <div className="ml-11 space-y-2">
-                      <div className="flex flex-col gap-1 text-xs text-[#8A8B95]">
-                        <span>{pagamento.data} às {pagamento.hora}</span>
-                        <span>
-                          {pagamento.placas.length === 1 
-                            ? `Placa ${pagamento.placas[0]}`
-                            : `${pagamento.placas.length} placas: ${pagamento.placas.join(', ')}`
-                          }
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs w-fit ${pagamento.metodo === 'PIX' ? 
-                            'bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A]' : 
-                            'bg-[#F4EFFB] text-[#5B2E8C] border-[#5B2E8C]'
+                    <div className="ml-11 space-y-1.5">
+                      {/* Data + badge PIX na mesma linha */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-[#8A8B95]">{pagamento.data} às {pagamento.hora}</span>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs shrink-0 ${pagamento.metodo === 'PIX'
+                            ? 'bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A]'
+                            : 'bg-[#F4EFFB] text-[#5B2E8C] border-[#5B2E8C]'
                           }`}
                         >
                           {pagamento.metodo}
                         </Badge>
-                        <div className="text-xs text-[#8A8B95] text-right">
-                          {pagamento.protocolo}
-                        </div>
+                      </div>
+                      {/* Placas + protocolo na mesma linha */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-[#8A8B95] truncate">
+                          {pagamento.placas.length === 1
+                            ? `Placa ${pagamento.placas[0]}`
+                            : `${pagamento.placas.length} placas: ${pagamento.placas.join(', ')}`
+                          }
+                        </span>
+                        <span className="text-xs text-[#8A8B95] shrink-0">{pagamento.protocolo}</span>
                       </div>
                       <Button
                         size="sm"
