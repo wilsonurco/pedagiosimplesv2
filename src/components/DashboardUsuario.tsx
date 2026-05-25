@@ -458,11 +458,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       />
                       <label htmlFor="todas-placas" className="text-xs sm:text-sm cursor-pointer flex items-center gap-1 sm:gap-2 whitespace-nowrap">
                         <Car className="h-3 w-3" />
-                        <span>Todas as placas ({todosOsDebitos.length})</span>
+                        <span>Todas as placas ({passagensTodas.length})</span>
                       </label>
                     </div>
                     {placasUnicas.map(placa => {
-                      const qtdDebitos = todosOsDebitos.filter(d => d.placa === placa).length;
+                      const qtdDebitos = passagensTodas.filter(d => d.placa === placa).length;
                       const isChecked = filtroPlaca.includes(placa);
                       return (
                         <div key={placa} className="flex items-center space-x-2">

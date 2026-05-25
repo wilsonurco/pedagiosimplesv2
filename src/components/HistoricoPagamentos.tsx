@@ -15,6 +15,7 @@ import {
   Share2,
   MapPin,
   Hash,
+  Shield,
   ChevronLeft,
   ChevronRight,
   X,
