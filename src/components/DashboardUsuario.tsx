@@ -841,7 +841,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5FB] md:pb-0 pb-20">
+    <div className="min-h-screen bg-[#F7F5FB] md:pb-0 pb-20 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-[#DCDDE3] sticky top-0 z-50">
         <div className="px-4 sm:px-6 lg:px-8 py-3">
@@ -915,7 +915,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="px-3 sm:px-4 py-4 sm:py-6">
+      <main className="px-3 sm:px-4 py-4 sm:py-6 flex-1">
         {renderContent()}
       </main>
 

@@ -373,7 +373,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
   }, [detalhes]);
 
   return (
-    <div className="min-h-screen bg-[#F7F5FB]">
+    <div className="min-h-screen bg-[#F7F5FB] flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-[#DCDDE3]">
         <div className="flex items-center justify-between px-6 py-3">
@@ -414,7 +414,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
         </div>
       </div>
 
-      <div className="max-w-[1084px] mx-auto px-6 py-8">
+      <div className="max-w-[1084px] mx-auto px-6 py-8 flex-1">
 
         {/* ── LISTA DE REPASSE ── */}
         {tabAtiva === "repasse" && !periodoSelecionado && (
