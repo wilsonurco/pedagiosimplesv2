@@ -33,6 +33,7 @@ import {
 } from "recharts";
 import LogoCinza from "../imports/LogoCinza";
 import { exportarRepasse, exportarPedidosPagos, exportarComprovante } from "../utils/exportRepasse";
+import { FooterLogado } from "./FooterLogado";
 
 interface DashboardConcessionariaProps {
   dadosGestor: any;
@@ -1359,6 +1360,9 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
       })()}
 
       {/* ── MODAL ALERTA SEM TÍTULO ── */}
+      {/* Footer — Desktop only */}
+      <FooterLogado />
+
       {mostrarAlertaSemTitulo && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"

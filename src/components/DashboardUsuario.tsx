@@ -44,6 +44,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Checkbox } from "./ui/checkbox";
 import { gerarDebitos, agregarPorTipo, proximoVencimento, filtrarPorTipo, filtrarPorStatus, type Passagem } from '../utils/simulator';
 import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
+import { FooterLogado } from './FooterLogado';
 
 interface DashboardUsuarioProps {
   onLogout: () => void;
@@ -917,6 +918,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       <main className="px-3 sm:px-4 py-4 sm:py-6">
         {renderContent()}
       </main>
+
+      {/* Footer — Desktop only */}
+      <FooterLogado />
 
       {/* Bottom Navigation - Mobile Only */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DCDDE3] z-50">
