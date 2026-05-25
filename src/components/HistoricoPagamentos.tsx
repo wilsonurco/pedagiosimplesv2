@@ -488,28 +488,30 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
 
         {/* Filtros */}
         <Card className="border border-[#DCDDE3]">
-          <CardContent className="p-3 space-y-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8A8B95]" />
-              <input
-                type="text"
-                placeholder="Pórtico, placa, ID..."
-                value={filtroTexto}
-                onChange={e => { setFiltroTexto(e.target.value); setPaginaAtual(1); }}
-                className="w-full pl-9 pr-3 h-9 bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
-              />
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 min-w-0">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8A8B95]" />
+                <input
+                  type="text"
+                  placeholder="Pórtico, placa, ID..."
+                  value={filtroTexto}
+                  onChange={e => { setFiltroTexto(e.target.value); setPaginaAtual(1); }}
+                  className="w-full pl-9 pr-3 h-9 bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] placeholder-[#8A8B95] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/20"
+                />
+              </div>
+              <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
+                <SelectTrigger className="h-9 w-36 shrink-0 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7d">Últimos 7 dias</SelectItem>
+                  <SelectItem value="30d">Últimos 30 dias</SelectItem>
+                  <SelectItem value="90d">Últimos 3 meses</SelectItem>
+                  <SelectItem value="todos">Todo o período</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={filtroPeriodo} onValueChange={v => { setFiltroPeriodo(v); setPaginaAtual(1); }}>
-              <SelectTrigger className="h-9 text-sm border-[#DCDDE3] bg-[#F7F5FB] text-[#1A1B23]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">Últimos 7 dias</SelectItem>
-                <SelectItem value="30d">Últimos 30 dias</SelectItem>
-                <SelectItem value="90d">Últimos 3 meses</SelectItem>
-                <SelectItem value="todos">Todo o período</SelectItem>
-              </SelectContent>
-            </Select>
           </CardContent>
         </Card>
 
