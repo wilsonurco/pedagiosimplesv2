@@ -25,8 +25,6 @@ const colunas = [
       { label: "Sobre o Pedágio Simples", href: "#" },
       { label: "Sobre a Move Mais", href: "#" },
       { label: "Parcerias com concessionárias", href: "#" },
-      { label: "Imprensa", href: "#" },
-      { label: "Trabalhe conosco", href: "#" },
     ],
   },
   {
