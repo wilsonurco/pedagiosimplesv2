@@ -8,15 +8,13 @@ import jsPDF from 'jspdf';
 import {
   Search,
   Download,
-  CheckCircle,
   CreditCard,
   Smartphone,
   FileText,
   Eye,
   Share2,
-  Car,
-  Calendar,
-  Shield,
+  MapPin,
+  Hash,
   ChevronLeft,
   ChevronRight,
   X,
@@ -543,67 +541,78 @@ export function HistoricoPagamentos({ onIrParaPagamento }: HistoricoPagamentosPr
             <>
               <div className="divide-y divide-[#ECECF1]">
                 {passagensPaginadas.map(p => (
-                  <div key={p.id} className="px-4 py-3 hover:bg-[#F7F5FB] transition-colors">
-                    {/* Linha 1: ícone + local + badge | valor + botão */}
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#D4F0E2] flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <CheckCircle className="h-4 w-4 text-[#0E8B5A]" />
+                  <div key={p.id} className="px-4 py-4">
+
+                    {/* Cabeçalho: placa + valor */}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none">Número da Placa</p>
+                        <p className="font-bold text-[#5B2E8C] text-base tracking-wide mt-1">{p.placa}</p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        {/* Título + valor */}
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
-                            <p className="font-semibold text-[#1A1B23] text-sm leading-tight truncate">{p.portico}</p>
-                            <TipoPassagemBadge tipo={p.tipo} />
-                          </div>
-                          <span className="font-bold text-[#5B2E8C] text-sm whitespace-nowrap flex-shrink-0">{formatCurrency(p.valor)}</span>
-                        </div>
-
-                        {/* Linha 2: concessionária · sentido */}
-                        <p className="text-xs text-[#8A8B95] mb-1.5">{p.concessionaria} · {p.sentido}</p>
-
-                        {/* Linha 3: data · placa · pagamento */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="text-xs text-[#8A8B95] flex items-center gap-1">
-                            <Calendar className="h-3 w-3 flex-shrink-0" />
-                            {p.data} às {p.hora}
-                          </span>
-                          <span className="text-xs text-[#8A8B95] flex items-center gap-1">
-                            <Car className="h-3 w-3" />
-                            <span className="tracking-wide">{p.placa}</span>
-                          </span>
-                          <span className="text-xs text-[#8A8B95] flex items-center gap-1">
-                            {p.formaPagamento === 'pix' ? <Smartphone className="h-3 w-3" /> : <CreditCard className="h-3 w-3" />}
-                            {formaPagamentoLabel(p.formaPagamento)}
-                          </span>
-                        </div>
-
-                        {/* Linha 4: ID · rodovia · km — detalhes técnicos */}
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 pt-2 border-t border-[#ECECF1]/60">
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">ID</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">{p.id}</span>
-                          </span>
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Rodovia</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">{p.rodovia.split(' ')[0]}</span>
-                          </span>
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Quilômetro</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">km {p.km}</span>
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPassagemSelecionada(p)}
-                            className="h-6 px-2 text-[10px] border-[#DCDDE3] text-[#5B2E8C] hover:border-[#8B5FFF] hover:text-[#8B5FFF] self-end ml-auto"
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            Comprovante
-                          </Button>
-                        </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest leading-none">Valor</p>
+                        <p className="font-bold text-[#5B2E8C] text-base mt-1">{formatCurrency(p.valor)}</p>
                       </div>
                     </div>
+
+                    {/* Divisor */}
+                    <div className="border-t border-[#DCDDE3] my-3" />
+
+                    {/* Grid de detalhes */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Data</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{p.data}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Horário</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{p.hora}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">ID da Passagem</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{p.id}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Placa do Veículo</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 tracking-wide">{p.placa}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Praça</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 flex items-start gap-1">
+                          <MapPin className="h-3.5 w-3.5 text-[#8A8B95] flex-shrink-0 mt-0.5" />
+                          <span className="leading-tight">{p.portico}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Quilômetro</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1 flex items-center gap-1">
+                          <Hash className="h-3.5 w-3.5 text-[#8A8B95] flex-shrink-0" />
+                          km {p.km}
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-wide leading-none">Rodovia</p>
+                        <p className="text-sm font-semibold text-[#1A1B23] mt-1">{p.rodovia}</p>
+                      </div>
+                    </div>
+
+                    {/* Rodapé: forma de pagamento + comprovante */}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#ECECF1]">
+                      <span className="text-xs text-[#8A8B95] flex items-center gap-1.5">
+                        {p.formaPagamento === 'pix' ? <Smartphone className="h-3.5 w-3.5" /> : <CreditCard className="h-3.5 w-3.5" />}
+                        {formaPagamentoLabel(p.formaPagamento)}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPassagemSelecionada(p)}
+                        className="h-7 px-3 text-xs border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white transition-colors"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        Ver Comprovante
+                      </Button>
+                    </div>
+
                   </div>
                 ))}
               </div>
