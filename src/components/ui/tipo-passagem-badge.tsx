@@ -13,7 +13,7 @@ export function TipoPassagemBadge({ tipo, className = '' }: TipoPassagemBadgePro
         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-[#F4EFFB] text-[#5B2E8C] ${className}`}
       >
         <Building2 className="h-3 w-3" />
-        Praça SPMAR
+        Praça de Pedágio
       </span>
     )
   }

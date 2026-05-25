@@ -86,7 +86,7 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
             if (r.countTotal === 0) return null;
             return (
               <p className="text-[#5B2E8C] font-medium">
-                {r.countPraca > 0 && <><strong>{r.countPraca}</strong> {r.countPraca > 1 ? 'praças SPMAR' : 'praça SPMAR'}</>}
+                {r.countPraca > 0 && <><strong>{r.countPraca}</strong> {r.countPraca > 1 ? 'praças de pedágio' : 'praça de pedágio'}</>}
                 {r.countPraca > 0 && r.countPortico > 0 && ' · '}
                 {r.countPortico > 0 && <><strong>{r.countPortico}</strong> {r.countPortico > 1 ? 'pórticos Free Flow' : 'pórtico Free Flow'}</>}
               </p>

@@ -2,20 +2,20 @@ import { describe, it, expect } from 'vitest'
 import { gerarDebitos, agregarPorTipo, filtrarPorTipo, filtrarPorStatus, proximoVencimento } from './simulator'
 
 describe('gerarDebitos — cenários nomeados', () => {
-  it('ABC-1234 retorna mix de 2 praças SPMAR + 3 pórticos Free Flow', () => {
+  it('ABC-1234 retorna mix de 2 praças de pedágio + 3 pórticos Free Flow', () => {
     const passagens = gerarDebitos('ABC-1234')
     const pracas = passagens.filter(p => p.tipo === 'praca_fisica')
     const porticos = passagens.filter(p => p.tipo === 'portico_free_flow')
     expect(pracas).toHaveLength(2)
     expect(porticos).toHaveLength(3)
-    pracas.forEach(p => expect(p.concessionaria).toBe('SPMAR'))
+    pracas.forEach(p => expect(p.concessionaria).toBe('DER-SP'))
   })
 
-  it('XYZ-5678 retorna apenas 1 praça física SPMAR', () => {
+  it('XYZ-5678 retorna apenas 1 praça física de pedágio', () => {
     const passagens = gerarDebitos('XYZ-5678')
     expect(passagens).toHaveLength(1)
     expect(passagens[0].tipo).toBe('praca_fisica')
-    expect(passagens[0].concessionaria).toBe('SPMAR')
+    expect(passagens[0].concessionaria).toBe('DER-SP')
   })
 
   it('DEF-9012 retorna apenas 4 pórticos Free Flow da SP-330', () => {

@@ -27,13 +27,22 @@ function hojeMenosDias(dias: number): string {
   return hojeMaisDias(-dias)
 }
 
+// Helpers para o cenário GHI-3456
+const GHI_CONCESSIONARIAS_PRACA = ['Arteris', 'CCR ViaOeste', 'Rota das Bandeiras', 'Entrevias']
+
+const GHI_RODOVIAS_PORTICO = [
+  { rodovia: 'SP-270', concessionaria: 'CCR ViaOeste' },
+  { rodovia: 'SP-348', concessionaria: 'Rota das Bandeiras' },
+  { rodovia: 'SP-280', concessionaria: 'CCR ViaOeste' },
+]
+
 const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
   'ABC-1234': (placa) => [
     {
       id: 'abc-praca-1',
       tipo: 'praca_fisica',
-      local: 'Praça SPMAR Itanhaém — KM 88',
-      concessionaria: 'SPMAR',
+      local: 'Praça de Pedágio SP-055 — KM 88',
+      concessionaria: 'DER-SP',
       rodovia: 'SP-055',
       km: 88,
       data: hojeMenosDias(12),
@@ -47,8 +56,8 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
     {
       id: 'abc-praca-2',
       tipo: 'praca_fisica',
-      local: 'Praça SPMAR Mongaguá — KM 65',
-      concessionaria: 'SPMAR',
+      local: 'Praça de Pedágio SP-055 — KM 65',
+      concessionaria: 'DER-SP',
       rodovia: 'SP-055',
       km: 65,
       data: hojeMenosDias(5),
@@ -63,7 +72,7 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
       id: 'abc-portico-1',
       tipo: 'portico_free_flow',
       local: 'Pórtico Free Flow SP-055 — KM 12',
-      concessionaria: 'SPMAR',
+      concessionaria: 'DER-SP',
       rodovia: 'SP-055',
       km: 12,
       data: hojeMenosDias(20),
@@ -107,8 +116,8 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
     {
       id: 'xyz-praca-1',
       tipo: 'praca_fisica',
-      local: 'Praça SPMAR Itanhaém — KM 88',
-      concessionaria: 'SPMAR',
+      local: 'Praça de Pedágio SP-055 — KM 88',
+      concessionaria: 'DER-SP',
       rodovia: 'SP-055',
       km: 88,
       data: hojeMenosDias(3),
@@ -182,13 +191,15 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
 
   'GHI-3456': (placa) => Array.from({ length: 8 }, (_, i) => {
     const ehPraca = i % 3 === 0
+    const concPraca = GHI_CONCESSIONARIAS_PRACA[i % GHI_CONCESSIONARIAS_PRACA.length]
+    const rodPortico = GHI_RODOVIAS_PORTICO[i % GHI_RODOVIAS_PORTICO.length]
     return ehPraca
       ? {
           id: `ghi-praca-${i}`,
           tipo: 'praca_fisica' as const,
-          local: `Praça SPMAR — KM ${30 + i * 7}`,
-          concessionaria: 'SPMAR',
-          rodovia: 'SP-055',
+          local: `Praça de Pedágio SP-${270 + i * 10} — KM ${30 + i * 7}`,
+          concessionaria: concPraca,
+          rodovia: `SP-${270 + i * 10}`,
           km: 30 + i * 7,
           data: hojeMenosDias(30 + i),
           hora: '12:00:00',
@@ -201,9 +212,9 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
       : {
           id: `ghi-portico-${i}`,
           tipo: 'portico_free_flow' as const,
-          local: `Pórtico Free Flow SP-${100 + i * 10} — KM ${i * 5}`,
-          concessionaria: i % 2 === 0 ? 'SPMAR' : 'Ecovias',
-          rodovia: `SP-${100 + i * 10}`,
+          local: `Pórtico Free Flow ${rodPortico.rodovia} — KM ${i * 5}`,
+          concessionaria: rodPortico.concessionaria,
+          rodovia: rodPortico.rodovia,
           km: i * 5,
           data: hojeMenosDias(30 + i),
           hora: '08:30:00',
@@ -243,7 +254,15 @@ const RODOVIAS_PORTICO = [
   { rodovia: 'SP-021', concessionaria: 'Ecovias' },
   { rodovia: 'SP-160', concessionaria: 'Ecovias' },
   { rodovia: 'BR-116', concessionaria: 'Arteris' },
-  { rodovia: 'SP-055', concessionaria: 'SPMAR' },
+  { rodovia: 'SP-055', concessionaria: 'DER-SP' },
+]
+
+const PRACAS_FISICAS = [
+  { rodovia: 'SP-055', concessionaria: 'DER-SP' },
+  { rodovia: 'SP-310', concessionaria: 'Arteris' },
+  { rodovia: 'SP-348', concessionaria: 'Rota das Bandeiras' },
+  { rodovia: 'SP-270', concessionaria: 'CCR ViaOeste' },
+  { rodovia: 'SP-280', concessionaria: 'Entrevias' },
 ]
 
 function gerarRandom(placa: string): Passagem[] {
@@ -256,12 +275,13 @@ function gerarRandom(placa: string): Passagem[] {
     const diasAtras = 1 + Math.floor(rnd() * 25)
     const diasPrazo = Math.floor(rnd() * 30)
     if (ehPraca) {
+      const praca = PRACAS_FISICAS[Math.floor(rnd() * PRACAS_FISICAS.length)]
       passagens.push({
         id: `rnd-${placa}-${i}`,
         tipo: 'praca_fisica',
-        local: `Praça SPMAR — KM ${km}`,
-        concessionaria: 'SPMAR',
-        rodovia: 'SP-055',
+        local: `Praça de Pedágio ${praca.rodovia} — KM ${km}`,
+        concessionaria: praca.concessionaria,
+        rodovia: praca.rodovia,
         km,
         data: hojeMenosDias(diasAtras),
         hora: `${String(6 + Math.floor(rnd() * 14)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}`,

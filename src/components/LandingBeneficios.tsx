@@ -17,7 +17,7 @@ const parceiros = [
   { nome: "Ecovias",            estilo: "font-medium tracking-tight" },
   { nome: "Intervias",          estilo: "font-medium tracking-tight" },
   { nome: "Rota das Bandeiras", estilo: "font-medium tracking-tight" },
-  { nome: "SPMAR",              estilo: "font-medium tracking-widest" },
+  { nome: "Entrevias",           estilo: "font-medium tracking-widest" },
 ];
 
 const passosPagamento = [
