@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { gerarDebitos, agregarPorTipo } from '../utils/simulator';
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -164,22 +163,22 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Veículos</p>
-          <p className="text-xl sm:text-2xl font-bold mt-1 text-[#5B2E8C]">{veiculos.length}</p>
-          <p className="text-xs text-[#8A8B95] mt-1">cadastrado{veiculos.length !== 1 ? 's' : ''}</p>
+        <div className="rounded-xl border bg-white border-[#ECECF1] p-3">
+          <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest">Veículos</p>
+          <p className="text-2xl font-bold mt-1 text-[#5B2E8C]">{veiculos.length}</p>
+          <p className="text-[11px] text-[#8A8B95] mt-0.5">cadastrado{veiculos.length !== 1 ? 's' : ''}</p>
         </div>
-        <div className={`rounded-xl border-2 p-3 sm:p-4 ${veiculosComPendencia.length > 0 ? 'bg-[#F8D7DD] border-[#F0A8B5]' : 'bg-white border-[#DCDDE3]'}`}>
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Pendências</p>
-          <p className={`text-xl sm:text-2xl font-bold mt-1 ${veiculosComPendencia.length > 0 ? 'text-[#A3203B]' : 'text-[#8A8B95]'}`}>
+        <div className={`rounded-xl border p-3 ${veiculosComPendencia.length > 0 ? 'bg-[#FEF2F4] border-[#F0A8B5]' : 'bg-white border-[#ECECF1]'}`}>
+          <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest">Pendências</p>
+          <p className={`text-2xl font-bold mt-1 ${veiculosComPendencia.length > 0 ? 'text-[#A3203B]' : 'text-[#8A8B95]'}`}>
             {veiculosComPendencia.length}
           </p>
-          <p className="text-xs text-[#8A8B95] mt-1">veículo{veiculosComPendencia.length !== 1 ? 's' : ''} com débito</p>
+          <p className="text-[11px] text-[#8A8B95] mt-0.5">com débito</p>
         </div>
-        <div className="rounded-xl border-2 bg-white border-[#DCDDE3] p-3 sm:p-4">
-          <p className="text-xs text-[#8A8B95] uppercase tracking-wide">Total pago</p>
-          <p className="text-lg sm:text-xl font-bold mt-1 text-[#0A6B45]">{formatCurrency(totalGeral)}</p>
-          <p className="text-xs text-[#8A8B95] mt-1">todos os veículos</p>
+        <div className="rounded-xl border bg-white border-[#ECECF1] p-3">
+          <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest">Total pago</p>
+          <p className="text-base font-bold mt-1 text-[#0A6B45]">{formatCurrency(totalGeral)}</p>
+          <p className="text-[11px] text-[#8A8B95] mt-0.5">acumulado</p>
         </div>
       </div>
 
@@ -218,113 +217,95 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
           {veiculos.map(veiculo => (
             <div
               key={veiculo.id}
-              className={`rounded-xl border-2 p-3 sm:p-4 transition-colors ${
+              className={`rounded-xl border transition-colors ${
                 veiculo.totalPendencias > 0
-                  ? 'bg-[#FEF8F8] border-[#F0A8B5]'
-                  : 'bg-white border-[#DCDDE3] hover:border-[#C9AEEA]'
+                  ? 'bg-[#FEF2F4] border-[#F0A8B5]'
+                  : 'bg-white border-[#ECECF1]'
               }`}
             >
-              <div className="flex items-start gap-3">
-                {/* Icon */}
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+              {/* Card header */}
+              <div className="flex items-center gap-3 p-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   veiculo.isPrincipal ? 'bg-[#5B2E8C]' : 'bg-[#F4EFFB]'
                 }`}>
                   <Car className={`h-5 w-5 ${veiculo.isPrincipal ? 'text-white' : 'text-[#5B2E8C]'}`} />
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[#1A1B23] tracking-[0.05em] uppercase text-base">
-                          {veiculo.placa}
-                        </span>
-                        {veiculo.isPrincipal && (
-                          <Badge className="bg-[#5B2E8C] text-white text-[10px] px-1.5 py-0 h-4">
-                            <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
-                            Principal
-                          </Badge>
-                        )}
-                        {veiculo.totalPendencias > 0 && (
-                          <Badge className="bg-[#F8D7DD] text-[#A3203B] text-[10px] px-1.5 py-0 h-4 border border-[#F0A8B5]">
-                            <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
-                            {veiculo.totalPendencias} pendência{veiculo.totalPendencias !== 1 ? 's' : ''}
-                          </Badge>
-                        )}
-                      </div>
-                      {veiculo.apelido && (
-                        <p className="text-xs text-[#8A8B95] mt-0.5">{veiculo.apelido}</p>
-                      )}
-                      {(() => {
-                        const r = agregarPorTipo(gerarDebitos(veiculo.placa))
-                        return (
-                          <p className="text-sm text-[#8A8B95] mt-1">
-                            {r.countPraca} praça{r.countPraca === 1 ? '' : 's'} · {r.countPortico} pórtico{r.countPortico === 1 ? '' : 's'} ·{' '}
-                            <span className="font-semibold text-[#5B2E8C]">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(r.totalGeral)}
-                            </span>{' '}
-                            em aberto
-                          </p>
-                        )
-                      })()}
-                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                        <span className="text-xs text-[#8A8B95]">
-                          Total pago: <span className="font-semibold text-[#0A6B45]">{formatCurrency(veiculo.totalPago)}</span>
-                        </span>
-                        {veiculo.totalPendencias > 0 && (
-                          <span className="text-xs text-[#C8324A]">
-                            Pendente: <span className="font-semibold">{formatCurrency(veiculo.valorPendente)}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {veiculo.totalPendencias > 0 && (
-                        <Button
-                          size="sm"
-                          onClick={() => onIrParaPagamentoDireto?.(veiculo.placa)}
-                          className="h-8 px-2.5 text-xs bg-[#8B5FFF] hover:bg-[#7142B8] text-white"
-                        >
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          <span className="hidden sm:inline">Pagar</span>
-                        </Button>
-                      )}
-                      {!veiculo.isPrincipal && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => definirPrincipal(veiculo.id)}
-                          title="Definir como veículo principal"
-                          className="h-8 w-8 p-0 border-[#DCDDE3] text-[#8A8B95] hover:border-[#5B2E8C] hover:text-[#5B2E8C]"
-                        >
-                          <Star className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => abrirModalEditar(veiculo)}
-                        title="Editar veículo"
-                        className="h-8 w-8 p-0 border-[#DCDDE3] text-[#8A8B95] hover:border-[#5B2E8C] hover:text-[#5B2E8C]"
-                      >
-                        <Edit2 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => { setVeiculoParaExcluir(veiculo); setDialogExclusaoAberto(true); }}
-                        title="Remover veículo"
-                        className="h-8 w-8 p-0 border-[#DCDDE3] text-[#8A8B95] hover:border-[#C8324A] hover:text-[#C8324A]"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#1A1B23] tracking-wide text-base leading-none">
+                      {veiculo.placa}
+                    </span>
+                    {veiculo.isPrincipal && (
+                      <Badge className="bg-[#5B2E8C] text-white text-[10px] px-1.5 h-4 leading-none">
+                        <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
+                        Principal
+                      </Badge>
+                    )}
                   </div>
+                  {veiculo.apelido && (
+                    <p className="text-xs text-[#8A8B95] mt-0.5">{veiculo.apelido}</p>
+                  )}
+                </div>
+
+                {/* Ações secundárias */}
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  {!veiculo.isPrincipal && (
+                    <button
+                      onClick={() => definirPrincipal(veiculo.id)}
+                      title="Definir como principal"
+                      className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                    >
+                      <Star className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => abrirModalEditar(veiculo)}
+                    title="Editar veículo"
+                    className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => { setVeiculoParaExcluir(veiculo); setDialogExclusaoAberto(true); }}
+                    title="Remover veículo"
+                    className="p-2 rounded-lg text-[#8A8B95] hover:text-[#C8324A] hover:bg-[#FEF2F4] transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
+
+              {/* Status + CTA */}
+              {veiculo.totalPendencias > 0 ? (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="border-t border-[#F0A8B5] pt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle className="h-4 w-4 text-[#A3203B]" />
+                      <span className="text-sm font-semibold text-[#A3203B]">
+                        {veiculo.totalPendencias} pendência{veiculo.totalPendencias !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <span className="text-sm font-bold text-[#A3203B]">
+                      {formatCurrency(veiculo.valorPendente)}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => onIrParaPagamentoDireto?.(veiculo.placa)}
+                    className="w-full h-10 text-sm font-semibold bg-[#8B5FFF] hover:bg-[#7142B8] text-white cursor-pointer"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Pagar pendências
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-4 pb-4">
+                  <div className="border-t border-[#ECECF1] pt-3 flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-[#0A6B45]" />
+                    <span className="text-sm text-[#0A6B45]">Em dia</span>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
