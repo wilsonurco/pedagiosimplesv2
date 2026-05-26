@@ -914,18 +914,33 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           id="aceitaTermos"
                           checked={formData.aceitaTermos}
                           onCheckedChange={(checked) => handleInputChange('aceitaTermos', checked)}
-                          className={`mt-0.5 flex-shrink-0 ${errors.aceitaTermos ? 'border-[#C8324A]' : ''}`}
+                          className={`mt-0.5 shrink-0 ${errors.aceitaTermos ? 'border-[#C8324A]' : ''}`}
                         />
-                        <div>
-                          <label htmlFor="aceitaTermos" className="block text-sm cursor-pointer text-[#1A1B23] leading-relaxed">
-                            Aceito os{" "}
-                            <a href="#" className="text-[#5B2E8C] hover:underline">Termos e condições</a>
-                            {" "}e o{" "}
-                            <a href="#" className="text-[#5B2E8C] hover:underline">Aviso de privacidade</a>
-                          </label>
-                          {errors.aceitaTermos && <p className="text-sm text-[#C8324A] mt-1">{errors.aceitaTermos}</p>}
-                        </div>
+                        <p
+                          className="flex-1 min-w-0 text-sm text-[#1A1B23] leading-relaxed cursor-pointer"
+                          onClick={() => handleInputChange('aceitaTermos', !formData.aceitaTermos)}
+                        >
+                          Aceito os{" "}
+                          <a
+                            href="#"
+                            className="text-[#5B2E8C] hover:underline"
+                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+                          >
+                            Termos e condições
+                          </a>
+                          {" "}e o{" "}
+                          <a
+                            href="#"
+                            className="text-[#5B2E8C] hover:underline"
+                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+                          >
+                            Aviso de privacidade
+                          </a>
+                        </p>
                       </div>
+                      {errors.aceitaTermos && (
+                        <p className="text-sm text-[#C8324A] mt-1 pl-7">{errors.aceitaTermos}</p>
+                      )}
                     </div>
 
                   </div>
