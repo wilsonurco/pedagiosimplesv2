@@ -10,7 +10,6 @@ import {
   User,
   Car,
   History,
-  Home,
   LogOut,
   CheckCircle,
   Bell,
@@ -307,7 +306,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
   // Configuração das abas para navegação
   const tabs = [
-    { id: 'home', label: 'Início', icon: Home, hasAlert: vencendoEmBreve > 0 },
+    { id: 'home', label: 'Pendências', icon: AlertTriangle, hasAlert: vencendoEmBreve > 0 },
     { id: 'historico', label: 'Histórico', icon: History },
     { id: 'total-pago', label: 'Total Pago', icon: CreditCard },
     { id: 'veiculos', label: 'Veículos', icon: Car },
