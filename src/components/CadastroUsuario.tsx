@@ -6,6 +6,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Progress } from "./ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { ArrowLeft, User, Smartphone, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
+import logoPedagioSimples from "../assets/logo-pedagio-simples.svg";
 import { useState, useMemo, useEffect } from "react";
 import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "../utils/placaValidation";
 
@@ -647,12 +648,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
               Voltar
             </Button>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
-              <User className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Simples</span>
-          </div>
+          <img
+            src={logoPedagioSimples}
+            alt="Pedágio Simples — by Move Mais"
+            className="h-8 w-auto"
+          />
         </div>
       </header>
 
