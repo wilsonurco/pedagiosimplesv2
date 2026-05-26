@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { ArrowLeft, Car, CheckCircle2, Shield, Calendar, MapPin, ArrowRight, Plus, Minus, Filter, CheckCircle, XCircle, Loader2, X } from "lucide-react";
+import logoPedagioSimples from "../assets/logo-pedagio-simples.svg";
 import { Checkbox } from "./ui/checkbox";
 import { useState } from "react";
 import { TipoPassagemBadge } from './ui/tipo-passagem-badge';
@@ -196,11 +197,23 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               Voltar
             </Button>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <div className="flex items-center gap-1 text-[#5B2E8C]">
-                <CheckCircle2 className="h-3 w-3" />
-                <span className="text-[9px] font-bold uppercase tracking-widest">Resumo do Pedido</span>
+              {/* Steps — mobile */}
+              <div className="flex items-center gap-1.5 text-[10px]">
+                <span className="flex items-center gap-1 text-[#0E8B5A] font-medium">
+                  <span className="w-4 h-4 rounded-full bg-[#0E8B5A] text-white flex items-center justify-center text-[8px] font-bold">✓</span>
+                  Consulta
+                </span>
+                <div className="w-4 h-px bg-[#5B2E8C]" />
+                <span className="flex items-center gap-1 text-[#5B2E8C] font-bold">
+                  <span className="w-4 h-4 rounded-full bg-[#5B2E8C] text-white flex items-center justify-center text-[8px] font-bold">2</span>
+                  Revisão
+                </span>
+                <div className="w-4 h-px bg-[#DCDDE3]" />
+                <span className="flex items-center gap-1 text-[#C6C7CF]">
+                  <span className="w-4 h-4 rounded-full border-2 border-[#DCDDE3] flex items-center justify-center text-[8px] font-bold">3</span>
+                  Pagamento
+                </span>
               </div>
-              <span className="text-[13px] font-bold text-[#1A1B23] leading-tight mt-0.5">Revise suas Pendências</span>
             </div>
           </div>
 
@@ -215,12 +228,11 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
-                <Car className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Online</span>
-            </div>
+            <img
+              src={logoPedagioSimples}
+              alt="Pedágio Simples — by Move Mais"
+              className="h-8 w-auto"
+            />
           </div>
 
         </div>
@@ -232,6 +244,23 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
 
           {/* Título e Breadcrumb — desktop only */}
           <div className="hidden sm:block text-center mb-12">
+            {/* Steps — desktop */}
+            <div className="flex items-center justify-center gap-3 mb-8 text-sm">
+              <span className="flex items-center gap-2 text-[#0E8B5A] font-medium">
+                <span className="w-6 h-6 rounded-full bg-[#0E8B5A] text-white flex items-center justify-center text-xs font-bold">✓</span>
+                Consulta
+              </span>
+              <div className="w-10 h-px bg-[#5B2E8C]" />
+              <span className="flex items-center gap-2 text-[#5B2E8C] font-semibold">
+                <span className="w-6 h-6 rounded-full bg-[#5B2E8C] text-white flex items-center justify-center text-xs font-bold">2</span>
+                Revisão do pedido
+              </span>
+              <div className="w-10 h-px bg-[#DCDDE3]" />
+              <span className="flex items-center gap-2 text-[#C6C7CF]">
+                <span className="w-6 h-6 rounded-full border-2 border-[#DCDDE3] flex items-center justify-center text-xs font-bold">3</span>
+                Pagamento
+              </span>
+            </div>
             <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-6">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm font-semibold">RESUMO DO PEDIDO</span>

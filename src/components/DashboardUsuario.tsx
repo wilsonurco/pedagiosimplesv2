@@ -306,7 +306,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
   // Configuração das abas para navegação
   const tabs = [
-    { id: 'home', label: 'Pendências', icon: AlertTriangle, hasAlert: vencendoEmBreve > 0 },
+    { id: 'home', label: 'Pendências', icon: passagensTodas.length === 0 ? CheckCircle : AlertTriangle, hasAlert: vencendoEmBreve > 0 },
     { id: 'historico', label: 'Histórico', icon: History },
     { id: 'total-pago', label: 'Total Pago', icon: CreditCard },
     { id: 'veiculos', label: 'Veículos', icon: Car },
@@ -322,7 +322,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   ];
 
   const renderHomeContent = () => (
-    <div className="max-w-4xl mx-auto space-y-4">
+    <div className="max-w-6xl mx-auto">
 
       {/* Cabeçalho compacto */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -360,7 +360,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </div>
       </div>
 
-      {/* ── Estado 1: sem veículos cadastrados ───────────────────────────────── */}
+      {/* Grid: 2 colunas no desktop (Estado 3), 1 coluna nos demais */}
+      <div className={`mt-4 space-y-4 ${passagensTodas.length > 0 && placasUsuario.length > 0 ? 'lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-6 lg:space-y-0' : ''}`}>
+        <div className="space-y-4">
+
+          {/* ── Estado 1: sem veículos cadastrados ───────────────────────────────── */}
       {placasUsuario.length === 0 ? (
         <Card className="border border-[#DCDDE3]">
           <CardContent className="py-10">
@@ -478,26 +482,24 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       ) : (
       <Card className="border border-[#DCDDE3]">
         <CardHeader className="pb-3 sm:pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <CardTitle className="text-lg sm:text-xl text-[#1A1B23] flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-[#C77700]" />
               Passagens a pagar
             </CardTitle>
-            <Button
-              onClick={handleProsseguir}
-              disabled={debitosSelecionadosResumo.length === 0}
-              className={`h-10 sm:h-8 text-xs sm:text-xs px-2 sm:px-3 rounded-md transition-all ${
-                debitosSelecionadosResumo.length > 0
-                  ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
-                  : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-              }`}
-            >
-              <ArrowRight className="h-3 w-3 mr-1 hidden sm:inline" />
-              <span className="hidden sm:inline">Prosseguir para pagamento - {formatCurrency(calcularValorTotal())}</span>
-              <span className="sm:hidden">Pagar {formatCurrency(calcularValorTotal())}</span>
-            </Button>
+            {/* "Consultar outra placa" promovida para o header */}
+            {!mostrandoFormularioNovaPlaca && (
+              <button
+                onClick={() => setMostrandoFormularioNovaPlaca(true)}
+                className="flex-shrink-0 flex items-center gap-1 text-xs text-[#5B2E8C] hover:text-[#8B5FFF] transition-colors"
+              >
+                <Plus className="h-3 w-3" />
+                <span className="hidden sm:inline">Outra placa</span>
+                <span className="sm:hidden">+ Placa</span>
+              </button>
+            )}
           </div>
-          <p className="text-[#8A8B95] mt-2">
+          <p className="text-[#8A8B95] mt-1.5 text-sm">
             Selecione quais débitos deseja pagar agora
           </p>
         </CardHeader>
@@ -612,7 +614,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide leading-tight">
-                    {pendentesFiltradas.length} Pendência{pendentesFiltradas.length > 1 ? 's' : ''} {filtroTipo === 'todas' && filtroStatus === 'todas' ? 'Disponíveis' : 'Filtradas'}
+                    {pendentesFiltradas.length} Pendência{pendentesFiltradas.length > 1 ? 's' : ''} {filtroTipo === 'todas' && filtroStatus === 'todas' ? `Disponíve${pendentesFiltradas.length > 1 ? 'is' : 'l'}` : `Filtrada${pendentesFiltradas.length > 1 ? 's' : ''}`}
                     {!filtroPlaca.includes('todas') && (
                       <span className="text-[#8B5FFF] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
                     )}
@@ -761,6 +763,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </div>
           )}
 
+          {/* Total + Prosseguir — ocultos no desktop (exibidos na sidebar direita) */}
+          <div className="lg:hidden">
+
           {/* Total */}
           <div className="border-t-2 border-[#DCDDE3] pt-6">
             <div className="bg-[#5B2E8C] text-white rounded-lg p-3 sm:p-6">
@@ -795,17 +800,11 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </Button>
           </div>
 
-          {/* Consultar outra placa — ação terciária */}
+          </div> {/* fim lg:hidden Total+Prosseguir */}
+
+          {/* Consultar outra placa — form (trigger promovido para o CardHeader) */}
           <div className="border-t border-[#ECECF1] pt-3">
-            {!mostrandoFormularioNovaPlaca ? (
-              <button
-                onClick={() => setMostrandoFormularioNovaPlaca(true)}
-                className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors group"
-              >
-                <Plus className="h-3 w-3 group-hover:text-[#5B2E8C]" />
-                Consultar outra placa
-              </button>
-            ) : (
+            {!mostrandoFormularioNovaPlaca ? null : (
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
@@ -913,6 +912,50 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           </div>
         )}
       </Card>
+
+        </div> {/* fim left column */}
+
+        {/* Sidebar direita — desktop only, apenas no Estado 3 */}
+        {passagensTodas.length > 0 && placasUsuario.length > 0 && (
+          <div className="hidden lg:block">
+            <div className="sticky top-24 space-y-3">
+              <Card className="border border-[#DCDDE3]">
+                <CardContent className="pt-5 space-y-4">
+                  <h3 className="text-sm font-semibold text-[#1A1B23]">Resumo do Pagamento</h3>
+                  <div className="bg-[#5B2E8C] text-white rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-semibold">Total a Pagar</span>
+                      <span className="text-xl font-bold">{formatCurrency(calcularValorTotal())}</span>
+                    </div>
+                    {passagensTodas.length > 0 && (
+                      <p className="text-xs text-[#F7F5FB] opacity-90">
+                        {debitosSelecionadosResumo.length} de {passagensTodas.length} pendência{passagensTodas.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleProsseguir}
+                    disabled={debitosSelecionadosResumo.length === 0}
+                    className={`w-full h-12 text-sm font-semibold rounded-lg transition-all ${
+                      debitosSelecionadosResumo.length > 0
+                        ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
+                        : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                    }`}
+                  >
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    Prosseguir para Pagamento
+                  </Button>
+                  <div className="flex items-center justify-center gap-2 text-xs text-[#8A8B95] pt-1">
+                    <Shield className="h-3 w-3 text-[#8B5FFF]" />
+                    <span>Pagamento 100% seguro</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+      </div> {/* fim grid wrapper */}
 
     </div>
   );
