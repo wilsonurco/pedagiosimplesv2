@@ -182,18 +182,39 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
     <div className="min-h-screen bg-gradient-to-br from-[#F7F5FB] to-white">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-[#F7F5FB] sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+        <div className="container mx-auto px-4">
+
+          {/* Mobile: título centrado + botão voltar */}
+          <div className="sm:hidden relative flex items-center h-12">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB] -ml-2 z-10"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Button>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="flex items-center gap-1 text-[#5B2E8C]">
+                <CheckCircle2 className="h-3 w-3" />
+                <span className="text-[9px] font-bold uppercase tracking-widest">Resumo do Pedido</span>
+              </div>
+              <span className="text-[13px] font-bold text-[#1A1B23] leading-tight mt-0.5">Revise suas Pendências</span>
+            </div>
+          </div>
+
+          {/* Desktop: layout original */}
+          <div className="hidden sm:flex items-center justify-between py-4">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onBack}
               className="flex items-center gap-2 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
-            
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-[#5B2E8C] rounded-lg flex items-center justify-center">
                 <Car className="h-5 w-5 text-white" />
@@ -201,38 +222,38 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               <span className="text-xl font-semibold text-[#5B2E8C]">Pedágio Online</span>
             </div>
           </div>
+
         </div>
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="container mx-auto px-4 py-6 sm:py-12">
+      <main className="container mx-auto px-4 py-2 sm:py-12">
         <div className="max-w-4xl mx-auto">
 
-          {/* Título e Breadcrumb */}
-          <div className="text-center mb-6 sm:mb-12">
-            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-4 sm:mb-6">
+          {/* Título e Breadcrumb — desktop only */}
+          <div className="hidden sm:block text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#5B2E8C] text-white rounded-full px-4 py-2 mb-6">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm font-semibold">RESUMO DO PEDIDO</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-bold text-[#1A1B23] mb-4">
+            <h1 className="text-4xl font-bold text-[#1A1B23] mb-4">
               Revise suas Pendências
             </h1>
-
           </div>
 
           {/* Card Principal */}
           <Card className="border border-[#DCDDE3] shadow-lg">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl text-[#1A1B23] flex items-center gap-2">
-                <Car className="h-6 w-6 text-[#8B5FFF]" />
+            <CardHeader className="pb-3 pt-4 sm:pb-6 sm:pt-6">
+              <CardTitle className="text-base sm:text-2xl text-[#1A1B23] flex items-center gap-2">
+                <Car className="h-4 w-4 sm:h-6 sm:w-6 text-[#8B5FFF]" />
                 Pendências Selecionadas
               </CardTitle>
-              <p className="text-[#8A8B95] mt-2">
+              <p className="hidden sm:block text-[#8A8B95] mt-2">
                 Selecione quais débitos deseja pagar agora
               </p>
             </CardHeader>
             
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               {/* Filtro por Placa - apenas se houver múltiplas placas */}
               {placasUnicas.length > 1 && (
                 <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4">
@@ -304,7 +325,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                     )}
                   </div>
                   
-                  <div className="max-h-80 overflow-y-auto space-y-3">
+                  <div className="sm:max-h-80 sm:overflow-y-auto space-y-3">
                     {debitosFiltrados.map((debito, index) => {
                       const isSelected = debitosSelecionadosResumo.includes(debito.id);
                       return (
@@ -345,13 +366,13 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                                 </Badge>
                               </div>
                             </div>
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="flex items-center gap-2 text-sm text-[#8A8B95]">
-                                <Calendar className="h-3 w-3" />
-                                <span>Data: 30/09/2025 {debito.data} • Hora: {debito.hora || '14:30:00'}</span>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4 mt-1">
+                              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#8A8B95]">
+                                <Calendar className="h-3 w-3 flex-shrink-0" />
+                                <span>{debito.data} • {debito.hora || '14:30:00'}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-[#8A8B95]">
-                                <Car className="h-3 w-3" />
+                              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#8A8B95]">
+                                <Car className="h-3 w-3 flex-shrink-0" />
                                 <span>Placa: {debito.placa}</span>
                               </div>
                             </div>
@@ -391,11 +412,11 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               )}
 
               {/* Total */}
-              <div className="border-t-2 border-[#DCDDE3] pt-6">
-                <div className="bg-[#5B2E8C] text-white rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xl font-semibold">Total a Pagar</span>
-                    <span className="text-2xl sm:text-3xl font-bold">
+              <div className="border-t-2 border-[#DCDDE3] pt-4 sm:pt-6">
+                <div className="bg-[#5B2E8C] text-white rounded-lg p-4 sm:p-6">
+                  <div className="flex justify-between items-center mb-1 sm:mb-2">
+                    <span className="text-base sm:text-xl font-semibold">Total a Pagar</span>
+                    <span className="text-xl sm:text-3xl font-bold">
                       {formatCurrency(calcularValorTotal())}
                     </span>
                   </div>
@@ -408,7 +429,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               </div>
 
               {/* Botão de Prosseguir */}
-              <div className="pt-4">
+              <div className="pt-1 sm:pt-4">
                 <Button
                   onClick={handleProsseguir}
                   disabled={debitosSelecionadosResumo.length === 0}
@@ -529,7 +550,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
               </div>
 
               {/* Selo de Segurança */}
-              <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-6 mt-6">
+              <div className="bg-[#F7F5FB] border border-[#DCDDE3] rounded-lg p-4 sm:p-6 mt-4 sm:mt-6">
                 <div className="flex items-start gap-4">
                   <Shield className="h-6 w-6 text-[#5B2E8C] mt-1 flex-shrink-0" />
                   <div>
