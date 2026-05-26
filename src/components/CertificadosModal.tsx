@@ -178,6 +178,7 @@ const certificados = [
     icone: Star,
     itens: [
       {
+        selo: null,
         logo: <MescLogo />,
         titulo: "Melhores Empresas em Satisfação do Cliente",
         norma: "MESC 2025",
@@ -186,6 +187,7 @@ const certificados = [
         href: "#",
       },
       {
+        selo: null,
         logo: <ReclameAquiLogo />,
         titulo: "Verificada por ReclameAQUI",
         norma: "ReclameAQUI",
@@ -203,6 +205,7 @@ const certificados = [
     icone: ShieldCheck,
     itens: [
       {
+        selo: null,
         logo: <ConsumidorGovLogo />,
         titulo: "Participo do consumidor.gov.br",
         norma: "Consumidor.gov.br",
@@ -211,6 +214,7 @@ const certificados = [
         href: "https://consumidor.gov.br",
       },
       {
+        selo: null,
         logo: (
           <img src={logoSectigo} alt="Sectigo" className="h-7 w-auto object-contain" />
         ),
@@ -271,7 +275,7 @@ export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps
                       key={item.norma}
                       className={`rounded-xl border ${grupo.border} bg-white p-4 flex flex-col gap-3`}
                     >
-                      {'selo' in item && item.selo ? (
+                      {item.selo !== null ? (
                         /* ── Layout com selo circular (ISO) ── */
                         <>
                           <div className="flex items-start gap-3">
