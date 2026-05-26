@@ -908,19 +908,22 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                     </div>
 
                     {/* Checkbox de Termos */}
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-3">
+                    <div>
+                      <div className="flex items-start gap-3">
                         <Checkbox
                           id="aceitaTermos"
                           checked={formData.aceitaTermos}
                           onCheckedChange={(checked) => handleInputChange('aceitaTermos', checked)}
-                          className={errors.aceitaTermos ? 'border-[#C8324A]' : ''}
+                          className={`mt-0.5 flex-shrink-0 ${errors.aceitaTermos ? 'border-[#C8324A]' : ''}`}
                         />
-                        <div className="space-y-2 text-left">
-                          <Label htmlFor="aceitaTermos" className="text-sm cursor-pointer text-[#1A1B23] leading-relaxed">
-                            Aceito os <a href="#" className="text-[#5B2E8C] hover:underline">Termos e condições</a> e o <a href="#" className="text-[#5B2E8C] hover:underline">Aviso de privacidade</a>
-                          </Label>
-                          {errors.aceitaTermos && <p className="text-sm text-[#C8324A]">{errors.aceitaTermos}</p>}
+                        <div>
+                          <label htmlFor="aceitaTermos" className="block text-sm cursor-pointer text-[#1A1B23] leading-relaxed">
+                            Aceito os{" "}
+                            <a href="#" className="text-[#5B2E8C] hover:underline">Termos e condições</a>
+                            {" "}e o{" "}
+                            <a href="#" className="text-[#5B2E8C] hover:underline">Aviso de privacidade</a>
+                          </label>
+                          {errors.aceitaTermos && <p className="text-sm text-[#C8324A] mt-1">{errors.aceitaTermos}</p>}
                         </div>
                       </div>
                     </div>
