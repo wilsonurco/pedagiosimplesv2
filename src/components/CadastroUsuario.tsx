@@ -909,35 +909,27 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Checkbox de Termos */}
                     <div>
-                      <div className="flex items-start gap-3">
+                      <label
+                        htmlFor="aceitaTermos"
+                        className="flex items-start gap-3 cursor-pointer"
+                      >
                         <Checkbox
                           id="aceitaTermos"
                           checked={formData.aceitaTermos}
                           onCheckedChange={(checked) => handleInputChange('aceitaTermos', checked)}
                           className={`mt-0.5 shrink-0 ${errors.aceitaTermos ? 'border-[#C8324A]' : ''}`}
                         />
-                        <p
-                          className="flex-1 min-w-0 text-sm text-[#1A1B23] leading-relaxed cursor-pointer"
-                          onClick={() => handleInputChange('aceitaTermos', !formData.aceitaTermos)}
-                        >
+                        <span className="text-sm text-[#1A1B23] leading-relaxed">
                           Aceito os{" "}
-                          <a
-                            href="#"
-                            className="text-[#5B2E8C] hover:underline"
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
-                          >
+                          <a href="#" className="text-[#5B2E8C] hover:underline" onClick={(e) => e.preventDefault()}>
                             Termos e condições
                           </a>
                           {" "}e o{" "}
-                          <a
-                            href="#"
-                            className="text-[#5B2E8C] hover:underline"
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
-                          >
+                          <a href="#" className="text-[#5B2E8C] hover:underline" onClick={(e) => e.preventDefault()}>
                             Aviso de privacidade
                           </a>
-                        </p>
-                      </div>
+                        </span>
+                      </label>
                       {errors.aceitaTermos && (
                         <p className="text-sm text-[#C8324A] mt-1 pl-7">{errors.aceitaTermos}</p>
                       )}
