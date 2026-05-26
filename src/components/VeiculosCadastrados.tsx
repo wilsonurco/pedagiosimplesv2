@@ -217,27 +217,26 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
           {veiculos.map(veiculo => (
             <div
               key={veiculo.id}
-              className={`rounded-xl border transition-colors ${
+              className={`rounded-xl border overflow-hidden transition-colors ${
                 veiculo.totalPendencias > 0
                   ? 'bg-[#FEF2F4] border-[#F0A8B5]'
                   : 'bg-white border-[#ECECF1]'
               }`}
             >
-              {/* Card header */}
-              <div className="flex items-center gap-3 p-4">
+              {/* Zona 1 — Identidade */}
+              <div className="flex items-start gap-3 px-4 pt-4 pb-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   veiculo.isPrincipal ? 'bg-[#5B2E8C]' : 'bg-[#F4EFFB]'
                 }`}>
                   <Car className={`h-5 w-5 ${veiculo.isPrincipal ? 'text-white' : 'text-[#5B2E8C]'}`} />
                 </div>
-
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#1A1B23] tracking-wide text-base leading-none">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-[#1A1B23] tracking-wide text-base leading-tight">
                       {veiculo.placa}
                     </span>
                     {veiculo.isPrincipal && (
-                      <Badge className="bg-[#5B2E8C] text-white text-[10px] px-1.5 h-4 leading-none">
+                      <Badge className="bg-[#5B2E8C] text-white text-[10px] px-1.5 h-4">
                         <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
                         Principal
                       </Badge>
@@ -247,62 +246,96 @@ export function VeiculosCadastrados({ onIrParaConsulta, onIrParaPagamentoDireto 
                     <p className="text-xs text-[#8A8B95] mt-0.5">{veiculo.apelido}</p>
                   )}
                 </div>
-
-                {/* Ações secundárias */}
-                <div className="flex items-center gap-0.5 flex-shrink-0">
-                  {!veiculo.isPrincipal && (
-                    <button
-                      onClick={() => definirPrincipal(veiculo.id)}
-                      title="Definir como principal"
-                      className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
-                    >
-                      <Star className="h-4 w-4" />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => abrirModalEditar(veiculo)}
-                    title="Editar veículo"
-                    className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => { setVeiculoParaExcluir(veiculo); setDialogExclusaoAberto(true); }}
-                    title="Remover veículo"
-                    className="p-2 rounded-lg text-[#8A8B95] hover:text-[#C8324A] hover:bg-[#FEF2F4] transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
               </div>
 
-              {/* Status + CTA */}
+              {/* Zona 2 — Status */}
               {veiculo.totalPendencias > 0 ? (
-                <div className="px-4 pb-4 space-y-3">
-                  <div className="border-t border-[#F0A8B5] pt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <AlertTriangle className="h-4 w-4 text-[#A3203B]" />
-                      <span className="text-sm font-semibold text-[#A3203B]">
-                        {veiculo.totalPendencias} pendência{veiculo.totalPendencias !== 1 ? 's' : ''}
-                      </span>
+                <>
+                  {/* Grid 2 colunas: contagem | valor */}
+                  <div className={`grid grid-cols-2 border-t ${
+                    veiculo.totalPendencias > 0 ? 'border-[#F0A8B5]' : 'border-[#ECECF1]'
+                  }`}>
+                    <div className="px-4 py-3 border-r border-[#F0A8B5]">
+                      <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest">Pendências</p>
+                      <p className="text-2xl font-bold text-[#A3203B] mt-0.5 leading-none">
+                        {veiculo.totalPendencias}
+                      </p>
                     </div>
-                    <span className="text-sm font-bold text-[#A3203B]">
-                      {formatCurrency(veiculo.valorPendente)}
-                    </span>
+                    <div className="px-4 py-3">
+                      <p className="text-[10px] font-medium text-[#8A8B95] uppercase tracking-widest">Em aberto</p>
+                      <p className="text-xl font-bold text-[#A3203B] mt-0.5 leading-none">
+                        {formatCurrency(veiculo.valorPendente)}
+                      </p>
+                    </div>
                   </div>
-                  <Button
-                    onClick={() => onIrParaPagamentoDireto?.(veiculo.placa)}
-                    className="w-full h-10 text-sm font-semibold bg-[#8B5FFF] hover:bg-[#7142B8] text-white cursor-pointer"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Pagar pendências
-                  </Button>
-                </div>
+
+                  {/* Zona 3 — Ações (pendente) */}
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-[#F0A8B5]/50">
+                    <div className="flex items-center gap-0.5">
+                      {!veiculo.isPrincipal && (
+                        <button
+                          onClick={() => definirPrincipal(veiculo.id)}
+                          title="Definir como principal"
+                          className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                        >
+                          <Star className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => abrirModalEditar(veiculo)}
+                        title="Editar veículo"
+                        className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => { setVeiculoParaExcluir(veiculo); setDialogExclusaoAberto(true); }}
+                        title="Remover veículo"
+                        className="p-2 rounded-lg text-[#8A8B95] hover:text-[#C8324A] hover:bg-[#FEF2F4] transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <Button
+                      onClick={() => onIrParaPagamentoDireto?.(veiculo.placa)}
+                      className="h-9 px-4 text-sm font-semibold bg-[#8B5FFF] hover:bg-[#7142B8] text-white cursor-pointer"
+                    >
+                      <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+                      Pagar agora
+                    </Button>
+                  </div>
+                </>
               ) : (
-                <div className="px-4 pb-4">
-                  <div className="border-t border-[#ECECF1] pt-3 flex items-center gap-1.5">
+                /* Zona 3 — Ações (em dia) */
+                <div className="flex items-center justify-between px-4 py-3 border-t border-[#ECECF1]">
+                  <div className="flex items-center gap-1.5">
                     <CheckCircle className="h-4 w-4 text-[#0A6B45]" />
-                    <span className="text-sm text-[#0A6B45]">Em dia</span>
+                    <span className="text-sm font-medium text-[#0A6B45]">Em dia</span>
+                  </div>
+                  <div className="flex items-center gap-0.5">
+                    {!veiculo.isPrincipal && (
+                      <button
+                        onClick={() => definirPrincipal(veiculo.id)}
+                        title="Definir como principal"
+                        className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                      >
+                        <Star className="h-4 w-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => abrirModalEditar(veiculo)}
+                      title="Editar veículo"
+                      className="p-2 rounded-lg text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F4EFFB] transition-colors cursor-pointer"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => { setVeiculoParaExcluir(veiculo); setDialogExclusaoAberto(true); }}
+                      title="Remover veículo"
+                      className="p-2 rounded-lg text-[#8A8B95] hover:text-[#C8324A] hover:bg-[#FEF2F4] transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
               )}
