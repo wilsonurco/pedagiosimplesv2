@@ -16,6 +16,75 @@ interface CertificadosModalProps {
 
 /* ── Inline SVG logos ───────────────────────────────────────────────────────── */
 
+/** Selo circular Fundação Vanzolini — fiel ao badge oficial (ISO 9001 / ISO/IEC 27001) */
+function VanzoliniSeal({ norma }: { norma: string }) {
+  const uid = norma.replace(/[\s/]/g, '-');
+  const isLong = norma.length > 8; // ISO/IEC 27001 é mais longo
+  return (
+    <svg
+      viewBox="0 0 180 180"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label={`Selo ${norma} — Fundação Vanzolini`}
+      className="w-full h-full"
+    >
+      <defs>
+        {/* Arco superior para o texto curvo */}
+        <path id={`topArc-${uid}`} d="M 20,90 A 70,70 0 0,1 160,90" />
+      </defs>
+
+      {/* Fundo do círculo */}
+      <circle cx="90" cy="90" r="88" fill="#2B2870" />
+
+      {/* Anéis decorativos */}
+      <circle cx="90" cy="90" r="83" fill="none" stroke="white" strokeWidth="1.5" opacity="0.45" />
+      <circle cx="90" cy="90" r="78" fill="none" stroke="white" strokeWidth="0.5" opacity="0.2" />
+
+      {/* "Fundação Vanzolini" curvado no topo */}
+      <text
+        fill="white"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="11"
+        fontWeight="600"
+        letterSpacing="1.8"
+      >
+        <textPath href={`#topArc-${uid}`} startOffset="50%" textAnchor="middle">
+          Fundação Vanzolini
+        </textPath>
+      </text>
+
+      {/* Logo Vanzolini: triângulo com corte em V */}
+      <polygon points="90,36 74,64 106,64" fill="white" opacity="0.96" />
+      <polygon points="90,46 82,64  98,64" fill="#2B2870" />
+
+      {/* Faixa horizontal com a norma */}
+      <rect x="6" y="99" width="168" height="34" fill="#1B1963" />
+      <text
+        x="90"
+        y={isLong ? "120" : "122"}
+        textAnchor="middle"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontWeight="700"
+        fontSize={isLong ? 13 : 17}
+        letterSpacing={isLong ? 1 : 2}
+        fill="white"
+      >
+        {norma}
+      </text>
+
+      {/* Texto inferior */}
+      <text x="90" y="146" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="7.5" fontWeight="500" letterSpacing="1.8" fill="white" opacity="0.88">
+        SISTEMA DE GESTÃO
+      </text>
+      <text x="90" y="158" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="7.5" fontWeight="500" letterSpacing="1.8" fill="white" opacity="0.88">
+        CERTIFICADO
+      </text>
+    </svg>
+  );
+}
+
 function IqnetLogo() {
   return (
     <svg viewBox="0 0 120 36" xmlns="http://www.w3.org/2000/svg" className="h-6 w-auto">
@@ -82,12 +151,8 @@ const certificados = [
     icone: Award,
     itens: [
       {
-        logo: (
-          <div className="flex items-center gap-3">
-            <img src={logoVanzolini} alt="Fundação Vanzolini" className="h-7 w-auto object-contain" />
-            <IqnetLogo />
-          </div>
-        ),
+        selo: <VanzoliniSeal norma="ISO 9001" />,
+        logo: null,
         titulo: "Sistema de Gestão da Qualidade",
         norma: "ISO 9001",
         emissor: "Fundação Vanzolini · IQNET",
@@ -95,12 +160,8 @@ const certificados = [
         href: "https://vanzolini.org.br",
       },
       {
-        logo: (
-          <div className="flex items-center gap-3">
-            <img src={logoVanzolini} alt="Fundação Vanzolini" className="h-7 w-auto object-contain" />
-            <IqnetLogo />
-          </div>
-        ),
+        selo: <VanzoliniSeal norma="ISO/IEC 27001" />,
+        logo: null,
         titulo: "Segurança da Informação",
         norma: "ISO/IEC 27001",
         emissor: "Fundação Vanzolini · IQNET",
@@ -210,35 +271,71 @@ export function CertificadosModal({ open, onOpenChange }: CertificadosModalProps
                       key={item.norma}
                       className={`rounded-xl border ${grupo.border} bg-white p-4 flex flex-col gap-3`}
                     >
-                      {/* Logo area */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center min-h-[2rem]">
-                          {item.logo}
-                        </div>
-                        {item.href !== "#" && (
-                          <a
-                            href={item.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-shrink-0 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
-                            aria-label={`Ver mais sobre ${item.norma}`}
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                      </div>
-
-                      {/* Text content */}
-                      <div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${grupo.bg} ${grupo.cor}`}>
-                          {item.norma}
-                        </span>
-                        <p className="font-semibold text-[#1A1B23] text-sm mt-2 leading-snug">
-                          {item.titulo}
-                        </p>
-                        <p className="text-[11px] text-[#8A8B95] mt-0.5">{item.emissor}</p>
-                        <p className="text-xs text-[#8A8B95] leading-relaxed mt-2">{item.descricao}</p>
-                      </div>
+                      {'selo' in item && item.selo ? (
+                        /* ── Layout com selo circular (ISO) ── */
+                        <>
+                          <div className="flex items-start gap-3">
+                            {/* Selo */}
+                            <div className="w-[72px] h-[72px] flex-shrink-0 drop-shadow-sm">
+                              {item.selo}
+                            </div>
+                            {/* Info */}
+                            <div className="flex-1 min-w-0 pt-0.5">
+                              <div className="flex items-start justify-between gap-1">
+                                <span className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${grupo.bg} ${grupo.cor}`}>
+                                  {item.norma}
+                                </span>
+                                {item.href !== "#" && (
+                                  <a
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-shrink-0 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
+                                    aria-label={`Ver mais sobre ${item.norma}`}
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                  </a>
+                                )}
+                              </div>
+                              <p className="font-semibold text-[#1A1B23] text-sm mt-1.5 leading-snug">
+                                {item.titulo}
+                              </p>
+                              <p className="text-[11px] text-[#8A8B95] mt-0.5">{item.emissor}</p>
+                            </div>
+                          </div>
+                          <p className="text-xs text-[#8A8B95] leading-relaxed">{item.descricao}</p>
+                        </>
+                      ) : (
+                        /* ── Layout padrão (logos horizontais) ── */
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center min-h-[2rem]">
+                              {item.logo}
+                            </div>
+                            {item.href !== "#" && (
+                              <a
+                                href={item.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-shrink-0 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
+                                aria-label={`Ver mais sobre ${item.norma}`}
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                          </div>
+                          <div>
+                            <span className={`text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${grupo.bg} ${grupo.cor}`}>
+                              {item.norma}
+                            </span>
+                            <p className="font-semibold text-[#1A1B23] text-sm mt-2 leading-snug">
+                              {item.titulo}
+                            </p>
+                            <p className="text-[11px] text-[#8A8B95] mt-0.5">{item.emissor}</p>
+                            <p className="text-xs text-[#8A8B95] leading-relaxed mt-2">{item.descricao}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
