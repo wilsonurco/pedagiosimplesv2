@@ -361,7 +361,122 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </div>
       </div>
 
-      {/* Card de pendências */}
+      {/* ── Estado 1: sem veículos cadastrados ───────────────────────────────── */}
+      {placasUsuario.length === 0 ? (
+        <Card className="border border-[#DCDDE3]">
+          <CardContent className="py-10">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-[#8B5FFF] rounded-full flex items-center justify-center mx-auto">
+                <Car className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-[#5B2E8C]">Nenhum veículo cadastrado</h3>
+                <p className="text-sm text-[#8A8B95] max-w-xs mx-auto leading-relaxed">
+                  Para consultar e pagar pendências, cadastre pelo menos uma placa.
+                  Acesse a aba <strong className="text-[#5B2E8C]">Veículos</strong>.
+                </p>
+              </div>
+              <Button
+                onClick={() => setAbaSelecionada('veiculos')}
+                className="bg-[#8B5FFF] hover:bg-[#7142B8] text-white h-12 px-6 font-semibold"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Cadastrar meu primeiro veículo
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+      /* ── Estado 2: veículos cadastrados, sem pendências ───────────────────── */
+      ) : passagensTodas.length === 0 ? (
+        <Card className="border border-[#DCDDE3]">
+          <CardContent className="py-12">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-[#D4F0E2] rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="h-8 w-8 text-[#0E8B5A]" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-xl font-bold text-[#1A1B23]">Tudo em dia!</h3>
+                <p className="text-sm text-[#8A8B95] max-w-xs mx-auto leading-relaxed">
+                  Não existe pendência de pedágio para{' '}
+                  {placasUsuario.length === 1
+                    ? <span className="font-semibold text-[#5B2E8C]">a placa {placasUsuario[0]}</span>
+                    : <span>as <strong className="text-[#5B2E8C]">{placasUsuario.length} placas</strong> cadastradas</span>
+                  }.
+                </p>
+              </div>
+              {/* "Consultar outra placa" no empty state */}
+              {!mostrandoFormularioNovaPlaca ? (
+                <button
+                  onClick={() => setMostrandoFormularioNovaPlaca(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-[#8A8B95] hover:text-[#5B2E8C] transition-colors mt-2"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Consultar outra placa
+                </button>
+              ) : (
+                <div className="max-w-xs mx-auto space-y-2 pt-1 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
+                    <button
+                      onClick={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
+                      className="text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={novaPlaca}
+                      onChange={(e) => {
+                        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                        if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) value = value.slice(0, 3) + '-' + value.slice(3);
+                        setNovaPlaca(value);
+                      }}
+                      placeholder="ABC-1234"
+                      className="flex-1 h-9 px-3 bg-[#F7F7F9] border border-[#E5E6EC] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#B0B1BB] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/15"
+                      maxLength={8}
+                    />
+                    <Button
+                      onClick={buscarDebitosNovaPlaca}
+                      disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
+                      size="sm"
+                      className="h-9 px-4 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs"
+                    >
+                      {consultandoNovaPlaca ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Buscar'}
+                    </Button>
+                  </div>
+                  {resultadoConsultaNovaPlaca && (
+                    <div className="rounded-lg border border-[#DCDDE3] bg-white p-3 mt-1">
+                      {resultadoConsultaNovaPlaca.success ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-[#0E8B5A] flex-shrink-0" />
+                            <span className="text-xs text-[#1A1B23] font-medium">
+                              {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} · {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
+                            </span>
+                          </div>
+                          <Button onClick={adicionarDebitosNovaPlaca} size="sm" className="h-7 px-3 text-xs bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white flex-shrink-0">
+                            Adicionar
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <XCircle className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
+                          <span className="text-xs text-[#8A8B95]">Nenhuma pendência encontrada</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+      /* ── Estado 3: tem pendências — card completo ─────────────────────────── */
+      ) : (
       <Card className="border border-[#DCDDE3]">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
@@ -630,7 +745,8 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                 </div>
               )}
             </div>
-          ) : passagensTodas.length > 0 ? (
+          ) : (
+            /* Filtro ativo mas sem correspondência */
             <div className="bg-[#FBE8C5] border border-[#FBE8C5] rounded-lg p-4 text-center">
               <p className="text-sm text-[#9A5B00] font-medium">
                 Nenhuma pendência encontrada para os filtros selecionados
@@ -643,30 +759,6 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               >
                 Ver todas as passagens
               </Button>
-            </div>
-          ) : (
-            <div className="bg-gradient-to-r from-[#F4EFFB] to-[#F4EFFB] border-2 border-[#8B5FFF] rounded-lg p-6">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-[#8B5FFF] rounded-full flex items-center justify-center mx-auto">
-                  <Car className="h-8 w-8 text-white" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-[#5B2E8C]">
-                    Nenhum veículo cadastrado
-                  </h3>
-                  <p className="text-sm text-[#8A8B95] max-w-md mx-auto leading-relaxed">
-                    Para consultar e pagar pendências, você precisa primeiro cadastrar um veículo. 
-                    Vá para a aba <strong className="text-[#5B2E8C]">Veículos</strong> e adicione as placas dos seus veículos.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => setAbaSelecionada('veiculos')}
-                  className="bg-[#8B5FFF] hover:bg-[#7142B8] text-white h-12 px-6 font-semibold"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Cadastrar meu primeiro veículo
-                </Button>
-              </div>
             </div>
           )}
 
@@ -778,6 +870,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
         </CardContent>
       </Card>
+      )} {/* fim ternário de estado */}
 
       {/* Feed de atividade recente — colapsável */}
       <Card className="border border-[#DCDDE3] overflow-hidden">
