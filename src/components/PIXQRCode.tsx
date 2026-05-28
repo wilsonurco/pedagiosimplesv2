@@ -101,21 +101,21 @@ export function PIXQRCode({
     switch (statusPagamento) {
       case 'aguardando':
         return (
-          <Badge variant="secondary" className="bg-[#FBE8C5] text-[#7A4800] border-yellow-300">
+          <Badge variant="pendente">
             <Clock className="h-3 w-3 mr-1" />
             Aguardando pagamento
           </Badge>
         );
       case 'processando':
         return (
-          <Badge variant="secondary" className="bg-[#E5D8F5] text-[#5B2E8C] border-blue-300">
+          <Badge variant="info">
             <div className="animate-spin rounded-full h-3 w-3 border border-[#5B2E8C] border-t-transparent mr-1"></div>
             Processando
           </Badge>
         );
       case 'confirmado':
         return (
-          <Badge variant="default" className="bg-[#D4F0E2] text-[#0A6B45] border-green-300">
+          <Badge variant="sucesso">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Pagamento confirmado
           </Badge>

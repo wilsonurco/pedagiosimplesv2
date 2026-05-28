@@ -80,14 +80,14 @@ export function ConsultaDebitos({ onBack, onConsultar }: ConsultaDebitosProps) {
               <Shield className="h-6 w-6 text-[#8B5FFF]" />
               <div>
                 <p className="font-semibold text-[#1A1B23]">100% Seguro</p>
-                <p className="text-sm text-[#8A8B95]">Seus dados estão protegidos</p>
+                <p className="text-sm text-[#5B5C68]">Seus dados estão protegidos</p>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-white border border-[#F7F5FB] p-4 rounded-lg shadow-sm">
               <Clock className="h-6 w-6 text-[#8B5FFF]" />
               <div>
                 <p className="font-semibold text-[#1A1B23]">Resultado Instantâneo</p>
-                <p className="text-sm text-[#8A8B95]">Consulta em tempo real</p>
+                <p className="text-sm text-[#5B5C68]">Consulta em tempo real</p>
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ export function ConsultaDebitos({ onBack, onConsultar }: ConsultaDebitosProps) {
                 <Car className="h-6 w-6 text-[#5B2E8C]" />
                 Consulta por Placa
               </CardTitle>
-              <p className="text-[#8A8B95] mt-2">
+              <p className="text-[#5B5C68] mt-2">
                 Digite apenas a placa do seu veículo para buscar pendências
               </p>
             </CardHeader>
@@ -108,7 +108,7 @@ export function ConsultaDebitos({ onBack, onConsultar }: ConsultaDebitosProps) {
                 <div className="space-y-4">
                   <div className="text-center">
                     <Label htmlFor="placa" className="text-lg text-[#1A1B23]">Digite a placa do seu veículo</Label>
-                    <p className="text-sm text-[#8A8B95] mt-1">
+                    <p className="text-sm text-[#5B5C68] mt-1">
                       Formato ABC-1234 ou ABC1234
                     </p>
                   </div>
@@ -152,7 +152,7 @@ export function ConsultaDebitos({ onBack, onConsultar }: ConsultaDebitosProps) {
                   </div>
                   <div>
                     <p className="font-semibold text-[#1A1B23] mb-1">Apenas a placa é suficiente</p>
-                    <p className="text-sm text-[#8A8B95]">
+                    <p className="text-sm text-[#5B5C68]">
                       Identificamos todas as suas passagens em pórticos Free Flow pela placa do veículo, mesmo sem TAG.
                     </p>
                   </div>

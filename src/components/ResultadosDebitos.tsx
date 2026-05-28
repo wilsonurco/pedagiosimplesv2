@@ -205,7 +205,7 @@ export function ResultadosDebitos({ onBack, onPagar, onCadastrar, onLogin, dados
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-semibold text-[#5B2E8C] text-sm truncate">{p.local}</span>
                               {p.status === 'risco_multa' && (
-                                <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Próx. venc.</Badge>
+                                <Badge variant="risco" className="flex-shrink-0">Próx. venc.</Badge>
                               )}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1 text-xs text-[#8A8B95]">

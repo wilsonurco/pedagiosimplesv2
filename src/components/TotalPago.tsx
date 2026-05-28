@@ -630,8 +630,8 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                   <div>
                     <p className="text-xs text-[#8A8B95] mb-1">Método de Pagamento</p>
                     <Badge 
-                      variant="outline" 
-                      className="bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A] w-fit"
+                      variant="sucesso"
+                      className="w-fit"
                     >
                       {comprovanteAberto.metodo}
                     </Badge>
@@ -639,8 +639,8 @@ export function TotalPago({ dadosUsuario }: TotalPagoProps) {
                   <div>
                     <p className="text-xs text-[#8A8B95] mb-1">Status</p>
                     <Badge 
-                      variant="outline" 
-                      className="bg-[#D4F0E2] text-[#0E8B5A] border-[#0E8B5A] w-fit"
+                      variant="sucesso"
+                      className="w-fit"
                     >
                       {comprovanteAberto.status}
                     </Badge>

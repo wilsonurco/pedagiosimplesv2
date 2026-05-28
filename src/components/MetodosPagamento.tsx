@@ -296,7 +296,7 @@ export function MetodosPagamento() {
                             </Badge>
                           )}
                           {cartao.cobrancaAutomatica && (
-                            <Badge variant="outline" className="text-xs border-[#C9AEEA] text-[#5B2E8C] bg-[#F4EFFB]">
+                            <Badge variant="info">
                               <Zap className="h-3 w-3 mr-1" />
                               Cobrança Automática
                             </Badge>

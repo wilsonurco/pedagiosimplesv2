@@ -125,7 +125,7 @@ export function AlertasInteligentes() {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className={`text-sm font-medium ${config.canais.sms ? 'text-[#1A1B23]' : 'text-[#8A8B95]'}`}>SMS</span>
-                <Badge className="text-[9px] px-1 py-0 h-3.5 bg-[#FBE8C5] text-[#9A5B00] border-0 leading-none">Premium</Badge>
+                <Badge variant="pendente" className="text-[9px] px-1 py-0 h-3.5 border-0 leading-none">Premium</Badge>
               </div>
             </div>
             <Switch checked={config.canais.sms} onCheckedChange={() => toggleCanal('sms')} onClick={e => e.stopPropagation()} />

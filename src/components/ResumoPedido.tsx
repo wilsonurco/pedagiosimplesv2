@@ -277,7 +277,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                 <Car className="h-4 w-4 sm:h-6 sm:w-6 text-[#8B5FFF]" />
                 Pendências Selecionadas
               </CardTitle>
-              <p className="hidden sm:block text-[#8A8B95] mt-2">
+              <p className="hidden sm:block text-[#5B5C68] mt-2">
                 Selecione quais débitos deseja pagar agora
               </p>
             </CardHeader>
@@ -390,7 +390,7 @@ export function ResumoPedido({ onBack, onProsseguir, valorTotal, debitosSelecion
                                 }`}>
                                   {formatCurrency(debito.valor)}
                                 </span>
-                                <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs ml-2">
+                                <Badge variant="pendente" className="ml-2">
                                   Pendente
                                 </Badge>
                               </div>

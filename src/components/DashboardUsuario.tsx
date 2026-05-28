@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { ConsultarNovaPlacaForm } from "./ConsultarNovaPlacaForm";
+import { PagamentoSummary } from "./PagamentoSummary";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -330,7 +332,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <h2 className="text-lg font-semibold text-[#1A1B23]">
             Olá, {(usuario.nome || 'Usuário').split(' ')[0]}
           </h2>
-          <p className="text-sm text-[#8A8B95] mt-0.5">
+          <p className="text-sm text-[#5B5C68] mt-0.5">
             {vencendoEmBreve > 0
               ? `${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
               : passagensTodas.length === 0
@@ -374,7 +376,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-[#5B2E8C]">Nenhum veículo cadastrado</h3>
-                <p className="text-sm text-[#8A8B95] max-w-xs mx-auto leading-relaxed">
+                <p className="text-sm text-[#5B5C68] max-w-xs mx-auto leading-relaxed">
                   Para consultar e pagar pendências, cadastre pelo menos uma placa.
                   Acesse a aba <strong className="text-[#5B2E8C]">Veículos</strong>.
                 </p>
@@ -400,7 +402,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-xl font-bold text-[#1A1B23]">Tudo em dia!</h3>
-                <p className="text-sm text-[#8A8B95] max-w-xs mx-auto leading-relaxed">
+                <p className="text-sm text-[#5B5C68] max-w-xs mx-auto leading-relaxed">
                   Não existe pendência de pedágio para{' '}
                   {placasUsuario.length === 1
                     ? <span className="font-semibold text-[#5B2E8C]">a placa {placasUsuario[0]}</span>
@@ -418,61 +420,17 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                   Consultar outra placa
                 </button>
               ) : (
-                <div className="max-w-xs mx-auto space-y-2 pt-1 text-left">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
-                    <button
-                      onClick={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
-                      className="text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={novaPlaca}
-                      onChange={(e) => {
-                        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                        if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) value = value.slice(0, 3) + '-' + value.slice(3);
-                        setNovaPlaca(value);
-                      }}
-                      placeholder="ABC-1234"
-                      className="flex-1 h-9 px-3 bg-[#F7F7F9] border border-[#E5E6EC] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#B0B1BB] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/15"
-                      maxLength={8}
-                    />
-                    <Button
-                      onClick={buscarDebitosNovaPlaca}
-                      disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
-                      size="sm"
-                      className="h-9 px-4 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs"
-                    >
-                      {consultandoNovaPlaca ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Buscar'}
-                    </Button>
-                  </div>
-                  {resultadoConsultaNovaPlaca && (
-                    <div className="rounded-lg border border-[#DCDDE3] bg-white p-3 mt-1">
-                      {resultadoConsultaNovaPlaca.success ? (
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-[#0E8B5A] flex-shrink-0" />
-                            <span className="text-xs text-[#1A1B23] font-medium">
-                              {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} · {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
-                            </span>
-                          </div>
-                          <Button onClick={adicionarDebitosNovaPlaca} size="sm" className="h-7 px-3 text-xs bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white flex-shrink-0">
-                            Adicionar
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <XCircle className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                          <span className="text-xs text-[#8A8B95]">Nenhuma pendência encontrada</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <ConsultarNovaPlacaForm
+                  placa={novaPlaca}
+                  onPlacaChange={setNovaPlaca}
+                  onBuscar={buscarDebitosNovaPlaca}
+                  onAdicionar={adicionarDebitosNovaPlaca}
+                  onFechar={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
+                  consultando={consultandoNovaPlaca}
+                  resultado={resultadoConsultaNovaPlaca}
+                  formatCurrency={formatCurrency}
+                  className="max-w-xs mx-auto"
+                />
               )}
             </div>
           </CardContent>
@@ -499,7 +457,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               </button>
             )}
           </div>
-          <p className="text-[#8A8B95] mt-1.5 text-sm">
+          <p className="text-[#5B5C68] mt-1.5 text-sm">
             Selecione quais débitos deseja pagar agora
           </p>
         </CardHeader>
@@ -683,9 +641,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                               {formatCurrency(p.valor)}
                             </span>
                             {isRisco ? (
-                              <Badge className="bg-[#F8D7DD] text-[#A3203B] text-xs flex-shrink-0">Vence em breve</Badge>
+                              <Badge variant="risco" className="flex-shrink-0">Vence em breve</Badge>
                             ) : (
-                              <Badge className="bg-[#FBE8C5] text-[#7A4800] text-xs flex-shrink-0">Pendente</Badge>
+                              <Badge variant="pendente" className="flex-shrink-0">Pendente</Badge>
                             )}
                           </div>
                         </div>
@@ -765,106 +723,31 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
 
           {/* Total + Prosseguir — ocultos no desktop (exibidos na sidebar direita) */}
           <div className="lg:hidden">
-
-          {/* Total */}
-          <div className="border-t-2 border-[#DCDDE3] pt-6">
-            <div className="bg-[#5B2E8C] text-white rounded-lg p-3 sm:p-6">
-              <div className="flex justify-between items-center mb-1 sm:mb-2">
-                <span className="text-sm sm:text-xl font-semibold">Total a Pagar</span>
-                <span className="text-lg sm:text-3xl font-bold">
-                  {formatCurrency(calcularValorTotal())}
-                </span>
-              </div>
-              {passagensTodas.length > 0 && (
-                <p className="text-xs sm:text-sm text-[#F7F5FB] opacity-90">
-                  {debitosSelecionadosResumo.length} de {passagensTodas.length} pendência{passagensTodas.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Botão de Prosseguir */}
-          <div className="pt-4">
-            <Button
-              onClick={handleProsseguir}
-              disabled={debitosSelecionadosResumo.length === 0}
-              className={`w-full h-12 sm:h-14 text-sm sm:text-lg font-semibold rounded-lg transition-all ${
-                debitosSelecionadosResumo.length > 0
-                  ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
-                  : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-              }`}
-            >
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
-              <span className="hidden sm:inline">Prosseguir para Pagamento - {formatCurrency(calcularValorTotal())}</span>
-              <span className="sm:hidden">Pagar - {formatCurrency(calcularValorTotal())}</span>
-            </Button>
-          </div>
-
+            <PagamentoSummary
+              variant="inline"
+              valorTotal={calcularValorTotal()}
+              totalPassagens={passagensTodas.length}
+              selecionadas={debitosSelecionadosResumo.length}
+              onProsseguir={handleProsseguir}
+              formatCurrency={formatCurrency}
+            />
           </div> {/* fim lg:hidden Total+Prosseguir */}
 
           {/* Consultar outra placa — form (trigger promovido para o CardHeader) */}
-          <div className="border-t border-[#ECECF1] pt-3">
-            {!mostrandoFormularioNovaPlaca ? null : (
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-[#8A8B95]">Consultar outra placa</span>
-                  <button
-                    onClick={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
-                    className="text-[#B0B1BB] hover:text-[#5B2E8C] transition-colors"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={novaPlaca}
-                    onChange={(e) => {
-                      let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                      if (value.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(value)) {
-                        value = value.slice(0, 3) + '-' + value.slice(3);
-                      }
-                      setNovaPlaca(value);
-                    }}
-                    placeholder="ABC-1234"
-                    className="flex-1 h-9 px-3 bg-[#F7F7F9] border border-[#E5E6EC] rounded-lg text-sm text-center font-semibold tracking-wider placeholder-[#B0B1BB] focus:outline-none focus:border-[#8B5FFF] focus:ring-1 focus:ring-[#8B5FFF]/15"
-                    maxLength={8}
-                  />
-                  <Button
-                    onClick={buscarDebitosNovaPlaca}
-                    disabled={novaPlaca.length < 7 || consultandoNovaPlaca}
-                    size="sm"
-                    className="h-9 px-4 bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs"
-                  >
-                    {consultandoNovaPlaca ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Buscar'}
-                  </Button>
-                </div>
-
-                {resultadoConsultaNovaPlaca && (
-                  <div className="rounded-lg border border-[#DCDDE3] bg-white p-3 mt-1">
-                    {resultadoConsultaNovaPlaca.success ? (
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-[#0E8B5A] flex-shrink-0" />
-                          <span className="text-xs text-[#1A1B23] font-medium">
-                            {resultadoConsultaNovaPlaca.quantidade} pendência{resultadoConsultaNovaPlaca.quantidade > 1 ? 's' : ''} · {formatCurrency(resultadoConsultaNovaPlaca.valorTotal)}
-                          </span>
-                        </div>
-                        <Button onClick={adicionarDebitosNovaPlaca} size="sm" className="h-7 px-3 text-xs bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white flex-shrink-0">
-                          Adicionar
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <XCircle className="h-4 w-4 text-[#8A8B95] flex-shrink-0" />
-                        <span className="text-xs text-[#8A8B95]">Nenhuma pendência encontrada</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {mostrandoFormularioNovaPlaca && (
+            <div className="border-t border-[#ECECF1] pt-3">
+              <ConsultarNovaPlacaForm
+                placa={novaPlaca}
+                onPlacaChange={setNovaPlaca}
+                onBuscar={buscarDebitosNovaPlaca}
+                onAdicionar={adicionarDebitosNovaPlaca}
+                onFechar={() => { setMostrandoFormularioNovaPlaca(false); setNovaPlaca(''); setResultadoConsultaNovaPlaca(null); }}
+                consultando={consultandoNovaPlaca}
+                resultado={resultadoConsultaNovaPlaca}
+                formatCurrency={formatCurrency}
+              />
+            </div>
+          )}
 
         </CardContent>
       </Card>
@@ -920,35 +803,15 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <div className="hidden lg:block">
             <div className="sticky top-24 space-y-3">
               <Card className="border border-[#DCDDE3]">
-                <CardContent className="pt-5 space-y-4">
-                  <h3 className="text-sm font-semibold text-[#1A1B23]">Resumo do Pagamento</h3>
-                  <div className="bg-[#5B2E8C] text-white rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-semibold">Total a Pagar</span>
-                      <span className="text-xl font-bold">{formatCurrency(calcularValorTotal())}</span>
-                    </div>
-                    {passagensTodas.length > 0 && (
-                      <p className="text-xs text-[#F7F5FB] opacity-90">
-                        {debitosSelecionadosResumo.length} de {passagensTodas.length} pendência{passagensTodas.length > 1 ? 's' : ''} selecionada{debitosSelecionadosResumo.length > 1 ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleProsseguir}
-                    disabled={debitosSelecionadosResumo.length === 0}
-                    className={`w-full h-12 text-sm font-semibold rounded-lg transition-all ${
-                      debitosSelecionadosResumo.length > 0
-                        ? 'bg-[#8B5FFF] hover:bg-[#7142B8] text-white'
-                        : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-                    }`}
-                  >
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                    Prosseguir para Pagamento
-                  </Button>
-                  <div className="flex items-center justify-center gap-2 text-xs text-[#8A8B95] pt-1">
-                    <Shield className="h-3 w-3 text-[#8B5FFF]" />
-                    <span>Pagamento 100% seguro</span>
-                  </div>
+                <CardContent className="pt-5">
+                  <PagamentoSummary
+                    variant="sidebar"
+                    valorTotal={calcularValorTotal()}
+                    totalPassagens={passagensTodas.length}
+                    selecionadas={debitosSelecionadosResumo.length}
+                    onProsseguir={handleProsseguir}
+                    formatCurrency={formatCurrency}
+                  />
                 </CardContent>
               </Card>
             </div>
