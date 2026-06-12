@@ -398,7 +398,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           <CardContent className="py-12">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-[#D4F0E2] rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 className="h-8 w-8 text-[#0E8B5A]" />
+                <CheckCircle className="h-8 w-8 text-[#0E8B5A]" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-xl font-bold text-[#1A1B23]">Tudo em dia!</h3>

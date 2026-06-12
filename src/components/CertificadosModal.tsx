@@ -7,7 +7,13 @@ import {
 } from "./ui/dialog";
 import { ShieldCheck, Award, Star, ExternalLink, X } from "lucide-react";
 import logoVanzolini from "../assets/logo-vanzolini.webp";
-import logoSectigo from "../assets/logo-sectigo.svg";
+
+import sealIso9001 from "../assets/iso-9001-azul.svg";
+import sealIso27001 from "../assets/iso-27001-azul.svg";
+import seloMesc from "../assets/selo-mesc.svg";
+import verificadaRa from "../assets/verificada-ra.svg";
+import consumidorBr from "../assets/consumidor-br.svg";
+import sectigoSeguranca from "../assets/sectigo-seguranca.svg";
 
 interface CertificadosModalProps {
   open: boolean;
@@ -16,73 +22,12 @@ interface CertificadosModalProps {
 
 /* ── Inline SVG logos ───────────────────────────────────────────────────────── */
 
-/** Selo circular Fundação Vanzolini — fiel ao badge oficial (ISO 9001 / ISO/IEC 27001) */
-function VanzoliniSeal({ norma }: { norma: string }) {
-  const uid = norma.replace(/[\s/]/g, '-');
-  const isLong = norma.length > 8; // ISO/IEC 27001 é mais longo
-  return (
-    <svg
-      viewBox="0 0 180 180"
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label={`Selo ${norma} — Fundação Vanzolini`}
-      className="w-full h-full"
-    >
-      <defs>
-        {/* Arco superior para o texto curvo */}
-        <path id={`topArc-${uid}`} d="M 20,90 A 70,70 0 0,1 160,90" />
-      </defs>
+function Iso9001Seal() {
+  return <img src={sealIso9001} alt="Selo ISO 9001 — Fundação Vanzolini" className="w-full h-full object-contain" />;
+}
 
-      {/* Fundo do círculo */}
-      <circle cx="90" cy="90" r="88" fill="#2B2870" />
-
-      {/* Anéis decorativos */}
-      <circle cx="90" cy="90" r="83" fill="none" stroke="white" strokeWidth="1.5" opacity="0.45" />
-      <circle cx="90" cy="90" r="78" fill="none" stroke="white" strokeWidth="0.5" opacity="0.2" />
-
-      {/* "Fundação Vanzolini" curvado no topo */}
-      <text
-        fill="white"
-        fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="11"
-        fontWeight="600"
-        letterSpacing="1.8"
-      >
-        <textPath href={`#topArc-${uid}`} startOffset="50%" textAnchor="middle">
-          Fundação Vanzolini
-        </textPath>
-      </text>
-
-      {/* Logo Vanzolini: triângulo com corte em V */}
-      <polygon points="90,36 74,64 106,64" fill="white" opacity="0.96" />
-      <polygon points="90,46 82,64  98,64" fill="#2B2870" />
-
-      {/* Faixa horizontal com a norma */}
-      <rect x="6" y="99" width="168" height="34" fill="#1B1963" />
-      <text
-        x="90"
-        y={isLong ? "120" : "122"}
-        textAnchor="middle"
-        fontFamily="Arial, Helvetica, sans-serif"
-        fontWeight="700"
-        fontSize={isLong ? 13 : 17}
-        letterSpacing={isLong ? 1 : 2}
-        fill="white"
-      >
-        {norma}
-      </text>
-
-      {/* Texto inferior */}
-      <text x="90" y="146" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="7.5" fontWeight="500" letterSpacing="1.8" fill="white" opacity="0.88">
-        SISTEMA DE GESTÃO
-      </text>
-      <text x="90" y="158" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="7.5" fontWeight="500" letterSpacing="1.8" fill="white" opacity="0.88">
-        CERTIFICADO
-      </text>
-    </svg>
-  );
+function Iso27001Seal() {
+  return <img src={sealIso27001} alt="Selo ISO/IEC 27001 — Fundação Vanzolini" className="w-full h-full object-contain" />;
 }
 
 function IqnetLogo() {
@@ -96,48 +41,15 @@ function IqnetLogo() {
 }
 
 function MescLogo() {
-  return (
-    <svg viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg" className="h-8 w-auto">
-      <rect width="140" height="40" rx="6" fill="#1A1B23" />
-      <text x="70" y="16" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="800"
-        fontSize="13" letterSpacing="3" fill="#F5C542">MESC</text>
-      <text x="70" y="30" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="400"
-        fontSize="9" letterSpacing="1" fill="#ffffff99">SATISFAÇÃO DO CLIENTE</text>
-    </svg>
-  );
+  return <img src={seloMesc} alt="Selo MESC" className="h-16 w-auto object-contain" />;
 }
 
 function ReclameAquiLogo() {
-  return (
-    <svg viewBox="0 0 160 40" xmlns="http://www.w3.org/2000/svg" className="h-8 w-auto">
-      {/* speech bubble background */}
-      <rect x="0" y="2" width="36" height="30" rx="8" fill="#38C766" />
-      <polygon points="8,32 18,32 12,40" fill="#38C766" />
-      <text x="18" y="22" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="800"
-        fontSize="14" fill="#ffffff">RA</text>
-      {/* brand name */}
-      <text x="47" y="17" fontFamily="Arial, sans-serif" fontWeight="700"
-        fontSize="12" fill="#38C766">reclame</text>
-      <text x="47" y="32" fontFamily="Arial, sans-serif" fontWeight="700"
-        fontSize="12" fill="#1A1B23">aqui</text>
-    </svg>
-  );
+  return <img src={verificadaRa} alt="Verificada por ReclameAQUI" className="h-8 w-auto object-contain" />;
 }
 
 function ConsumidorGovLogo() {
-  return (
-    <svg viewBox="0 0 200 44" xmlns="http://www.w3.org/2000/svg" className="h-9 w-auto">
-      {/* gov.br flag strip */}
-      <rect x="0" y="0" width="200" height="44" rx="6" fill="#f8f8f8" />
-      <rect x="0" y="0" width="6" height="44" rx="3" fill="#009B3A" />
-      <rect x="3" y="0" width="3" height="44" fill="#FEDF00" />
-      {/* text */}
-      <text x="16" y="20" fontFamily="Arial, sans-serif" fontWeight="700"
-        fontSize="13" fill="#1A1B23">consumidor</text>
-      <text x="16" y="35" fontFamily="Arial, sans-serif" fontWeight="400"
-        fontSize="10" fill="#555555">.gov.br</text>
-    </svg>
-  );
+  return <img src={consumidorBr} alt="consumidor.gov.br" className="h-9 w-auto object-contain" />;
 }
 
 /* ── Data ───────────────────────────────────────────────────────────────────── */
@@ -151,7 +63,7 @@ const certificados = [
     icone: Award,
     itens: [
       {
-        selo: <VanzoliniSeal norma="ISO 9001" />,
+        selo: <Iso9001Seal />,
         logo: null,
         titulo: "Sistema de Gestão da Qualidade",
         norma: "ISO 9001",
@@ -160,7 +72,7 @@ const certificados = [
         href: "https://vanzolini.org.br",
       },
       {
-        selo: <VanzoliniSeal norma="ISO/IEC 27001" />,
+        selo: <Iso27001Seal />,
         logo: null,
         titulo: "Segurança da Informação",
         norma: "ISO/IEC 27001",
@@ -216,7 +128,7 @@ const certificados = [
       {
         selo: null,
         logo: (
-          <img src={logoSectigo} alt="Sectigo" className="h-7 w-auto object-contain" />
+          <img src={sectigoSeguranca} alt="Sectigo" className="h-7 w-auto object-contain" />
         ),
         titulo: "Secured by Sectigo",
         norma: "Sectigo SSL",
