@@ -373,7 +373,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               Economize até 30% em pedágios com a Tag Move Mais
             </p>
             <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
-              Planos exclusivos para frota CNPJ — sem burocracia, sem mensalidade.
+              Pague menos em cada passagem — conheça os planos Move Mais.
             </p>
           </div>
         </div>

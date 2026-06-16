@@ -55,7 +55,6 @@ const colunas = [
       { label: "Termos de Uso", href: "#" },
       { label: "Política de Privacidade", href: "#" },
       { label: "Política de Cookies", href: "#" },
-      { label: "LGPD", href: "#" },
     ],
   },
 ];
