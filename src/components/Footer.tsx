@@ -36,10 +36,7 @@ const colunas = [
   {
     titulo: "Controle & Ajuda",
     links: [
-      { label: "Consultar minha placa", href: "#" },
-      { label: "Pagar pedágio Free Flow", href: "#" },
       { label: "Minha conta", href: "#" },
-      { label: "Histórico de passagens", href: "#" },
       { label: "Comprovante RPV", href: "#" },
       { label: "Concessionárias Parceiras", href: "#" },
     ],
@@ -49,7 +46,6 @@ const colunas = [
     links: [
       { label: "Sobre o Pedágio Simples", href: "#" },
       { label: "Sobre a Move Mais", href: "#" },
-      { label: "Parcerias com concessionárias", href: "#" },
       { label: "Seja uma Concessionária Parceira", href: "#" },
     ],
   },

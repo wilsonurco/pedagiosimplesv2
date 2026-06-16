@@ -362,6 +362,30 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </div>
       </div>
 
+      {/* Banner — conversão para Tag Move Mais */}
+      <div className="mt-4 rounded-xl bg-gradient-to-r from-[#1A1B23] to-[#2D1B69] px-5 py-4 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <Radio className="h-4 w-4 text-[#C4B5FD]" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white leading-snug">
+              Economize até 30% em pedágios com a Tag Move Mais
+            </p>
+            <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
+              Planos exclusivos para frota CNPJ — sem burocracia, sem mensalidade.
+            </p>
+          </div>
+        </div>
+        <a
+          href="#planos-move-mais"
+          className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
+        >
+          Ver planos
+          <ArrowRight className="h-3.5 w-3.5" />
+        </a>
+      </div>
+
       {/* Grid: 2 colunas no desktop (Estado 3), 1 coluna nos demais */}
       <div className={`mt-4 space-y-4 ${passagensTodas.length > 0 && placasUsuario.length > 0 ? 'lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-6 lg:space-y-0' : ''}`}>
         <div className="space-y-4">
