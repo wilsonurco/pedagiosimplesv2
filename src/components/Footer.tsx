@@ -1,6 +1,6 @@
 import { useState } from "react";
 import logoFooterImg from "figma:asset/b4b61ea2aff4e0735f9cc375bc7a4846923c94d1.png";
-import { CreditCard, Instagram, Twitter, Linkedin, Youtube, Building2, ShieldCheck } from "lucide-react";
+import { CreditCard, Instagram, Facebook, Linkedin, Youtube, Building2, ShieldCheck } from "lucide-react";
 import pixLogo from "../assets/pix.svg";
 import { CertificadosModal } from "./CertificadosModal";
 
@@ -61,7 +61,7 @@ const colunas = [
 
 const redesSociais = [
   { icone: Instagram, label: "Instagram", href: "#" },
-  { icone: Twitter, label: "Twitter / X", href: "#" },
+  { icone: Facebook, label: "Facebook", href: "#" },
   { icone: Linkedin, label: "LinkedIn", href: "#" },
   { icone: Youtube, label: "YouTube", href: "#" },
 ];
