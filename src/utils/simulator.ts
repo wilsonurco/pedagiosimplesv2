@@ -1,4 +1,4 @@
-export type TipoPassagem = 'praca_fisica' | 'portico_free_flow'
+export type TipoPassagem = 'praca_fisica' | 'portico_free_flow' | 'praca_convencional'
 export type StatusPassagem = 'em_prazo' | 'risco_multa'
 
 export type Passagem = {
@@ -109,6 +109,21 @@ const CENARIOS_FIXOS: Record<string, (placa: string) => Passagem[]> = {
       placa,
       status: 'em_prazo',
       prazoLimite: hojeMaisDias(22),
+    },
+    {
+      id: 'abc-conv-1',
+      tipo: 'praca_convencional',
+      local: 'Praça Convencional SP-310 — KM 157',
+      concessionaria: 'Arteris',
+      rodovia: 'SP-310',
+      km: 157,
+      data: hojeMenosDias(6),
+      hora: '08:22:14',
+      valor: 9.80,
+      categoria: 'Carro de passeio',
+      placa,
+      status: 'em_prazo',
+      prazoLimite: hojeMaisDias(24),
     },
   ],
 
@@ -270,7 +285,9 @@ function gerarRandom(placa: string): Passagem[] {
   const quantidade = 1 + Math.floor(rnd() * 5) // 1 a 5
   const passagens: Passagem[] = []
   for (let i = 0; i < quantidade; i++) {
-    const ehPraca = rnd() < 0.3
+    const sorteio = rnd()
+    const ehPraca = sorteio < 0.3
+    const ehConvencional = sorteio >= 0.3 && sorteio < 0.45
     const km = 10 + Math.floor(rnd() * 200)
     const diasAtras = 1 + Math.floor(rnd() * 25)
     const diasPrazo = Math.floor(rnd() * 30)
@@ -286,6 +303,23 @@ function gerarRandom(placa: string): Passagem[] {
         data: hojeMenosDias(diasAtras),
         hora: `${String(6 + Math.floor(rnd() * 14)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}`,
         valor: 12.50 + Math.floor(rnd() * 10),
+        categoria: 'Carro de passeio',
+        placa,
+        status: diasPrazo <= 7 ? 'risco_multa' : 'em_prazo',
+        prazoLimite: hojeMaisDias(diasPrazo),
+      })
+    } else if (ehConvencional) {
+      const praca = PRACAS_FISICAS[Math.floor(rnd() * PRACAS_FISICAS.length)]
+      passagens.push({
+        id: `rnd-conv-${placa}-${i}`,
+        tipo: 'praca_convencional',
+        local: `Praça Convencional ${praca.rodovia} — KM ${km}`,
+        concessionaria: praca.concessionaria,
+        rodovia: praca.rodovia,
+        km,
+        data: hojeMenosDias(diasAtras),
+        hora: `${String(6 + Math.floor(rnd() * 14)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}`,
+        valor: 8.00 + Math.floor(rnd() * 12),
         categoria: 'Carro de passeio',
         placa,
         status: diasPrazo <= 7 ? 'risco_multa' : 'em_prazo',
@@ -321,15 +355,19 @@ export function gerarDebitos(placa: string): Passagem[] {
 export function agregarPorTipo(passagens: Passagem[]) {
   const pracas = passagens.filter(p => p.tipo === 'praca_fisica')
   const porticos = passagens.filter(p => p.tipo === 'portico_free_flow')
+  const convencionais = passagens.filter(p => p.tipo === 'praca_convencional')
   const totalPraca = pracas.reduce((s, p) => s + p.valor, 0)
   const totalPortico = porticos.reduce((s, p) => s + p.valor, 0)
+  const totalConvencional = convencionais.reduce((s, p) => s + p.valor, 0)
   return {
     countPraca: pracas.length,
     countPortico: porticos.length,
+    countConvencional: convencionais.length,
     countTotal: passagens.length,
     totalPraca,
     totalPortico,
-    totalGeral: totalPraca + totalPortico,
+    totalConvencional,
+    totalGeral: totalPraca + totalPortico + totalConvencional,
   }
 }
 

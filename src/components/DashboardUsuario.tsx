@@ -75,7 +75,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const [filtroPlaca, setFiltroPlaca] = useState<string[]>(['todas']);
   const [debitosSelecionadosResumo, setDebitosSelecionadosResumo] = useState<string[]>([]);
   const [filtroExpandido, setFiltroExpandido] = useState(false);
-  const [filtroTipo, setFiltroTipo] = useState<'todas' | 'praca_fisica' | 'portico_free_flow'>('todas')
+  const [filtroTipo, setFiltroTipo] = useState<'todas' | 'praca_fisica' | 'portico_free_flow' | 'praca_convencional'>('todas')
   const [filtroStatus, setFiltroStatus] = useState<'todas' | 'em_prazo' | 'risco_multa'>('todas')
   const [modalConfirmacaoPlacaAberto, setModalConfirmacaoPlacaAberto] = useState(false);
   const [placasUsuario, setPlacasUsuario] = useState<string[]>(['MOV-1234']); // Placa do usuário logado
@@ -490,7 +490,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           {/* Filtros — estilo iOS Segmented Control, largura total */}
           <div className="mb-4">
             <div className="flex w-full bg-[#EBEBED] rounded-full p-0.5">
-              {(['todas', 'praca_fisica', 'portico_free_flow'] as const).map(t => (
+              {(['todas', 'praca_fisica', 'portico_free_flow', 'praca_convencional'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setFiltroTipo(t)}
@@ -500,7 +500,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                       : 'text-[#6B6F7A] hover:text-[#1A1B23]'
                   }`}
                 >
-                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça Manual' : 'Free Flow'}
+                  {t === 'todas' ? 'Todas' : t === 'praca_fisica' ? 'Praça Manual' : t === 'portico_free_flow' ? 'Free Flow' : 'Praça Convencional'}
                 </button>
               ))}
             </div>
