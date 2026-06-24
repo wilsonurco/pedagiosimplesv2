@@ -2,9 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogClose } from "./ui/dialog";
 import { User, Mail, Phone, Building2, MapPin, MessageCircle, CheckCircle2, X, AlertCircle } from "lucide-react";
 
-const RD_TOKEN = "c6cc9c951391d58a2eea";
-const RD_IDENTIFICADOR = "pedagio-simples-seja-uma-concessionaria-parceira";
-
 const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 
 const fieldClass =
@@ -42,12 +39,10 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
     if (!formValido) return;
     setStatus("loading");
     try {
-      const res = await fetch("https://app.rdstation.com.br/api/1.3/conversions", {
+      const res = await fetch("/api/concessionaria", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token_rdstation: RD_TOKEN,
-          identificador: RD_IDENTIFICADOR,
           nome: form.nome,
           email: form.email,
           celular: form.celular,
@@ -56,7 +51,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
           mensagem: form.mensagem,
         }),
       });
-      if (res.ok || res.status === 200 || res.status === 201) {
+      if (res.ok) {
         setStatus("success");
       } else {
         setStatus("error");
