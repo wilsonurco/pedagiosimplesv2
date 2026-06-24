@@ -1,8 +1,9 @@
 import { useState } from "react";
 import logoFooterImg from "figma:asset/b4b61ea2aff4e0735f9cc375bc7a4846923c94d1.png";
-import { CreditCard, Instagram, Facebook, Linkedin, Youtube, Building2, ShieldCheck } from "lucide-react";
+import { CreditCard, Instagram, Building2, ShieldCheck } from "lucide-react";
 import pixLogo from "../assets/pix.svg";
 import { CertificadosModal } from "./CertificadosModal";
+import { ConcessionariaModal } from "./ConcessionariaModal";
 
 interface FooterProps {
   onNavigateToFAQ?: () => void;
@@ -37,14 +38,12 @@ const colunas = [
     titulo: "Controle & Ajuda",
     links: [
       { label: "Minha conta", href: "#" },
-      { label: "Comprovante RPV", href: "#" },
       { label: "Concessionárias Parceiras", href: "#" },
     ],
   },
   {
     titulo: "Institucional",
     links: [
-      { label: "Sobre o Pedágio Simples", href: "#" },
       { label: "Sobre a Move Mais", href: "#" },
       { label: "Seja uma Concessionária Parceira", href: "#" },
     ],
@@ -53,7 +52,7 @@ const colunas = [
     titulo: "Legal",
     links: [
       { label: "Termos de Uso", href: "#" },
-      { label: "Política de Privacidade", href: "#" },
+      { label: "Aviso de Privacidade", href: "#" },
       { label: "Política de Cookies", href: "#" },
     ],
   },
@@ -61,13 +60,11 @@ const colunas = [
 
 const redesSociais = [
   { icone: Instagram, label: "Instagram", href: "#" },
-  { icone: Facebook, label: "Facebook", href: "#" },
-  { icone: Linkedin, label: "LinkedIn", href: "#" },
-  { icone: Youtube, label: "YouTube", href: "#" },
 ];
 
 export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps) {
   const [modalCertificados, setModalCertificados] = useState(false);
+  const [modalConcessionaria, setModalConcessionaria] = useState(false);
 
   return (
     <footer className="bg-[#1A1B23]">
@@ -151,7 +148,13 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      onClick={link.label === "Perguntas Frequentes" ? (e) => { e.preventDefault(); onNavigateToFAQ?.(); } : undefined}
+                      onClick={
+                        link.label === "Perguntas Frequentes"
+                          ? (e) => { e.preventDefault(); onNavigateToFAQ?.(); }
+                          : link.label === "Seja uma Concessionária Parceira"
+                          ? (e) => { e.preventDefault(); setModalConcessionaria(true); }
+                          : undefined
+                      }
                       className="text-sm text-white/50 hover:text-white transition-colors"
                     >
                       {link.label}
@@ -233,6 +236,7 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
       </div>
 
       <CertificadosModal open={modalCertificados} onOpenChange={setModalCertificados} />
+      <ConcessionariaModal open={modalConcessionaria} onOpenChange={setModalConcessionaria} />
     </footer>
   );
 }

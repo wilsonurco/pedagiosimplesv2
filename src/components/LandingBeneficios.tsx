@@ -286,10 +286,7 @@ export function LandingBeneficios() {
               <p className="text-[#8A8B95] leading-relaxed mb-6">
                 Tudo sobre pedágio Free Flow, PNU, RPV e pagamentos. Se não encontrar sua resposta aqui, fale com a gente.
               </p>
-              <a href="#" className="inline-flex items-center gap-2 text-[#5B2E8C] font-semibold hover:text-[#8B5FFF] transition-colors text-sm">
-                Ver todas as perguntas
-                <ArrowRight className="h-4 w-4" />
-              </a>
+
             </div>
 
             <div className="divide-y divide-[#ECECF1] border border-[#ECECF1] rounded-2xl bg-white px-6">
