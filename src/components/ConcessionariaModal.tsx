@@ -39,6 +39,8 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  const formValido = form.nome.trim() !== "" && form.email.trim() !== "" && form.telefone.trim() !== "" && form.empresa.trim() !== "" && form.uf !== "";
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setEnviado(true);
@@ -193,7 +195,12 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-lg bg-[#5B2E8C] text-white text-sm font-semibold hover:bg-[#4a2272] transition-colors"
+                disabled={!formValido}
+                className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  formValido
+                    ? "bg-[#5B2E8C] text-white hover:bg-[#4a2272]"
+                    : "bg-[#ECECF1] text-[#AEAFB8] cursor-not-allowed"
+                }`}
               >
                 Enviar solicitação
               </button>
