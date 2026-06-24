@@ -77,6 +77,15 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
   const [filtroExpandido, setFiltroExpandido] = useState(false);
   const [filtroTipo, setFiltroTipo] = useState<'todas' | 'praca_fisica' | 'portico_free_flow'>('todas')
   const [filtroStatus, setFiltroStatus] = useState<'todas' | 'em_prazo' | 'risco_multa'>('todas')
+  const [expandedCardIds, setExpandedCardIds] = useState<Set<string>>(new Set())
+
+  const toggleCardExpanded = (id: string) => {
+    setExpandedCardIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
   const [modalConfirmacaoPlacaAberto, setModalConfirmacaoPlacaAberto] = useState(false);
   const [placasUsuario, setPlacasUsuario] = useState<string[]>(['MOV-1234']); // Placa do usuário logado
   
@@ -334,10 +343,10 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
           </h2>
           <p className="text-sm text-[#5B5C68] mt-0.5">
             {vencendoEmBreve > 0
-              ? `${vencendoEmBreve} passagem${vencendoEmBreve > 1 ? 'ns' : ''} com prazo próximo do vencimento`
+              ? `${vencendoEmBreve} ${vencendoEmBreve > 1 ? 'passagens' : 'passagem'} com prazo próximo do vencimento`
               : passagensTodas.length === 0
                 ? 'Nenhuma pendência no momento'
-                : `${passagensTodas.length} passagem${passagensTodas.length !== 1 ? 'ns' : ''} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
+                : `${passagensTodas.length} ${passagensTodas.length !== 1 ? 'passagens' : 'passagem'} pendente${passagensTodas.length !== 1 ? 's' : ''} de pagamento`}
           </p>
         </div>
 
@@ -360,30 +369,6 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             {veiculosMonitorados} veículo{veiculosMonitorados > 1 ? 's' : ''}
           </span>
         </div>
-      </div>
-
-      {/* Banner — conversão para Tag Move Mais */}
-      <div className="mt-4 rounded-xl bg-gradient-to-r from-[#1A1B23] to-[#2D1B69] px-5 py-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-            <Radio className="h-4 w-4 text-[#C4B5FD]" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white leading-snug">
-              Economize até 30% em pedágios com a Tag Move Mais
-            </p>
-            <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
-              Pague menos em cada passagem — conheça os planos Move Mais.
-            </p>
-          </div>
-        </div>
-        <a
-          href="#planos-move-mais"
-          className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
-        >
-          Ver planos
-          <ArrowRight className="h-3.5 w-3.5" />
-        </a>
       </div>
 
       {/* Grid: 2 colunas no desktop (Estado 3), 1 coluna nos demais */}
@@ -596,34 +581,23 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-[#5B2E8C] text-sm uppercase tracking-wide leading-tight">
-                    {pendentesFiltradas.length} Pendência{pendentesFiltradas.length > 1 ? 's' : ''} {filtroTipo === 'todas' && filtroStatus === 'todas' ? `Disponíve${pendentesFiltradas.length > 1 ? 'is' : 'l'}` : `Filtrada${pendentesFiltradas.length > 1 ? 's' : ''}`}
+                    {`${pendentesFiltradas.length} ${pendentesFiltradas.length > 1 ? 'Pendências' : 'Pendência'} ${filtroTipo === 'todas' && filtroStatus === 'todas' ? (pendentesFiltradas.length > 1 ? 'Disponíveis' : 'Disponível') : (pendentesFiltradas.length > 1 ? 'Filtradas' : 'Filtrada')}`}
                     {!filtroPlaca.includes('todas') && (
                       <span className="text-[#8B5FFF] ml-1 block sm:inline">- {filtroPlaca.join(', ')}</span>
                     )}
                   </h4>
                 </div>
                 {pendentesFiltradas.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={todosSelecionados ? desselecionarTodos : selecionarTodos}
-                    className="text-xs h-9 sm:h-8 px-3 border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white flex-shrink-0"
-                  >
-                    {todosSelecionados ? (
-                      <>
-                        <Minus className="h-3 w-3 mr-1" />
-                        <span className="hidden sm:inline">Desmarcar todos</span>
-                        <span className="sm:hidden">Desmarcar</span>
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-3 w-3 mr-1" />
-                        <span className="hidden sm:inline">Selecionar todos</span>
-                        <span className="sm:hidden">Selecionar</span>
-                      </>
-                    )}
-                  </Button>
+                  <label className="flex items-center gap-2 cursor-pointer select-none flex-shrink-0">
+                    <Checkbox
+                      checked={todosSelecionados}
+                      onCheckedChange={(checked) => checked ? selecionarTodos() : desselecionarTodos()}
+                      className="flex-shrink-0"
+                    />
+                    <span className="text-xs text-[#5B2E8C] font-medium whitespace-nowrap">
+                      {todosSelecionados ? 'Desmarcar todos' : 'Selecionar todos'}
+                    </span>
+                  </label>
                 )}
               </div>
 
@@ -683,36 +657,49 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
                               </>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 flex-shrink-0">
-                            <span className={`flex items-center gap-1 ${isRisco ? 'text-[#C8324A] font-medium' : 'text-[#8A8B95]'}`}>
-                              <Shield className="h-3 w-3" />
-                              Vence: {p.prazoLimite}
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded ${isRisco ? 'bg-[#F8D7DD] text-[#C8324A]' : 'bg-[#ECECF1] text-[#5B5C68]'}`}>
+                              <Calendar className="h-2.5 w-2.5" />
+                              Vence {p.prazoLimite}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Car className="h-3 w-3" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[#1A1B23] text-white tracking-widest font-mono">
+                              <Car className="h-2.5 w-2.5" />
                               {p.placa}
                             </span>
                           </div>
                         </div>
 
-                        {/* Linha 3: ID · Rodovia · KM — numa linha só */}
-                        <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 flex flex-wrap gap-x-5 gap-y-1.5">
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">ID da Passagem</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</span>
-                          </span>
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Rodovia</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</span>
-                          </span>
-                          <span className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Quilômetro</span>
-                            <span className="text-xs font-semibold text-[#3A3B47]">km {p.km}</span>
-                          </span>
-                          <span className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Praça</span>
-                            <span className="text-xs font-semibold text-[#3A3B47] truncate max-w-[220px]">{p.local}</span>
-                          </span>
+                        {/* Linha 3: detalhes técnicos colapsáveis */}
+                        <div className="mt-2">
+                          <button
+                            onClick={() => toggleCardExpanded(p.id)}
+                            className="flex items-center gap-1 text-[11px] text-[#AEAFB8] hover:text-[#5B2E8C] transition-colors"
+                          >
+                            {expandedCardIds.has(p.id)
+                              ? <ChevronUp className="h-3 w-3" />
+                              : <ChevronDown className="h-3 w-3" />}
+                            Ver detalhes técnicos
+                          </button>
+                          {expandedCardIds.has(p.id) && (
+                            <div className="mt-2 pt-2 border-t border-[#ECECF1]/60 flex flex-wrap gap-x-5 gap-y-1.5">
+                              <span className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">ID da Passagem</span>
+                                <span className="text-xs font-semibold text-[#3A3B47]">{formatPassagemId(p.id)}</span>
+                              </span>
+                              <span className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Rodovia</span>
+                                <span className="text-xs font-semibold text-[#3A3B47]">{p.rodovia}</span>
+                              </span>
+                              <span className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Quilômetro</span>
+                                <span className="text-xs font-semibold text-[#3A3B47]">km {p.km}</span>
+                              </span>
+                              <span className="flex flex-col gap-0.5 min-w-0">
+                                <span className="text-[10px] font-medium text-[#B0B1BB] uppercase tracking-wide leading-none">Praça</span>
+                                <span className="text-xs font-semibold text-[#3A3B47] truncate max-w-[220px]">{p.local}</span>
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -776,6 +763,32 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
         </CardContent>
       </Card>
       )} {/* fim ternário de estado */}
+
+      {/* Banner — Tag Move Mais (após o usuário ver a "dor" das pendências) */}
+      {passagensTodas.length > 0 && (
+        <div className="rounded-xl bg-gradient-to-r from-[#1A1B23] to-[#2D1B69] px-5 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+              <Radio className="h-4 w-4 text-[#C4B5FD]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white leading-snug">
+                Economize até 30% em pedágios com a Tag Move Mais
+              </p>
+              <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
+                Pague menos em cada passagem — conheça os planos Move Mais.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#planos-move-mais"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
+          >
+            Ver planos
+            <ArrowRight className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      )}
 
       {/* Feed de atividade recente — colapsável */}
       <Card className="border border-[#DCDDE3] overflow-hidden">
