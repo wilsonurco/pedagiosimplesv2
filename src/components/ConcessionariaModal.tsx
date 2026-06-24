@@ -1,51 +1,52 @@
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogClose,
-} from "./ui/dialog";
-import { User, Mail, Phone, MessageCircle, Building2, MapPin, CheckCircle2, X } from "lucide-react";
+import { useEffect } from "react";
+import { Dialog, DialogContent, DialogClose } from "./ui/dialog";
+import { X } from "lucide-react";
+
+const RD_FORM_ID = "pedagio-simples-seja-uma-concessionaria-parceira-c6cc9c951391d58a2eea";
+const RD_SCRIPT_SRC = "https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js";
 
 interface ConcessionariaModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const fieldClass =
-  "w-full rounded-full border border-[#E2E3EA] bg-white pl-10 pr-4 py-3 text-sm text-[#1A1B23] placeholder:text-[#C6C7CF] focus:outline-none focus:ring-2 focus:ring-[#5B2E8C]/25 focus:border-[#5B2E8C] transition";
-
-const textareaClass =
-  "w-full rounded-2xl border border-[#E2E3EA] bg-white pl-10 pr-4 py-3 text-sm text-[#1A1B23] placeholder:text-[#C6C7CF] focus:outline-none focus:ring-2 focus:ring-[#5B2E8C]/25 focus:border-[#5B2E8C] transition resize-none";
-
-const labelClass = "block text-sm font-semibold text-[#1A1B23] mb-1.5";
-
 export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalProps) {
-  const [enviado, setEnviado] = useState(false);
-  const [form, setForm] = useState({ nome: "", email: "", telefone: "", empresa: "", uf: "", mensagem: "" });
+  useEffect(() => {
+    if (!open) return;
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }
+    // Limpa o conteúdo anterior para re-inicialização limpa
+    const container = document.getElementById(RD_FORM_ID);
+    if (container) container.innerHTML = "";
 
-  const formValido = form.nome.trim() !== "" && form.email.trim() !== "" && form.telefone.trim() !== "" && form.empresa.trim() !== "" && form.uf !== "";
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setEnviado(true);
-  }
-
-  function handleClose(value: boolean) {
-    if (!value) {
-      setTimeout(() => {
-        setEnviado(false);
-        setForm({ nome: "", email: "", telefone: "", empresa: "", uf: "", mensagem: "" });
-      }, 300);
+    function initForm() {
+      if ((window as any).RDStationForms) {
+        new (window as any).RDStationForms(RD_FORM_ID, "UA-37380722-2").createForm();
+      }
     }
-    onOpenChange(value);
-  }
+
+    // Script já carregado
+    if ((window as any).RDStationForms) {
+      initForm();
+      return;
+    }
+
+    // Script já injetado mas ainda carregando
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${RD_SCRIPT_SRC}"]`);
+    if (existing) {
+      existing.addEventListener("load", initForm, { once: true });
+      return;
+    }
+
+    // Injeta o script pela primeira vez
+    const script = document.createElement("script");
+    script.src = RD_SCRIPT_SRC;
+    script.type = "text/javascript";
+    script.addEventListener("load", initForm, { once: true });
+    document.head.appendChild(script);
+  }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md w-full flex flex-col overflow-hidden p-6 [&>button]:hidden gap-0 bg-white">
 
         {/* Header */}
@@ -62,176 +63,9 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
           Deixe seus dados e nossa equipe entrará em contato em até 1 dia útil.
         </p>
 
-        {/* Conteúdo */}
-        {enviado ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
-            <CheckCircle2 className="h-14 w-14 text-[#0E8B5A]" />
-            <div>
-              <p className="text-lg font-bold text-[#1A1B23]">Solicitação enviada!</p>
-              <p className="text-sm text-[#8A8B95] mt-1 max-w-xs mx-auto">
-                Recebemos seus dados. Nossa equipe entrará em contato em breve.
-              </p>
-            </div>
-            <button
-              onClick={() => handleClose(false)}
-              className="mt-2 px-5 py-2.5 rounded-full bg-[#5B2E8C] text-white text-sm font-semibold hover:bg-[#4a2272] transition-colors"
-            >
-              Fechar
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* RD Station Form */}
+        <div role="main" id={RD_FORM_ID} />
 
-            {/* Nome */}
-            <div>
-              <label className={labelClass} htmlFor="nome">
-                Nome completo <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8]" />
-                <input
-                  id="nome"
-                  name="nome"
-                  type="text"
-                  required
-                  placeholder="Logística Transportes Ltda"
-                  value={form.nome}
-                  onChange={handleChange}
-                  className={fieldClass}
-                />
-              </div>
-            </div>
-
-            {/* E-mail */}
-            <div>
-              <label className={labelClass} htmlFor="email">
-                E-mail <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8]" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="teste@gmail.com"
-                  value={form.email}
-                  onChange={handleChange}
-                  className={fieldClass}
-                />
-              </div>
-            </div>
-
-            {/* Telefone */}
-            <div>
-              <label className={labelClass} htmlFor="telefone">
-                Telefone <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8]" />
-                <input
-                  id="telefone"
-                  name="telefone"
-                  type="tel"
-                  required
-                  placeholder="(11) 99999-9999"
-                  value={form.telefone}
-                  onChange={handleChange}
-                  className={fieldClass}
-                />
-              </div>
-            </div>
-
-            {/* Empresa */}
-            <div>
-              <label className={labelClass} htmlFor="empresa">
-                Nome da concessionária <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8]" />
-                <input
-                  id="empresa"
-                  name="empresa"
-                  type="text"
-                  required
-                  placeholder="Razão social ou nome fantasia"
-                  value={form.empresa}
-                  onChange={handleChange}
-                  className={fieldClass}
-                />
-              </div>
-            </div>
-
-            {/* UF */}
-            <div>
-              <label className={labelClass} htmlFor="uf">
-                Estado (UF) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8] pointer-events-none" />
-                <select
-                  id="uf"
-                  name="uf"
-                  required
-                  value={form.uf}
-                  onChange={handleChange}
-                  className={`${fieldClass} appearance-none`}
-                >
-                  <option value="" disabled>Selecione o estado</option>
-                  {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map(uf => (
-                    <option key={uf} value={uf}>{uf}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Mensagem */}
-            <div>
-              <label className={labelClass} htmlFor="mensagem">
-                Mensagem <span className="font-normal text-[#AEAFB8]">(opcional)</span>
-              </label>
-              <div className="relative">
-                <MessageCircle className="absolute left-3.5 top-3.5 h-4 w-4 text-[#AEAFB8]" />
-                <textarea
-                  id="mensagem"
-                  name="mensagem"
-                  rows={3}
-                  placeholder="Conte-nos como podemos ajudar."
-                  value={form.mensagem}
-                  onChange={handleChange}
-                  className={textareaClass}
-                />
-              </div>
-            </div>
-
-            {/* Aviso */}
-            <p className="text-xs text-[#8A8B95] leading-relaxed">
-              Ao enviar, você concorda em ser contatado pela equipe Move Mais sobre soluções de vale-pedágio.
-            </p>
-
-            {/* Botões */}
-            <div className="flex gap-3 mt-1">
-              <button
-                type="button"
-                onClick={() => handleClose(false)}
-                className="flex-1 py-3 rounded-full border border-[#E2E3EA] text-sm font-semibold text-[#1A1B23] hover:bg-[#F7F5FB] transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={!formValido}
-                className={`flex-1 py-3 rounded-full text-sm font-semibold transition-colors ${
-                  formValido
-                    ? "bg-[#5B2E8C] text-white hover:bg-[#4a2272]"
-                    : "bg-[#ECECF1] text-[#AEAFB8] cursor-not-allowed"
-                }`}
-              >
-                Enviar solicitação
-              </button>
-            </div>
-          </form>
-        )}
       </DialogContent>
     </Dialog>
   );
