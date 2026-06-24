@@ -324,6 +324,28 @@ function gerarRandom(placa: string): Passagem[] {
       })
     }
   }
+  // Garante sempre ao menos uma praca_fisica
+  if (!passagens.some(p => p.tipo === 'praca_fisica')) {
+    const praca = PRACAS_FISICAS[Math.floor(rnd() * PRACAS_FISICAS.length)]
+    const km = 10 + Math.floor(rnd() * 200)
+    const diasAtras = 1 + Math.floor(rnd() * 25)
+    const diasPrazo = 8 + Math.floor(rnd() * 22)
+    passagens.push({
+      id: `rnd-praca-${placa}`,
+      tipo: 'praca_fisica',
+      local: `Praça de Pedágio ${praca.rodovia} — KM ${km}`,
+      concessionaria: praca.concessionaria,
+      rodovia: praca.rodovia,
+      km,
+      data: hojeMenosDias(diasAtras),
+      hora: `${String(6 + Math.floor(rnd() * 14)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}:${String(Math.floor(rnd() * 60)).padStart(2, '0')}`,
+      valor: 12.50 + Math.floor(rnd() * 10),
+      categoria: 'Carro de passeio',
+      placa,
+      status: 'em_prazo',
+      prazoLimite: hojeMaisDias(diasPrazo),
+    })
+  }
   return passagens
 }
 
