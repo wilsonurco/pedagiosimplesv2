@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogClose,
 } from "./ui/dialog";
-import { User, Mail, Phone, MessageCircle, CheckCircle2, X } from "lucide-react";
+import { User, Mail, Phone, MessageCircle, Building2, MapPin, CheckCircle2, X } from "lucide-react";
 
 interface ConcessionariaModalProps {
   open: boolean;
@@ -21,13 +21,13 @@ const labelClass = "block text-sm font-semibold text-[#1A1B23] mb-1.5";
 
 export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalProps) {
   const [enviado, setEnviado] = useState(false);
-  const [form, setForm] = useState({ nome: "", email: "", telefone: "", mensagem: "" });
+  const [form, setForm] = useState({ nome: "", email: "", telefone: "", empresa: "", uf: "", mensagem: "" });
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  const formValido = form.nome.trim() !== "" && form.email.trim() !== "" && form.telefone.trim() !== "";
+  const formValido = form.nome.trim() !== "" && form.email.trim() !== "" && form.telefone.trim() !== "" && form.empresa.trim() !== "" && form.uf !== "";
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +38,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
     if (!value) {
       setTimeout(() => {
         setEnviado(false);
-        setForm({ nome: "", email: "", telefone: "", mensagem: "" });
+        setForm({ nome: "", email: "", telefone: "", empresa: "", uf: "", mensagem: "" });
       }, 300);
     }
     onOpenChange(value);
@@ -51,7 +51,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
           <h2 className="text-2xl font-bold text-[#5B2E8C] leading-tight">
-            Falar com um consultor
+            Seja uma Concessionária Parceira
           </h2>
           <DialogClose className="flex-shrink-0 rounded-md p-1 text-[#8A8B95] hover:text-[#5B2E8C] transition-colors -mt-0.5 -mr-1">
             <X className="h-5 w-5" />
@@ -139,6 +139,49 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
                   onChange={handleChange}
                   className={fieldClass}
                 />
+              </div>
+            </div>
+
+            {/* Empresa */}
+            <div>
+              <label className={labelClass} htmlFor="empresa">
+                Nome da concessionária <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8]" />
+                <input
+                  id="empresa"
+                  name="empresa"
+                  type="text"
+                  required
+                  placeholder="Razão social ou nome fantasia"
+                  value={form.empresa}
+                  onChange={handleChange}
+                  className={fieldClass}
+                />
+              </div>
+            </div>
+
+            {/* UF */}
+            <div>
+              <label className={labelClass} htmlFor="uf">
+                Estado (UF) <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AEAFB8] pointer-events-none" />
+                <select
+                  id="uf"
+                  name="uf"
+                  required
+                  value={form.uf}
+                  onChange={handleChange}
+                  className={`${fieldClass} appearance-none`}
+                >
+                  <option value="" disabled>Selecione o estado</option>
+                  {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map(uf => (
+                    <option key={uf} value={uf}>{uf}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
