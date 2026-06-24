@@ -179,7 +179,7 @@ export function LandingBeneficios() {
     <div className="bg-white">
 
       {/* ── 1. Parceiros strip ─────────────────────────────────────── */}
-      <div className="border-y border-white/5 bg-[#1A1B23] py-4 overflow-hidden">
+      <div id="concessionarias-parceiras" className="border-y border-white/5 bg-[#1A1B23] py-4 overflow-hidden">
         <style>{`
           @keyframes marquee-scroll {
             from { transform: translateX(0); }

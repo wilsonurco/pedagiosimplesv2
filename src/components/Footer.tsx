@@ -38,7 +38,7 @@ const colunas = [
     titulo: "Controle & Ajuda",
     links: [
       { label: "Minha conta", href: "#" },
-      { label: "Concessionárias Parceiras", href: "#" },
+      { label: "Concessionárias Parceiras", href: "#concessionarias-parceiras" },
     ],
   },
   {
