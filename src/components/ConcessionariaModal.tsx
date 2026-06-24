@@ -186,9 +186,14 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
                 />
               </div>
 
+              <p className="text-[11px] text-[#8A8B95] text-center leading-relaxed">
+                Ao enviar, você concorda que seus dados serão utilizados pela Move Mais para fins de contato comercial, em conformidade com a{" "}
+                <a href="#" className="text-[#5B2E8C] hover:underline">Aviso de Privacidade</a>.
+              </p>
+
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-lg bg-[#5B2E8C] text-white text-sm font-semibold hover:bg-[#4a2272] transition-colors mt-2"
+                className="w-full py-2.5 rounded-lg bg-[#5B2E8C] text-white text-sm font-semibold hover:bg-[#4a2272] transition-colors"
               >
                 Enviar solicitação
               </button>
