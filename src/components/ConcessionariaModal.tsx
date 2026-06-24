@@ -97,7 +97,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className={labelClass} htmlFor="nome">Nome completo</label>
+                <label className={labelClass} htmlFor="nome">Nome completo <span className="text-red-500">*</span></label>
                 <input
                   id="nome"
                   name="nome"
@@ -112,7 +112,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass} htmlFor="email">E-mail</label>
+                  <label className={labelClass} htmlFor="email">E-mail <span className="text-red-500">*</span></label>
                   <input
                     id="email"
                     name="email"
@@ -125,7 +125,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
                   />
                 </div>
                 <div>
-                  <label className={labelClass} htmlFor="telefone">Telefone</label>
+                  <label className={labelClass} htmlFor="telefone">Telefone <span className="text-red-500">*</span></label>
                   <input
                     id="telefone"
                     name="telefone"
@@ -141,7 +141,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  <label className={labelClass} htmlFor="empresa">Nome da empresa / concessionária</label>
+                  <label className={labelClass} htmlFor="empresa">Nome da empresa / concessionária <span className="text-red-500">*</span></label>
                   <input
                     id="empresa"
                     name="empresa"
@@ -154,7 +154,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
                   />
                 </div>
                 <div>
-                  <label className={labelClass} htmlFor="uf">Estado (UF)</label>
+                  <label className={labelClass} htmlFor="uf">Estado (UF) <span className="text-red-500">*</span></label>
                   <select
                     id="uf"
                     name="uf"
