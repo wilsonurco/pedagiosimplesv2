@@ -46,7 +46,7 @@ export function ConcessionariaModal({ open, onOpenChange }: ConcessionariaModalP
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md w-full flex flex-col overflow-hidden p-6 [&>button]:hidden gap-0">
+      <DialogContent className="max-w-md w-full flex flex-col overflow-hidden p-6 [&>button]:hidden gap-0 bg-white">
 
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
