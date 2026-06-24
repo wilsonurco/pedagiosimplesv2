@@ -1,4 +1,4 @@
-import { Building2, Radio, Landmark } from 'lucide-react'
+import { Building2, Radio } from 'lucide-react'
 import type { TipoPassagem } from '../../utils/simulator'
 
 interface TipoPassagemBadgeProps {
@@ -17,22 +17,12 @@ export function TipoPassagemBadge({ tipo, className = '' }: TipoPassagemBadgePro
       </span>
     )
   }
-  if (tipo === 'portico_free_flow') {
-    return (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-[#DFF4EA] text-[#0E8B5A] ${className}`}
-      >
-        <Radio className="h-3 w-3" />
-        Free Flow
-      </span>
-    )
-  }
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-[#FBF4E6] text-[#C77700] ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-[#DFF4EA] text-[#0E8B5A] ${className}`}
     >
-      <Landmark className="h-3 w-3" />
-      Praça Convencional
+      <Radio className="h-3 w-3" />
+      Free Flow
     </span>
   )
 }

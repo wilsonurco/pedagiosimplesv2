@@ -32,7 +32,7 @@ interface PassagemPaga {
   hora: string;
   valor: number;
   placa: string;
-  tipo: 'praca_fisica' | 'portico_free_flow' | 'praca_convencional';
+  tipo: 'praca_fisica' | 'portico_free_flow';
   formaPagamento: 'pix' | 'cartao_elo' | 'cartao_visa' | 'cartao_master';
   transactionId: string;
   multa?: { economizada: number };
