@@ -462,7 +462,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
               >
                 <Plus className="h-3 w-3" />
                 <span className="hidden sm:inline">Outra placa</span>
-                <span className="sm:hidden">+ Placa</span>
+                <span className="sm:hidden">Placa</span>
               </button>
             )}
           </div>
