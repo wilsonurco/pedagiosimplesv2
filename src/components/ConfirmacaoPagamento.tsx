@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { CheckCircle, Download, Share, Home, CreditCard, QrCode, User, LogOut } from "lucide-react";
+import { CheckCircle, Download, CreditCard, QrCode, User, LogOut, Radio, ArrowRight } from "lucide-react";
 import jsPDF from 'jspdf';
 
 interface ConfirmacaoPagamentoProps {
@@ -271,6 +271,32 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
               </div>
             </CardContent>
           </Card>
+
+          {/* Banner upsell — Tag Move Mais */}
+          <div className="rounded-xl bg-gradient-to-r from-[#1A1B23] to-[#2D1B69] px-5 py-4 flex items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                <Radio className="h-4 w-4 text-[#C4B5FD]" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white leading-snug">
+                  Economize até 30% em pedágios com a Tag Move Mais
+                </p>
+                <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
+                  Pague menos em cada passagem — conheça os planos Move Mais.
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://movemais.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
+            >
+              Ver planos
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
 
           {/* Ações */}
           <div className="space-y-4">

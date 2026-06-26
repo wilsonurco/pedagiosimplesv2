@@ -781,7 +781,9 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
             </div>
           </div>
           <a
-            href="#planos-move-mais"
+            href="https://movemais.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
           >
             Ver planos
