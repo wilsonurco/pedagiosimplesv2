@@ -190,7 +190,7 @@ export function Footer({ onNavigateToFAQ, onAcessoConcessionaria }: FooterProps)
             {/* Selos de segurança + trigger do modal */}
             <div className="flex items-center gap-3 flex-wrap">
               {[
-                { label: "PCI DSS", sub: "Compliant", cor: "text-[#0E8B5A]" },
+                { label: "PCI DSS", sub: "Em conformidade", cor: "text-[#0E8B5A]" },
                 { label: "SSL", sub: "256-bit", cor: "text-[#8B5FFF]" },
                 { label: "LGPD", sub: "Conformidade", cor: "text-white/50" },
               ].map((s) => (
