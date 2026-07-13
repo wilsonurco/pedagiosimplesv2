@@ -453,8 +453,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       const cpfValido_check = cpfValido === true;
       // Email só precisa ter formato válido (não exige código)
       const emailValido_check = emailValido !== false;
-      // Telefone precisa ter código SMS confirmado
-      const telefoneValido_check = (!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true);
+      // Telefone só precisa ter formato válido nesta etapa — a confirmação por SMS acontece na etapa 3
+      const telefoneValido_check = telefoneValido === true;
       return camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check && telefoneValido_check;
     } else if (etapaAtual === 2) {
       // Senha
@@ -488,8 +488,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       else if (emailValido === false) newErrors.email = 'Formato de e-mail inválido';
       if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
       else if (telefoneValido === false) newErrors.telefone = 'Insira um celular válido com DDD (ex: (11) 98765-4321)';
-      else if (!codigoEnviado && telefoneValido !== true) newErrors.telefone = 'Aguarde a validação do telefone';
-      else if (codigoEnviado && codigoValido !== true) newErrors.telefone = 'Confirme o código enviado por SMS';
       if (!formData.cpf.trim()) newErrors.cpf = 'CPF é obrigatório';
       else if (cpfValido === false) newErrors.cpf = 'CPF inválido';
       else if (cpfValido === null && formData.cpf.trim()) newErrors.cpf = 'Aguarde a validação do CPF';
@@ -529,12 +527,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     if (etapaAtual === 1) {
       // Etapa 1: 0% a 33%
       let fieldsCompleted = 0;
-      const totalFields = 6;
+      const totalFields = 5;
       if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
       if (formData.dataNascimento.trim() && formData.dataNascimento.replace(/\D/g, '').length === 8) fieldsCompleted++;
       if (formData.nome.trim()) fieldsCompleted++;
       if (formData.email.trim() && emailValido !== false) fieldsCompleted++;
-      if (formData.telefone.trim() && (telefoneValido === true || codigoValido === true)) fieldsCompleted++;
       if (formData.aceitaTermos) fieldsCompleted++;
       progress = (fieldsCompleted / totalFields) * 33;
 
@@ -566,15 +563,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido, telefoneValido, codigoValido, formData.dataNascimento]);
 
   const handleNextStep = () => {
-    // Aguardar envio/validação de SMS se ainda em progresso
-    if (etapaAtual === 1 && (emailValidando || validandoCodigo)) {
-      setErrors(prev => ({ ...prev, telefone: 'Aguarde a validação do telefone' }));
-      return;
-    }
-
-    // Se estiver na etapa 1 e o telefone for válido mas ainda não enviou SMS
-    if (etapaAtual === 1 && telefoneValido === true && !codigoEnviado) {
-      enviarCodigoValidacao();
+    // Aguardar validação de e-mail em progresso (etapa 1)
+    if (etapaAtual === 1 && emailValidando) {
       return;
     }
 
@@ -876,33 +866,25 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           onChange={(e) => handleTelefoneChange(e.target.value)}
                           className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
                             errors.telefone ? 'border-[#C8324A]' :
-                            codigoValido === true ? 'border-[#0E8B5A]' :
-                            telefoneValido === true ? 'border-[#5B2E8C]' :
+                            telefoneValido === true ? 'border-[#0E8B5A]' :
                             telefoneValido === false ? 'border-[#C8324A]' : ''
                           }`}
                           maxLength={15}
-                          disabled={codigoValido === true}
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          {codigoValido === true && (
+                          {telefoneValido === true && (
                             <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
                           )}
-                          {codigoValido !== true && telefoneValido === false && (
+                          {telefoneValido === false && (
                             <XCircle className="h-5 w-5 text-[#C8324A]" />
                           )}
                         </div>
                       </div>
                       {errors.telefone && <p className="text-sm text-[#C8324A]">{errors.telefone}</p>}
-                      {codigoValido === true && !errors.telefone && (
+                      {telefoneValido === true && !errors.telefone && (
                         <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                           <CheckCircle className="h-4 w-4" />
-                          Telefone validado por SMS
-                        </p>
-                      )}
-                      {telefoneValido === true && !codigoEnviado && !errors.telefone && (
-                        <p className="text-sm text-[#5B2E8C] flex items-center gap-1">
-                          <Smartphone className="h-4 w-4" />
-                          Celular válido — enviaremos um SMS para confirmar
+                          Telefone válido
                         </p>
                       )}
                     </div>
@@ -1194,75 +1176,14 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                     <Button
                       type="submit"
                       size="lg"
-                      disabled={
-                        etapaAtual === 1
-                          ? (
-                              // Campos obrigatórios não preenchidos
-                              !formData.nome.trim() ||
-                              !formData.dataNascimento.trim() ||
-                              !formData.email.trim() ||
-                              !formData.telefone.trim() ||
-                              !formData.cpf.trim() ||
-                              !formData.aceitaTermos ||
-                              // CPF inválido
-                              cpfValido !== true ||
-                              // Email com formato inválido
-                              emailValido === false ||
-                              // Estados de carregamento
-                              emailValidando ||
-                              validandoCodigo ||
-                              // Telefone não validado / SMS não confirmado
-                              (!codigoEnviado && telefoneValido !== true) ||
-                              (codigoEnviado && codigoValido !== true)
-                            )
-                          : !isCurrentStepValid()
-                      }
-                      onClick={(e) => {
-                        if (etapaAtual === 1 && telefoneValido === true && !codigoEnviado) {
-                          e.preventDefault();
-                          enviarCodigoValidacao();
-                        }
-                      }}
+                      disabled={!isCurrentStepValid() || emailValidando}
                       className={`w-full py-4 text-lg rounded-lg font-medium transition-colors ${
-                        etapaAtual === 1
-                          ? (
-                              formData.nome.trim() &&
-                              formData.dataNascimento.trim() &&
-                              formData.email.trim() &&
-                              formData.telefone.trim() &&
-                              formData.cpf.trim() &&
-                              formData.aceitaTermos &&
-                              cpfValido === true &&
-                              emailValido !== false &&
-                              !emailValidando &&
-                              !validandoCodigo &&
-                              ((!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true))
-                            )
-                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
-                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-                          : isCurrentStepValid()
-                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
-                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                        isCurrentStepValid() && !emailValidando
+                          ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
+                          : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
                       }`}
                     >
-                      {etapaAtual === 1 && telefoneValido === true && !codigoEnviado
-                        ? (emailValidando ? (
-                            <>
-                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                              Enviando SMS...
-                            </>
-                          ) : (
-                            <>
-                              <Smartphone className="h-5 w-5 mr-2" />
-                              Enviar código por SMS
-                            </>
-                          ))
-                        : (
-                          <>
-                            Continuar <ArrowRight className="h-5 w-5 ml-2" />
-                          </>
-                        )
-                      }
+                      Continuar <ArrowRight className="h-5 w-5 ml-2" />
                     </Button>
                   ) : (
                     <>
