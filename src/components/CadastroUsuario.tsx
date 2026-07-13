@@ -473,6 +473,9 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (!formData.placa.trim()) return false;
       const placaValidacao = validarPlaca(formData.placa);
       if (!placaValidacao.isValid) return false;
+      // Telefone — precisa ter código SMS confirmado
+      const telefoneValido_check = (!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true);
+      if (!telefoneValido_check) return false;
     }
     return true;
   };
@@ -515,6 +518,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           newErrors.placa = placaValidacao.error || 'Placa inválida';
         }
       }
+      // Telefone (SMS)
+      if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
+      else if (telefoneValido === false) newErrors.telefone = 'Insira um celular válido com DDD (ex: (11) 98765-4321)';
+      else if (!codigoEnviado && telefoneValido !== true) newErrors.telefone = 'Aguarde a validação do telefone';
+      else if (codigoEnviado && codigoValido !== true) newErrors.telefone = 'Confirme o código enviado por SMS';
     }
 
     setErrors(newErrors);
@@ -551,12 +559,13 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       progress += (fieldsCompleted / 2) * 33;
 
     } else if (etapaAtual === 3) {
-      // Etapa 3: 66% a 100% (Placa)
+      // Etapa 3: 66% a 100% (Placa + Telefone confirmado por SMS)
       progress = 66;
-      if (formData.placa.trim()) {
-        const placaValidacaoLocal = validarPlaca(formData.placa);
-        progress = placaValidacaoLocal.isValid ? 100 : 83;
-      }
+      let fieldsCompleted = 0;
+      const totalFields = 2;
+      if (formData.placa.trim() && validarPlaca(formData.placa).isValid) fieldsCompleted++;
+      if (formData.telefone.trim() && codigoValido === true) fieldsCompleted++;
+      progress += (fieldsCompleted / totalFields) * 34;
     }
 
     return Math.max(0, Math.min(100, progress));
@@ -608,7 +617,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     switch (etapaAtual) {
       case 1: return 'Dados pessoais';
       case 2: return 'Senha e confirmação';
-      case 3: return 'Confirmar veículo';
+      case 3: return 'Confirmar veículo e telefone';
       default: return '';
     }
   };
@@ -1167,6 +1176,52 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       )}
                     </div>
 
+                    {/* Telefone */}
+                    <div className="space-y-2">
+                      <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center gap-2">
+                        <Smartphone className="h-4 w-4 text-[#5B2E8C]" />
+                        Telefone
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="telefone"
+                          type="tel"
+                          placeholder="(11) 98765-4321"
+                          value={formData.telefone}
+                          onChange={(e) => handleTelefoneChange(e.target.value)}
+                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                            errors.telefone ? 'border-[#C8324A]' :
+                            codigoValido === true ? 'border-[#0E8B5A]' :
+                            telefoneValido === true ? 'border-[#5B2E8C]' :
+                            telefoneValido === false ? 'border-[#C8324A]' : ''
+                          }`}
+                          maxLength={15}
+                          disabled={codigoValido === true}
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          {codigoValido === true && (
+                            <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
+                          )}
+                          {codigoValido !== true && telefoneValido === false && (
+                            <XCircle className="h-5 w-5 text-[#C8324A]" />
+                          )}
+                        </div>
+                      </div>
+                      {errors.telefone && <p className="text-sm text-[#C8324A]">{errors.telefone}</p>}
+                      {codigoValido === true && !errors.telefone && (
+                        <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4" />
+                          Telefone validado por SMS
+                        </p>
+                      )}
+                      {telefoneValido === true && !codigoEnviado && !errors.telefone && (
+                        <p className="text-sm text-[#5B2E8C] flex items-center gap-1">
+                          <Smartphone className="h-4 w-4" />
+                          Celular válido — enviaremos um SMS para confirmar
+                        </p>
+                      )}
+                    </div>
+
                   </div>
                 )}
 
@@ -1191,19 +1246,38 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         type="submit"
                         size="lg"
                         className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
-                        disabled={loading || !formData.aceitaTermos || !isCurrentStepValid()}
+                        disabled={loading || emailValidando || validandoCodigo || !isCurrentStepValid()}
+                        onClick={(e) => {
+                          if (telefoneValido === true && !codigoEnviado) {
+                            e.preventDefault();
+                            enviarCodigoValidacao();
+                          }
+                        }}
                       >
-                        {loading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                            Criando conta...
-                          </>
-                        ) : (
-                          <>
-                            <Car className="h-5 w-5 mr-2" />
-                            Criar conta e prosseguir
-                          </>
-                        )}
+                        {telefoneValido === true && !codigoEnviado
+                          ? (emailValidando ? (
+                              <>
+                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                Enviando SMS...
+                              </>
+                            ) : (
+                              <>
+                                <Smartphone className="h-5 w-5 mr-2" />
+                                Enviar código por SMS
+                              </>
+                            ))
+                          : loading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                              Criando conta...
+                            </>
+                          ) : (
+                            <>
+                              <Car className="h-5 w-5 mr-2" />
+                              Criar conta e prosseguir
+                            </>
+                          )
+                        }
                       </Button>
 
                       {/* Alternativa: criar conta sem vincular este veículo */}
@@ -1211,13 +1285,15 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         <button
                           type="button"
                           onClick={handleSubmitSemVeiculo}
-                          disabled={loading}
+                          disabled={loading || codigoValido !== true}
                           className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#8A8B95]"
                         >
                           Criar conta sem vincular este veículo
                         </button>
                         <p className="text-xs text-[#C6C7CF] mt-1.5">
-                          Você poderá cadastrar veículos depois pelo dashboard
+                          {codigoValido === true
+                            ? 'Você poderá cadastrar veículos depois pelo dashboard'
+                            : 'Confirme seu telefone para continuar'}
                         </p>
                       </div>
                     </>
