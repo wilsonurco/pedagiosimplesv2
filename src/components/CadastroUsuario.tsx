@@ -29,7 +29,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     confirmarSenha: '',
     placa: '',
     aceitaTermos: false,
-    aceitaNewsletter: false
+    aceitaNewsletter: false,
+    pularCadastroVeiculo: false
   });
 
   const [loading, setLoading] = useState(false);
@@ -473,9 +474,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (!formData.placa.trim()) return false;
       const placaValidacao = validarPlaca(formData.placa);
       if (!placaValidacao.isValid) return false;
+    } else if (etapaAtual === 4) {
       // Telefone — precisa ter código SMS confirmado
       const telefoneValido_check = (!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true);
-      if (!telefoneValido_check) return false;
+      return telefoneValido_check;
     }
     return true;
   };
@@ -518,6 +520,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           newErrors.placa = placaValidacao.error || 'Placa inválida';
         }
       }
+    } else if (etapaAtual === 4) {
       // Telefone (SMS)
       if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
       else if (telefoneValido === false) newErrors.telefone = 'Insira um celular válido com DDD (ex: (11) 98765-4321)';
@@ -533,7 +536,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     let progress = 0;
 
     if (etapaAtual === 1) {
-      // Etapa 1: 0% a 33%
+      // Etapa 1: 0% a 25%
       let fieldsCompleted = 0;
       const totalFields = 5;
       if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
@@ -541,11 +544,11 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (formData.nome.trim()) fieldsCompleted++;
       if (formData.email.trim() && emailValido !== false) fieldsCompleted++;
       if (formData.aceitaTermos) fieldsCompleted++;
-      progress = (fieldsCompleted / totalFields) * 33;
+      progress = (fieldsCompleted / totalFields) * 25;
 
     } else if (etapaAtual === 2) {
-      // Etapa 2: 33% a 66% (Senha)
-      progress = 33;
+      // Etapa 2: 25% a 50% (Senha)
+      progress = 25;
       const calcularReq = (senha: string) => ({
         tamanho: senha.length >= 8,
         maiuscula: /[A-Z]/.test(senha),
@@ -556,16 +559,22 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       let fieldsCompleted = 0;
       if (formData.senha && Object.values(calcularReq(formData.senha)).every(Boolean)) fieldsCompleted++;
       if (formData.senha && formData.confirmarSenha && formData.senha === formData.confirmarSenha) fieldsCompleted++;
-      progress += (fieldsCompleted / 2) * 33;
+      progress += (fieldsCompleted / 2) * 25;
 
     } else if (etapaAtual === 3) {
-      // Etapa 3: 66% a 100% (Placa + Telefone confirmado por SMS)
-      progress = 66;
-      let fieldsCompleted = 0;
-      const totalFields = 2;
-      if (formData.placa.trim() && validarPlaca(formData.placa).isValid) fieldsCompleted++;
-      if (formData.telefone.trim() && codigoValido === true) fieldsCompleted++;
-      progress += (fieldsCompleted / totalFields) * 34;
+      // Etapa 3: 50% a 75% (Placa)
+      progress = 50;
+      if (formData.placa.trim()) {
+        const placaValidacaoLocal = validarPlaca(formData.placa);
+        progress = placaValidacaoLocal.isValid ? 75 : 62;
+      }
+
+    } else if (etapaAtual === 4) {
+      // Etapa 4: 75% a 100% (Telefone confirmado por SMS)
+      progress = 75;
+      if (formData.telefone.trim() && codigoValido === true) {
+        progress = 100;
+      }
     }
 
     return Math.max(0, Math.min(100, progress));
@@ -604,20 +613,19 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     }, 2000);
   };
 
-  const handleSubmitSemVeiculo = () => {
-    setLoading(true);
-    // Cria a conta sem vincular o veículo consultado
-    setTimeout(() => {
-      setLoading(false);
-      onCadastrar({ ...formData, placa: '', pularCadastroVeiculo: true });
-    }, 1500);
+  const handlePularVeiculo = () => {
+    // Não cria a conta ainda — só pula a exigência de placa e avança para a
+    // etapa de confirmação de telefone, que continua obrigatória.
+    setFormData(prev => ({ ...prev, placa: '', pularCadastroVeiculo: true }));
+    setEtapaAtual(4);
   };
 
   const getStepTitle = () => {
     switch (etapaAtual) {
       case 1: return 'Dados pessoais';
       case 2: return 'Senha e confirmação';
-      case 3: return 'Confirmar veículo e telefone';
+      case 3: return 'Confirmar veículo';
+      case 4: return 'Confirmar telefone';
       default: return '';
     }
   };
@@ -627,6 +635,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       case 1: return <User className="h-6 w-6 text-[#5B2E8C]" />;
       case 2: return <Lock className="h-6 w-6 text-[#5B2E8C]" />;
       case 3: return <Car className="h-6 w-6 text-[#5B2E8C]" />;
+      case 4: return <Smartphone className="h-6 w-6 text-[#5B2E8C]" />;
       default: return null;
     }
   };
@@ -673,7 +682,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm font-medium text-[#1A1B23]">
-                Etapa {etapaAtual} de 3
+                Etapa {etapaAtual} de 4
               </span>
               <span className="text-sm text-[#8A8B95]">
                 {Math.round(progressoCalculado)}% concluído
@@ -691,7 +700,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={etapaAtual === 3 ? handleSubmit : (e) => { e.preventDefault(); handleNextStep(); }} className="space-y-6">
+              <form onSubmit={etapaAtual === 4 ? handleSubmit : (e) => { e.preventDefault(); handleNextStep(); }} className="space-y-6">
                 
                 {/* Etapa 1: Dados Pessoais */}
                 {etapaAtual === 1 && (
@@ -1176,6 +1185,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       )}
                     </div>
 
+                  </div>
+                )}
+
+                {/* Etapa 4: Confirmação do Telefone */}
+                {etapaAtual === 4 && (
+                  <div className="space-y-6">
                     {/* Telefone */}
                     <div className="space-y-2">
                       <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center gap-2">
@@ -1221,82 +1236,79 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </p>
                       )}
                     </div>
-
                   </div>
                 )}
 
                 {/* Botões de navegação */}
                 <div className="pt-6">
-                  {etapaAtual < 3 ? (
-                    <Button
-                      type="submit"
-                      size="lg"
-                      disabled={!isCurrentStepValid() || emailValidando}
-                      className={`w-full py-4 text-lg rounded-lg font-medium transition-colors ${
-                        isCurrentStepValid() && !emailValidando
-                          ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
-                          : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-                      }`}
-                    >
-                      Continuar <ArrowRight className="h-5 w-5 ml-2" />
-                    </Button>
-                  ) : (
+                  {etapaAtual < 4 ? (
                     <>
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
-                        disabled={loading || emailValidando || validandoCodigo || !isCurrentStepValid()}
-                        onClick={(e) => {
-                          if (telefoneValido === true && !codigoEnviado) {
-                            e.preventDefault();
-                            enviarCodigoValidacao();
-                          }
-                        }}
+                        disabled={!isCurrentStepValid() || emailValidando}
+                        className={`w-full py-4 text-lg rounded-lg font-medium transition-colors ${
+                          isCurrentStepValid() && !emailValidando
+                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
+                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                        }`}
                       >
-                        {telefoneValido === true && !codigoEnviado
-                          ? (emailValidando ? (
-                              <>
-                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                                Enviando SMS...
-                              </>
-                            ) : (
-                              <>
-                                <Smartphone className="h-5 w-5 mr-2" />
-                                Enviar código por SMS
-                              </>
-                            ))
-                          : loading ? (
+                        Continuar <ArrowRight className="h-5 w-5 ml-2" />
+                      </Button>
+
+                      {etapaAtual === 3 && (
+                        <div className="mt-4 text-center">
+                          <button
+                            type="button"
+                            onClick={handlePularVeiculo}
+                            className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors"
+                          >
+                            Criar conta sem vincular este veículo
+                          </button>
+                          <p className="text-xs text-[#C6C7CF] mt-1.5">
+                            Você poderá cadastrar veículos depois pelo dashboard
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
+                      disabled={loading || emailValidando || validandoCodigo || !isCurrentStepValid()}
+                      onClick={(e) => {
+                        if (telefoneValido === true && !codigoEnviado) {
+                          e.preventDefault();
+                          enviarCodigoValidacao();
+                        }
+                      }}
+                    >
+                      {telefoneValido === true && !codigoEnviado
+                        ? (emailValidando ? (
                             <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                              Criando conta...
+                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                              Enviando SMS...
                             </>
                           ) : (
                             <>
-                              <Car className="h-5 w-5 mr-2" />
-                              Criar conta e prosseguir
+                              <Smartphone className="h-5 w-5 mr-2" />
+                              Enviar código por SMS
                             </>
-                          )
-                        }
-                      </Button>
-
-                      {/* Alternativa: criar conta sem vincular este veículo */}
-                      <div className="mt-4 text-center">
-                        <button
-                          type="button"
-                          onClick={handleSubmitSemVeiculo}
-                          disabled={loading || codigoValido !== true}
-                          className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#8A8B95]"
-                        >
-                          Criar conta sem vincular este veículo
-                        </button>
-                        <p className="text-xs text-[#C6C7CF] mt-1.5">
-                          {codigoValido === true
-                            ? 'Você poderá cadastrar veículos depois pelo dashboard'
-                            : 'Confirme seu telefone para continuar'}
-                        </p>
-                      </div>
-                    </>
+                          ))
+                        : loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                            Criando conta...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-5 w-5 mr-2" />
+                            Criar conta e prosseguir
+                          </>
+                        )
+                      }
+                    </Button>
                   )}
                 </div>
               </form>
