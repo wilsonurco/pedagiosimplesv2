@@ -1155,6 +1155,9 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         onChange={(e) => {
                           const placaFormatada = formatarPlacaInput(e.target.value);
                           handleInputChange('placa', placaFormatada);
+                          if (formData.pularCadastroVeiculo) {
+                            setFormData(prev => ({ ...prev, pularCadastroVeiculo: false }));
+                          }
                         }}
                         className={`text-lg py-3 text-center font-mono font-semibold tracking-[0.05em] uppercase border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
                           errors.placa ? 'border-[#C8324A]' : 
