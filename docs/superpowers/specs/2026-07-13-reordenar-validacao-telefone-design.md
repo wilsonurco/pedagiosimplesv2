@@ -3,6 +3,8 @@
 **Data:** 2026-07-13
 **Status:** Aprovado para implementação
 
+> **Atualização (2026-07-13, pós-implementação inicial):** depois de ver a Etapa 3 combinando placa e telefone na mesma tela, o usuário pediu para separar em uma etapa própria. As seções 3, 4 e 5 abaixo foram revisadas para refletir esse novo modelo de **4 etapas**. O resto do documento (contexto, objetivos, não-objetivos) permanece válido.
+
 ## 1. Contexto e motivação
 
 O fluxo de cadastro (`CadastroUsuario.tsx`) tem 3 etapas: **1) Dados pessoais** (CPF, nascimento, nome, email, telefone com validação por SMS, termos), **2) Senha**, **3) Confirmar veículo** (placa). Hoje a validação do celular por SMS acontece logo na Etapa 1, antes mesmo do usuário confirmar o veículo.
@@ -22,7 +24,7 @@ A consulta pública de débitos (`ConsultaDebitos.tsx` / `ResultadosDebitos.tsx`
 - Mudar a Etapa 2 (senha).
 - Adicionar/remover campos do formulário.
 
-## 3. Escopo por etapa
+## 3. Escopo por etapa (revisado — modelo de 4 etapas)
 
 ### Etapa 1 — "Dados pessoais" (sem SMS)
 - Mantém: CPF, data de nascimento, nome, email, telefone (formatação e validação de DDD/9º dígito, como hoje), checkbox de termos.
@@ -32,25 +34,32 @@ A consulta pública de débitos (`ConsultaDebitos.tsx` / `ResultadosDebitos.tsx`
 ### Etapa 2 — "Senha e confirmação"
 Sem mudanças.
 
-### Etapa 3 — passa a se chamar "Confirmar veículo e telefone"
-- Ordem interna: campo de placa primeiro (como hoje), depois o bloco de telefone + validação por SMS (reaproveitando a UI e o modal existentes, apenas realocados).
-- O botão principal replica o padrão que hoje existe na Etapa 1: quando o telefone tem formato válido mas o código ainda não foi enviado, o botão vira "Enviar código por SMS"; depois que o código é confirmado (`codigoValido === true`), o botão volta a ser "Criar conta e prosseguir", agora exigindo placa válida **e** SMS confirmado.
-- "Criar conta sem vincular este veículo": fica **desabilitado até `codigoValido === true`**, independente do estado da placa. Enquanto desabilitado por esse motivo, mostra uma dica curta (ex.: "Confirme seu telefone para continuar").
+### Etapa 3 — "Confirmar veículo" (placa apenas)
+- Só o campo de placa (volta a ser como era antes da primeira rodada de implementação).
+- Botão "Continuar" avança para a Etapa 4 quando a placa é válida.
+- "Criar conta sem vincular este veículo": continua nesta etapa, mas **não cria mais a conta diretamente** — passa a pular a exigência de placa (`formData.placa = ''`, `pularCadastroVeiculo = true`) e avançar para a Etapa 4, onde o telefone ainda precisa ser confirmado por SMS antes da conta ser criada de fato.
 
-## 4. Barra de progresso
+### Etapa 4 (nova) — "Confirmar telefone"
+- Campo de telefone + validação por SMS, reaproveitando a UI e o modal existentes (apenas realocados desta vez para a Etapa 4, não mais dentro da Etapa 3).
+- O botão principal replica o padrão que já existe: quando o telefone tem formato válido mas o código ainda não foi enviado, o botão vira "Enviar código por SMS"; depois que o código é confirmado (`codigoValido === true`), o botão vira "Criar conta e prosseguir" — esta é agora a única etapa que efetivamente cria a conta (via `handleSubmit`), esteja o veículo vinculado ou não.
 
-- Etapa 1 (0–33%): recalculada sobre 5 campos (CPF, nascimento, nome, email, termos) — sem telefone/SMS.
-- Etapa 2 (33–66%): sem mudanças.
-- Etapa 3 (66–100%): passa a considerar placa válida **e** telefone confirmado por SMS para chegar a 100%.
+## 4. Barra de progresso (revisada — 4 faixas de 25%)
+
+- Etapa 1 (0–25%): recalculada sobre 5 campos (CPF, nascimento, nome, email, termos) — sem telefone/SMS.
+- Etapa 2 (25–50%): sem mudanças de conteúdo, só a faixa de porcentagem.
+- Etapa 3 (50–75%): só placa válida.
+- Etapa 4 (75–100%): telefone confirmado por SMS.
+
+Cabeçalho passa a mostrar "Etapa X de 4" em vez de "Etapa X de 3".
 
 ## 5. Duplicação a atualizar
 
-A lógica de validade/gating do telefone hoje existe em 3 lugares dentro de `CadastroUsuario.tsx`, todos amarrados a `etapaAtual === 1`:
-1. `isCurrentStepValid()` (bloco da etapa 1)
-2. `validateCurrentStep()` (bloco da etapa 1)
-3. O bloco inline `disabled`/`className`/`onClick` do botão principal (que hoje duplica a mesma expressão de validade do telefone e o intercept de envio de SMS)
+A lógica de validade/gating do telefone (que a primeira rodada desta mudança já moveu da Etapa 1 para dentro da Etapa 3) precisa ser movida — não duplicada — mais uma vez, agora da Etapa 3 para um bloco próprio da Etapa 4, em:
+1. `isCurrentStepValid()` — bloco da etapa 3 volta a ser só placa; novo bloco da etapa 4 tem a checagem de telefone/SMS.
+2. `validateCurrentStep()` — mesma separação.
+3. O botão principal: a faixa `etapaAtual < 3` (que mostra "Continuar") passa a ser `etapaAtual < 4`; o bloco final (SMS + "Criar conta e prosseguir") passa a ser exclusivo de `etapaAtual === 4`.
 
-Essa lógica precisa ser movida — não duplicada — para o bloco da etapa 3, incluindo o intercept em `handleNextStep()`/`onClick` que hoje dispara `enviarCodigoValidacao()` quando `etapaAtual === 1 && telefoneValido === true && !codigoEnviado`. O `handleSubmit()` final (e `handleSubmitSemVeiculo()`) passam a checar a condição combinada `(!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true)` antes de criar a conta.
+`handleSubmitSemVeiculo()` deixa de chamar `onCadastrar` diretamente — passa a apenas marcar `pularCadastroVeiculo: true` no `formData` e chamar `setEtapaAtual(4)`. A criação da conta em si (com ou sem veículo vinculado) passa a acontecer só via `handleSubmit()` na Etapa 4, que já checa a condição combinada `(!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true)` antes de criar a conta.
 
 O restante da máquina de SMS (`enviarCodigoValidacao`, `reenviarCodigoDoModal`, o handler inline de validação do código no modal, e o próprio `<Dialog>`) é agnóstico de etapa e não precisa mudar de lugar — só o que dispara e gate.
 
