@@ -42,13 +42,16 @@ export function LoginConcessionaria({ onLogin, onVoltar }: LoginConcessionariaPr
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      const isSenhaTemp = formData.senha === "123@Mudar";
       onLogin({
-        id: 'gestor-1',
-        nome: 'Administrador',
+        id: 'usr-master-1',
+        nome: 'Giuliana Santiago',
+        email: formData.usuario.includes('@') ? formData.usuario : `${formData.usuario}@pedagiosimples.com.br`,
         usuario: formData.usuario,
-        perfil: 'gestor',
+        perfil: 'Administrador',
         concessionaria: 'Concessionária Via Expressa S/A',
-        trecho: 'SP-330 — km 45 a km 120'
+        trecho: 'SP-330 — km 45 a km 120',
+        senhaTemporaria: isSenhaTemp,
       });
     }, 1500);
   };

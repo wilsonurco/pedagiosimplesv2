@@ -18,6 +18,7 @@ import {
   CheckCircle,
   MapPin,
   Hash,
+  Users,
 } from "lucide-react";
 import {
   BarChart,
@@ -34,9 +35,13 @@ import {
 import LogoCinza from "../imports/LogoCinza";
 import { exportarRepasse, exportarPedidosPagos, exportarComprovante } from "../utils/exportRepasse";
 import { FooterLogado } from "./FooterLogado";
+import { HeaderConcessionaria } from "./HeaderConcessionaria";
+import { MeuPerfilModal } from "./MeuPerfilModal";
+import { GestaoUsuarios } from "./GestaoUsuarios";
+import { Usuario } from "../types/usuario";
 
 interface DashboardConcessionariaProps {
-  dadosGestor: any;
+  dadosGestor?: any;
   onLogout: () => void;
 }
 
@@ -108,7 +113,7 @@ const MESES_LABEL: Record<string, string> = {
   "06/2026": "Junho de 2026",
 };
 
-type Tab = "repasse" | "pedidos-pagos";
+type Tab = "repasse" | "pedidos-pagos" | "gestao-usuarios";
 type DetalheView = "tabela" | "grafico";
 type GraficoTipo = "colunas" | "linhas";
 
@@ -258,8 +263,18 @@ function gerarDadosComprovante(pedido: PedidoPago): {
   return { protocolo, passagens };
 }
 
-export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaProps) {
+export function DashboardConcessionaria({ dadosGestor, onLogout }: DashboardConcessionariaProps) {
   const [tabAtiva, setTabAtiva] = useState<Tab>("repasse");
+  const [gestorAtual, setGestorAtual] = useState({
+    id: dadosGestor?.id || "usr-master-1",
+    nome: dadosGestor?.nome || "Giuliana Santiago",
+    email: dadosGestor?.email || "giuliana.santiago@pedagiosimples.com.br",
+    perfil: dadosGestor?.perfil || "Administrador",
+    empresa: dadosGestor?.concessionaria || "Concessionária Via Expressa S/A",
+    senhaTemporaria: dadosGestor?.senhaTemporaria || false,
+  });
+  const [meuPerfilOpen, setMeuPerfilOpen] = useState(false);
+
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string | null>(null);
   const [detalheView, setDetalheView] = useState<DetalheView>("tabela");
   const [graficoTipo, setGraficoTipo] = useState<GraficoTipo>("colunas");
@@ -374,28 +389,19 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
   return (
     <div className="min-h-screen bg-[#F7F5FB] flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-[#DCDDE3]">
-        <div className="flex items-center justify-between px-6 py-3">
-          <div className="w-44 h-10">
-            <LogoCinza />
-          </div>
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-1.5 text-sm text-[#8A8B95] hover:text-[#5B2E8C] transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair
-          </button>
-        </div>
-      </header>
+      {/* Header Concessionária com Perfil do Usuário e Dropdown */}
+      <HeaderConcessionaria
+        usuarioLogado={gestorAtual}
+        onAbrirMeuPerfil={() => setMeuPerfilOpen(true)}
+        onLogout={onLogout}
+      />
 
-      {/* Tabs */}
-      <div className="bg-white border-b border-[#DCDDE3] px-6">
-        <div className="flex gap-2 py-3">
+      {/* Tabs Sub-cabeçalho */}
+      <div className="bg-white border-b border-[#DCDDE3] px-4 sm:px-6 lg:px-8">
+        <div className="flex gap-2 py-3 overflow-x-auto">
           <button
             onClick={() => { setTabAtiva("repasse"); setPeriodoSelecionado(null); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               tabAtiva === "repasse" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:text-[#5B2E8C]"
             }`}
           >
@@ -404,21 +410,38 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
           </button>
           <button
             onClick={() => { setTabAtiva("pedidos-pagos"); setPeriodoSelecionado(null); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               tabAtiva === "pedidos-pagos" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:text-[#5B2E8C]"
             }`}
           >
             <FileText className="h-4 w-4" />
             Pedidos pagos
           </button>
+          <button
+            onClick={() => { setTabAtiva("gestao-usuarios"); setPeriodoSelecionado(null); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              tabAtiva === "gestao-usuarios" ? "bg-[#5B2E8C] text-white" : "text-[#8A8B95] hover:text-[#5B2E8C]"
+            }`}
+          >
+            <Users className="h-4 w-4" />
+            Gestão de usuários
+          </button>
         </div>
       </div>
 
-      <div className="max-w-[1084px] mx-auto px-6 py-8 flex-1">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 flex-1">
+
+        {/* ── GESTÃO DE USUÁRIOS ── */}
+        {tabAtiva === "gestao-usuarios" && (
+          <GestaoUsuarios
+            usuarioLogadoPerfil={gestorAtual.perfil}
+            usuarioLogadoId={gestorAtual.id}
+          />
+        )}
 
         {/* ── LISTA DE REPASSE ── */}
         {tabAtiva === "repasse" && !periodoSelecionado && (
-          <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#DCDDE3] overflow-hidden">
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#F7F5FB]">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#5B2E8C] rounded-xl flex items-center justify-center flex-shrink-0">
@@ -487,7 +510,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
         {/* ── DETALHE DO PERÍODO ── */}
         {tabAtiva === "repasse" && periodoSelecionado && (
-          <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#DCDDE3] overflow-hidden">
 
             {/* Cabeçalho */}
             <div className="flex items-start justify-between px-6 py-5 border-b border-[#F7F5FB]">
@@ -810,7 +833,7 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
             </div>
 
             {/* Card de filtros */}
-            <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] px-6 py-5">
+            <div className="bg-white rounded-xl border border-[#DCDDE3] px-6 py-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 bg-[#F7F5FB] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -897,14 +920,14 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
 
             {/* Resultados */}
             {pedidosFiltrados.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] px-6 py-16 text-center">
+              <div className="bg-white rounded-xl border border-[#DCDDE3] px-6 py-16 text-center">
                 <p className="text-sm font-semibold text-[#1A1B23] mb-1">Nenhum pedido encontrado</p>
                 <p className="text-sm text-[#8A8B95]">
                   Não há pedidos pagos para {MESES_LABEL[filtroMes] ?? filtroMes}.
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-[#F7F5FB] overflow-hidden">
+              <div className="bg-white rounded-xl border border-[#DCDDE3] overflow-hidden">
 
                 {/* Linha de resumo */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5FB]">
@@ -1390,6 +1413,17 @@ export function DashboardConcessionaria({ onLogout }: DashboardConcessionariaPro
           </div>
         </div>
       )}
+
+      {/* Modal Meu Perfil & Redefinição Obrigatória de Senha */}
+      <MeuPerfilModal
+        open={meuPerfilOpen || gestorAtual.senhaTemporaria}
+        onOpenChange={setMeuPerfilOpen}
+        usuarioLogado={gestorAtual}
+        onSenhaAtualizada={(_novaSenha) => {
+          setGestorAtual((prev) => ({ ...prev, senhaTemporaria: false }));
+        }}
+        isPrimeiroAcesso={gestorAtual.senhaTemporaria}
+      />
     </div>
   );
 }
