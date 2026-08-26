@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,7 +17,7 @@ interface ModalUsuarioFormProps {
   perfisDisponiveis?: PerfilModulo[];
 }
 
-export function ModalUsuarioForm({
+export const ModalUsuarioForm = memo(function ModalUsuarioForm({
   open,
   onOpenChange,
   usuarioEdicao,
@@ -252,4 +252,4 @@ export function ModalUsuarioForm({
       </DialogContent>
     </Dialog>
   );
-}
+});

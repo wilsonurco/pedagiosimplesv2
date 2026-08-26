@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, startTransition, memo } from "react";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import {
@@ -239,7 +239,11 @@ export function GestaoUsuarios({
         {isAdministrador && (
           <div className="flex flex-wrap items-center gap-2.5">
             <Button
-              onClick={() => setModalPerfisOpen(true)}
+              onClick={() => {
+                startTransition(() => {
+                  setModalPerfisOpen(true);
+                });
+              }}
               variant="outline"
               className="border-[#DCDDE3] text-[#5B2E8C] hover:bg-[#F7F5FB] hover:text-[#5B2E8C] rounded-lg px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-colors cursor-pointer"
             >
@@ -249,8 +253,10 @@ export function GestaoUsuarios({
 
             <Button
               onClick={() => {
-                setUsuarioEmEdicao(null);
-                setModalFormOpen(true);
+                startTransition(() => {
+                  setUsuarioEmEdicao(null);
+                  setModalFormOpen(true);
+                });
               }}
               className="bg-[#6B3BA7] hover:bg-[#5B2E8C] text-white rounded-lg px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
@@ -388,8 +394,10 @@ export function GestaoUsuarios({
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            setUsuarioEmEdicao(u);
-                            setModalFormOpen(true);
+                            startTransition(() => {
+                              setUsuarioEmEdicao(u);
+                              setModalFormOpen(true);
+                            });
                           }}
                           title="Editar Usuário"
                           className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#6B3BA7] hover:bg-[#F7F5FB] rounded-lg cursor-pointer"

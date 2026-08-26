@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -14,7 +14,7 @@ interface ModalGestaoPerfisProps {
   onAtualizarPerfis: (perfis: PerfilModulo[]) => void;
 }
 
-export function ModalGestaoPerfis({
+export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
   open,
   onOpenChange,
   perfis,
@@ -157,4 +157,4 @@ export function ModalGestaoPerfis({
       />
     </>
   );
-}
+});
