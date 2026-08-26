@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, startTransition } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -65,8 +65,10 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
 
               <Button
                 onClick={() => {
-                  setPerfilEmEdicao(null);
-                  setModalFormOpen(true);
+                  startTransition(() => {
+                    setPerfilEmEdicao(null);
+                    setModalFormOpen(true);
+                  });
                 }}
                 className="bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer flex-shrink-0"
               >
@@ -102,8 +104,10 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setPerfilEmEdicao(p);
-                        setModalFormOpen(true);
+                        startTransition(() => {
+                          setPerfilEmEdicao(p);
+                          setModalFormOpen(true);
+                        });
                       }}
                       title="Editar perfil e permissões"
                       className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB]"

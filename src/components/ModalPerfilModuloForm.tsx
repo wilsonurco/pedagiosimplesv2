@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -16,7 +16,7 @@ interface ModalPerfilModuloFormProps {
   onSalvarPerfil: (perfil: PerfilModulo) => void;
 }
 
-export function ModalPerfilModuloForm({
+export const ModalPerfilModuloForm = memo(function ModalPerfilModuloForm({
   open,
   onOpenChange,
   perfilEdicao,
@@ -231,4 +231,4 @@ export function ModalPerfilModuloForm({
       </DialogContent>
     </Dialog>
   );
-}
+});
