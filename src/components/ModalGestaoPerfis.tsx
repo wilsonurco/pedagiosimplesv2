@@ -137,7 +137,7 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
         {/* CABEÇALHO DA LISTA DE PERFIS */}
         {!isFormAtivo ? (
           <DialogHeader className="p-6 pb-4 border-b border-[#DCDDE3] bg-white shrink-0 sticky top-0 z-10">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pr-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pr-10">
               <div>
                 <DialogTitle className="text-lg font-bold text-[#1A1B23] flex items-center gap-2">
                   <Shield className="w-5 h-5 text-[#5B2E8C]" />
@@ -160,7 +160,7 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
         ) : (
           /* CABEÇALHO DO FORMULÁRIO DE EDIÇÃO / CRIAÇÃO */
           <DialogHeader className="p-6 pb-4 border-b border-[#DCDDE3] bg-white shrink-0 sticky top-0 z-10">
-            <div className="flex items-center gap-3 pr-8">
+            <div className="flex items-center gap-3 pr-10">
               <Button
                 type="button"
                 variant="ghost"
