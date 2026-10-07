@@ -40,6 +40,7 @@ export interface PerfilModulo {
   modulos: string[];
   isSistema?: boolean;
   dataCriacao?: string;
+  empresa?: string;
 }
 
 export const PERFIS_INICIAIS: PerfilModulo[] = [

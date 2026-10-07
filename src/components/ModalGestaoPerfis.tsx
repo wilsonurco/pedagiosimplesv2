@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, useMemo, memo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -6,6 +6,13 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
 import { Badge } from "./ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { Shield, Plus, Pencil, Trash2, CheckCircle2, Lock, ArrowLeft, AlertCircle, Layers } from "lucide-react";
 import { PerfilModulo, MODULOS_SISTEMA } from "../types/usuario";
 import { toast } from "sonner";
@@ -15,6 +22,7 @@ interface ModalGestaoPerfisProps {
   onOpenChange: (open: boolean) => void;
   perfis: PerfilModulo[];
   onAtualizarPerfis: (perfis: PerfilModulo[]) => void;
+  empresas?: string[];
 }
 
 export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
@@ -22,24 +30,83 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
   onOpenChange,
   perfis,
   onAtualizarPerfis,
+  empresas = [],
 }: ModalGestaoPerfisProps) {
   // Controle de Visualização (Lista vs Formulário)
   const [perfilEmEdicao, setPerfilEmEdicao] = useState<PerfilModulo | null>(null);
   const [isCriandoPerfil, setIsCriandoPerfil] = useState(false);
 
+  // Filtros da Listagem (conforme design da interface)
+  const [filtroEmpresa, setFiltroEmpresa] = useState<string>("todas");
+  const [ordem, setOrdem] = useState<string>("az");
+
   // Estado do Formulário
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [empresaForm, setEmpresaForm] = useState("Todas as empresas");
   const [modulosSelecionados, setModulosSelecionados] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isFormAtivo = isCriandoPerfil || !!perfilEmEdicao;
+
+  // Lista dinâmica de empresas para o filtro
+  const listaEmpresas = useMemo(() => {
+    const setEmp = new Set<string>();
+    empresas.forEach((e) => {
+      if (e) setEmp.add(e);
+    });
+    perfis.forEach((p) => {
+      if (p.empresa && p.empresa !== "Todas as empresas") setEmp.add(p.empresa);
+    });
+    const defaults = [
+      "Concessionária Via Expressa S/A",
+      "Move Mais",
+      "Volkswagen",
+      "Parceiro",
+    ];
+    defaults.forEach((d) => setEmp.add(d));
+    return Array.from(setEmp);
+  }, [empresas, perfis]);
+
+  // Perfis filtrados e ordenados
+  const perfisProcessados = useMemo(() => {
+    let resultado = [...perfis];
+
+    // 1. Filtrar por empresa
+    if (filtroEmpresa && filtroEmpresa !== "todas") {
+      resultado = resultado.filter((p) => {
+        if (p.empresa === filtroEmpresa) return true;
+        // Perfis globais do sistema ou sem restrição atendem à empresa selecionada
+        if (!p.empresa || p.empresa === "Todas as empresas" || p.isSistema) return true;
+        return false;
+      });
+    }
+
+    // 2. Ordenar
+    resultado.sort((a, b) => {
+      switch (ordem) {
+        case "az":
+          return a.nome.localeCompare(b.nome, "pt-BR");
+        case "za":
+          return b.nome.localeCompare(a.nome, "pt-BR");
+        case "mais-modulos":
+          return b.modulos.length - a.modulos.length;
+        case "menos-modulos":
+          return a.modulos.length - b.modulos.length;
+        default:
+          return 0;
+      }
+    });
+
+    return resultado;
+  }, [perfis, filtroEmpresa, ordem]);
 
   const handleIniciarNovoPerfil = () => {
     setPerfilEmEdicao(null);
     setIsCriandoPerfil(true);
     setNome("");
     setDescricao("");
+    setEmpresaForm(filtroEmpresa !== "todas" ? filtroEmpresa : "Todas as empresas");
     setModulosSelecionados(["Consultas"]);
     setErrors({});
   };
@@ -49,6 +116,7 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
     setPerfilEmEdicao(perfil);
     setNome(perfil.nome || "");
     setDescricao(perfil.descricao || "");
+    setEmpresaForm(perfil.empresa || "Todas as empresas");
     setModulosSelecionados(perfil.modulos || []);
     setErrors({});
   };
@@ -96,6 +164,7 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
       id: perfilEmEdicao?.id || `perf-${Date.now()}`,
       nome: nome.trim(),
       descricao: descricao.trim() || "Perfil de acesso personalizado.",
+      empresa: empresaForm || "Todas as empresas",
       modulos: modulosSelecionados,
       isSistema: perfilEmEdicao?.isSistema || false,
       dataCriacao: perfilEmEdicao?.dataCriacao || new Date().toLocaleDateString("pt-BR"),
@@ -186,71 +255,147 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
 
         {/* CORPO DO MODAL - MODO LISTA */}
         {!isFormAtivo ? (
-          <div className="flex-1 overflow-y-auto p-6 space-y-3">
-            {perfis.map((p) => (
-              <div
-                key={p.id}
-                className="p-4 rounded-xl border border-[#DCDDE3] bg-white hover:border-[#5B2E8C]/40 transition-all space-y-2.5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-[#1A1B23]">{p.nome}</span>
-                    {p.isSistema ? (
-                      <Badge className="bg-gray-100 text-gray-600 border-gray-200 text-[10px]">
-                        <Lock className="w-2.5 h-2.5 mr-1" /> Nativo do Sistema
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-[#5B2E8C]/10 text-[#5B2E8C] border-[#5B2E8C]/20 text-[10px]">
-                        Personalizado
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleIniciarEdicaoPerfil(p)}
-                      title="Editar perfil e permissões"
-                      className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB] cursor-pointer"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-
-                    {!p.isSistema && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleExcluirPerfil(p)}
-                        title="Excluir perfil"
-                        className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#C8324A] hover:bg-red-50 cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-xs text-[#8A8B95]">{p.descricao}</p>
-
-                <div className="pt-2 border-t border-[#E5E6EC]">
-                  <p className="text-[11px] font-semibold text-[#5B2E8C] mb-1.5 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#0E8B5A]" />
-                    Módulos Liberados ({p.modulos.length}):
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {p.modulos.map((m) => (
-                      <span
-                        key={m}
-                        className="bg-[#F7F5FB] border border-[#E5E6EC] text-[#5B2E8C] text-[11px] px-2 py-0.5 rounded font-medium"
-                      >
-                        {m}
-                      </span>
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F8F9FA]">
+            {/* SEÇÃO DE FILTROS: FILTRAR POR EMPRESA E ORDENAR POR */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Filtro por Empresa */}
+              <div className="space-y-1.5">
+                <Label htmlFor="filtro-empresa" className="text-xs font-semibold text-[#1A1B23]">
+                  Filtrar por empresa
+                </Label>
+                <Select value={filtroEmpresa} onValueChange={setFiltroEmpresa}>
+                  <SelectTrigger
+                    id="filtro-empresa"
+                    className="w-full h-10 bg-white border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] focus:border-[#5B2E8C] focus:ring-1 focus:ring-[#5B2E8C]/20 shadow-xs cursor-pointer"
+                  >
+                    <SelectValue placeholder="Todas as empresas" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#DCDDE3]">
+                    <SelectItem value="todas">Todas as empresas</SelectItem>
+                    {listaEmpresas.map((emp) => (
+                      <SelectItem key={emp} value={emp}>
+                        {emp}
+                      </SelectItem>
                     ))}
-                  </div>
-                </div>
+                  </SelectContent>
+                </Select>
               </div>
-            ))}
+
+              {/* Ordenar Por */}
+              <div className="space-y-1.5">
+                <Label htmlFor="ordenar-perfil" className="text-xs font-semibold text-[#1A1B23]">
+                  Ordenar por
+                </Label>
+                <Select value={ordem} onValueChange={setOrdem}>
+                  <SelectTrigger
+                    id="ordenar-perfil"
+                    className="w-full h-10 bg-white border-[#DCDDE3] rounded-lg text-sm text-[#1A1B23] focus:border-[#5B2E8C] focus:ring-1 focus:ring-[#5B2E8C]/20 shadow-xs cursor-pointer"
+                  >
+                    <SelectValue placeholder="Nome do perfil (A-Z)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#DCDDE3]">
+                    <SelectItem value="az">Nome do perfil (A-Z)</SelectItem>
+                    <SelectItem value="za">Nome do perfil (Z-A)</SelectItem>
+                    <SelectItem value="mais-modulos">Mais módulos liberados</SelectItem>
+                    <SelectItem value="menos-modulos">Menos módulos liberados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* LISTA DE CARDS DE PERFIS */}
+            <div className="space-y-3 pt-1">
+              {perfisProcessados.length > 0 ? (
+                perfisProcessados.map((p) => (
+                  <div
+                    key={p.id}
+                    className="p-4 rounded-xl border border-[#DCDDE3] bg-white hover:border-[#5B2E8C]/40 transition-all space-y-2.5 shadow-xs"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm text-[#1A1B23]">{p.nome}</span>
+                        {p.isSistema ? (
+                          <Badge className="bg-gray-100 text-gray-600 border-gray-200 text-[10px]">
+                            <Lock className="w-2.5 h-2.5 mr-1" /> Nativo do Sistema
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-[#5B2E8C]/10 text-[#5B2E8C] border-[#5B2E8C]/20 text-[10px]">
+                            Personalizado
+                          </Badge>
+                        )}
+                        {p.empresa && p.empresa !== "Todas as empresas" && (
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px]">
+                            {p.empresa}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleIniciarEdicaoPerfil(p)}
+                          title="Editar perfil e permissões"
+                          className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#5B2E8C] hover:bg-[#F7F5FB] cursor-pointer"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+
+                        {!p.isSistema && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleExcluirPerfil(p)}
+                            title="Excluir perfil"
+                            className="h-8 w-8 p-0 text-[#8A8B95] hover:text-[#C8324A] hover:bg-red-50 cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[#8A8B95]">{p.descricao}</p>
+
+                    <div className="pt-2 border-t border-[#E5E6EC]">
+                      <p className="text-[11px] font-semibold text-[#5B2E8C] mb-1.5 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0E8B5A]" />
+                        Módulos Liberados ({p.modulos.length}):
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {p.modulos.map((m) => (
+                          <span
+                            key={m}
+                            className="bg-[#F7F5FB] border border-[#E5E6EC] text-[#5B2E8C] text-[11px] px-2 py-0.5 rounded font-medium"
+                          >
+                            {m}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10 px-4 bg-white rounded-xl border border-dashed border-[#DCDDE3]">
+                  <Shield className="w-10 h-10 text-[#8A8B95] mx-auto mb-2 opacity-50" />
+                  <p className="text-sm font-semibold text-[#1A1B23]">Nenhum perfil encontrado</p>
+                  <p className="text-xs text-[#8A8B95] mt-1">
+                    Nenhum perfil corresponde aos filtros selecionados.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFiltroEmpresa("todas");
+                      setOrdem("az");
+                    }}
+                    className="mt-3 text-xs text-[#5B2E8C] border-[#DCDDE3] hover:bg-[#F7F5FB] cursor-pointer"
+                  >
+                    Limpar Filtros
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           /* CORPO DO MODAL - MODO FORMULÁRIO DE EDIÇÃO / CRIAÇÃO */
@@ -285,6 +430,29 @@ export const ModalGestaoPerfis = memo(function ModalGestaoPerfis({
                 onChange={(e) => setDescricao(e.target.value)}
                 className="border-[#DCDDE3] focus:border-[#5B2E8C] text-xs resize-none h-16"
               />
+            </div>
+
+            {/* Empresa Vinculada */}
+            <div className="space-y-1">
+              <Label htmlFor="empresaPerfil" className="text-xs font-semibold text-[#1A1B23]">
+                Empresa Vinculada
+              </Label>
+              <Select value={empresaForm} onValueChange={setEmpresaForm}>
+                <SelectTrigger id="empresaPerfil" className="border-[#DCDDE3] focus:border-[#5B2E8C] text-sm bg-white cursor-pointer">
+                  <SelectValue placeholder="Selecione a empresa" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#DCDDE3]">
+                  <SelectItem value="Todas as empresas">Todas as empresas (Global)</SelectItem>
+                  {listaEmpresas.map((emp) => (
+                    <SelectItem key={emp} value={emp}>
+                      {emp}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-[#8A8B95]">
+                Defina se este perfil é aplicável a todas as empresas ou restrito a uma específica.
+              </p>
             </div>
 
             {/* Seleção de Módulos */}

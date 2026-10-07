@@ -170,6 +170,15 @@ export function GestaoUsuarios({
   const totalAtivos = usuarios.filter((u) => u.status === "Ativo").length;
   const totalAdmins = usuarios.filter((u) => u.perfil === "Administrador").length;
 
+  const empresasDisponiveis = useMemo(() => {
+    const set = new Set<string>();
+    usuarios.forEach((u) => {
+      if (u.empresa) set.add(u.empresa);
+    });
+    ["Concessionária Via Expressa S/A", "Move Mais", "Volkswagen", "Parceiro"].forEach((e) => set.add(e));
+    return Array.from(set);
+  }, [usuarios]);
+
   // Handler de Salvar (Criar ou Editar)
   const handleSalvarUsuario = (dados: Partial<Usuario>) => {
     if (dados.id) {
@@ -428,6 +437,7 @@ export function GestaoUsuarios({
         onOpenChange={setModalPerfisOpen}
         perfis={perfis}
         onAtualizarPerfis={setPerfis}
+        empresas={empresasDisponiveis}
       />
 
       <ModalExcluirUsuario
