@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { CheckCircle, Download, CreditCard, QrCode, User, LogOut, Radio, ArrowRight } from "lucide-react";
+import { CheckCircle, Download, CreditCard, QrCode, User, LogOut } from "lucide-react";
 import jsPDF from 'jspdf';
 
 interface ConfirmacaoPagamentoProps {
@@ -273,30 +273,25 @@ export function ConfirmacaoPagamento({ onVoltar, onIrParaDashboard, dadosPagamen
           </Card>
 
           {/* Banner upsell — Tag Move Mais */}
-          <div className="rounded-xl bg-gradient-to-r from-[#1A1B23] to-[#2D1B69] px-5 py-4 flex items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                <Radio className="h-4 w-4 text-[#C4B5FD]" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-white leading-snug">
-                  Economize até 30% em pedágios com a Tag Move Mais
-                </p>
-                <p className="text-xs text-white/50 mt-0.5 hidden sm:block">
-                  Pague menos em cada passagem — conheça os planos Move Mais.
-                </p>
-              </div>
+          <a
+            href="https://movemais.com/?utm_source=pedagiosimples"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-xl bg-[#5D0085] px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3.5 sm:gap-4 mb-8 hover:brightness-105 transition-all shadow-sm"
+          >
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 text-white text-sm sm:text-base">
+              <span>
+                Adquira sua <strong className="font-semibold">TAG</strong>{" "}
+                <span className="font-black tracking-tight text-white">movemais</span> com
+              </span>
+              <span className="inline-flex items-center px-3.5 py-1 rounded-xl bg-white text-[#5D0085] font-bold text-xs sm:text-sm whitespace-nowrap shadow-xs">
+                12 meses de isenção da taxa de recarga
+              </span>
             </div>
-            <a
-              href="https://movemais.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-[#1A1B23] hover:bg-white/90 transition-colors px-4 py-2 rounded-lg whitespace-nowrap"
-            >
-              Ver planos
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-          </div>
+            <span className="flex-shrink-0 inline-flex items-center justify-center text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#20996D] group-hover:bg-[#1a835c] text-white px-5 py-2.5 rounded-xl whitespace-nowrap transition-colors shadow-xs">
+              QUERO MINHA TAG
+            </span>
+          </a>
 
           {/* Ações */}
           <div className="space-y-4">

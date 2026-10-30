@@ -4,17 +4,28 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Progress } from "./ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
-import { ArrowLeft, User, Smartphone, Lock, Shield, CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, Car } from "lucide-react";
+import { 
+  ArrowLeft, User, Smartphone, Lock, Shield, ShieldCheck, 
+  CheckCircle, XCircle, Eye, EyeOff, Loader2, ArrowRight, 
+  Car, Mail, Check, RefreshCw, KeyRound
+} from "lucide-react";
 import logoPedagioSimples from "../assets/logo-pedagio-simples.svg";
 import { useState, useMemo, useEffect } from "react";
-import { validarPlaca, formatarPlacaInput, isPlacaCompleta } from "../utils/placaValidation";
+import { validarPlaca, formatarPlacaInput } from "../utils/placaValidation";
 
 interface CadastroUsuarioProps {
   onBack: () => void;
   onCadastrar: (dados: any) => void;
   onLogin?: () => void;
   placaConsultada?: string;
+}
+
+function WhatsAppIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+    </svg>
+  );
 }
 
 export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada }: CadastroUsuarioProps) {
@@ -37,18 +48,23 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cpfBuscando, setCpfBuscando] = useState(false);
   const [cpfAutoPreenchido, setCpfAutoPreenchido] = useState<string[]>([]);
+  const [cpfValido, setCpfValido] = useState<boolean | null>(null);
+  const [telefoneValido, setTelefoneValido] = useState<boolean | null>(null);
   const [emailValidando, setEmailValidando] = useState(false);
   const [emailValido, setEmailValido] = useState<boolean | null>(null);
   const [emailTimeout, setEmailTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Estados da Validação por 3 Canais (WhatsApp, SMS, E-mail)
+  const [canalValidacao, setCanalValidacao] = useState<'whatsapp' | 'sms' | 'email' | null>(null);
   const [codigoEnviado, setCodigoEnviado] = useState(false);
+  const [enviandoCodigo, setEnviandoCodigo] = useState(false);
   const [codigoValidacao, setCodigoValidacao] = useState('');
-  const [codigoCorreto, setCodigoCorreto] = useState('');
+  const [codigoCorreto, setCodigoCorreto] = useState('123456');
   const [validandoCodigo, setValidandoCodigo] = useState(false);
   const [codigoValido, setCodigoValido] = useState<boolean | null>(null);
   const [tempoReenvio, setTempoReenvio] = useState(0);
-  const [modalCodigoAberto, setModalCodigoAberto] = useState(false);
-  const [cpfValido, setCpfValido] = useState<boolean | null>(null);
-  const [telefoneValido, setTelefoneValido] = useState<boolean | null>(null);
+
+  // Estados da Senha
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [forcaSenha, setForcaSenha] = useState<'fraca' | 'media' | 'forte' | null>(null);
@@ -60,12 +76,27 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     especial: false
   });
 
-  // Sincronizar placa consultada quando o componente montar ou quando ela mudar
+  // Sincronizar placa consultada
   useEffect(() => {
     if (placaConsultada && !formData.placa) {
       setFormData(prev => ({ ...prev, placa: placaConsultada }));
     }
-  }, [placaConsultada]); // Remover formData.placa das dependências para evitar loops
+  }, [placaConsultada]);
+
+  // Contagem regressiva para reenvio de código
+  useEffect(() => {
+    if (tempoReenvio <= 0) return;
+    const interval = setInterval(() => {
+      setTempoReenvio(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [tempoReenvio]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -89,9 +120,50 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
   };
 
-  const buscarDadosCPF = async (cpf: string) => {
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 10) {
+      return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  const mascararTelefone = (telefone: string) => {
+    if (!telefone) return 'seu celular';
+    const numbers = telefone.replace(/\D/g, '');
+    if (numbers.length === 11) {
+      // Ex: (11) 98765-4321 -> (11) 9****-4321
+      return `(${numbers.slice(0, 2)}) ${numbers[2]}****-${numbers.slice(7)}`;
+    }
+    if (numbers.length === 10) {
+      // Ex: (11) 3456-7890 -> (11) ****-7890
+      return `(${numbers.slice(0, 2)}) ****-${numbers.slice(6)}`;
+    }
+    if (numbers.length >= 8) {
+      return `****-${numbers.slice(-4)}`;
+    }
+    return telefone;
+  };
+
+  const mascararEmail = (email: string) => {
+    if (!email || !email.includes('@')) return email || 'seu e-mail';
+    const [usuario, dominio] = email.split('@');
+    if (usuario.length <= 2) {
+      return `${usuario[0]}****@${dominio}`;
+    }
+    return `${usuario.slice(0, 2)}****@${dominio}`;
+  };
+
+  const validarTelefoneBrasileiro = (nums: string): boolean => {
+    if (nums.length !== 11) return false;
+    const ddd = parseInt(nums.substring(0, 2));
+    if (ddd < 11 || ddd > 99) return false;
+    if (nums[2] !== '9') return false;
+    return true;
+  };
+
+  const buscarDadosCPF = async (_cpf: string) => {
     setCpfBuscando(true);
-    // Simulates Receita Federal CPF lookup (~1.5s delay)
     await new Promise(resolve => setTimeout(resolve, 1500));
     const mockDados = {
       nome: 'João da Silva Santos',
@@ -106,47 +178,36 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       email: mockDados.email,
       telefone: mockDados.telefone,
     }));
-    // Validate phone from CPF-returned data
     const phoneNums = mockDados.telefone.replace(/\D/g, '');
     const phoneOk = validarTelefoneBrasileiro(phoneNums);
     setTelefoneValido(phoneOk);
+    setEmailValido(true);
     setErrors(prev => ({ ...prev, email: '', nome: '', dataNascimento: '', telefone: '' }));
     setCpfAutoPreenchido(['nome', 'dataNascimento', 'email', 'telefone']);
     setCpfBuscando(false);
   };
 
   const validateCPF = (cpf: string) => {
-    // Remove formatação
     const numbers = cpf.replace(/\D/g, '');
-    
-    // Verifica se tem 11 dígitos
     if (numbers.length !== 11) {
       setCpfValido(false);
       setErrors(prev => ({ ...prev, cpf: 'CPF deve ter 11 dígitos' }));
       return false;
     }
 
-    // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
     if (/^(\d)\1{10}$/.test(numbers)) {
       setCpfValido(false);
       setErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
       return false;
     }
 
-    // Validação do algoritmo do CPF
     let sum = 0;
     let remainder;
-
-    // Valida primeiro dígito verificador
     for (let i = 1; i <= 9; i++) {
       sum += parseInt(numbers.substring(i - 1, i)) * (11 - i);
     }
     remainder = (sum * 10) % 11;
-
-    if (remainder === 10 || remainder === 11) {
-      remainder = 0;
-    }
-
+    if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(numbers.substring(9, 10))) {
       setCpfValido(false);
       setErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
@@ -154,42 +215,19 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     }
 
     sum = 0;
-    // Valida segundo dígito verificador
     for (let i = 1; i <= 10; i++) {
       sum += parseInt(numbers.substring(i - 1, i)) * (12 - i);
     }
     remainder = (sum * 10) % 11;
-
-    if (remainder === 10 || remainder === 11) {
-      remainder = 0;
-    }
-
+    if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(numbers.substring(10, 11))) {
       setCpfValido(false);
       setErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
       return false;
     }
 
-    // CPF válido
     setCpfValido(true);
     setErrors(prev => ({ ...prev, cpf: '' }));
-    return true;
-  };
-
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 10) {
-      return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-    }
-    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-  };
-
-  /** Valida se é um celular brasileiro válido (11 dígitos, DDD 11-99, 9 como primeiro dígito) */
-  const validarTelefoneBrasileiro = (nums: string): boolean => {
-    if (nums.length !== 11) return false;
-    const ddd = parseInt(nums.substring(0, 2));
-    if (ddd < 11 || ddd > 99) return false;
-    if (nums[2] !== '9') return false; // celular exige 9 como primeiro dígito
     return true;
   };
 
@@ -197,14 +235,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     const formatted = formatPhone(raw);
     handleInputChange('telefone', formatted);
 
-    // Reset estados de validação do SMS ao alterar o telefone
     setTelefoneValido(null);
     setCodigoEnviado(false);
     setCodigoValidacao('');
-    setCodigoCorreto('');
+    setCodigoCorreto('123456');
     setCodigoValido(null);
     setTempoReenvio(0);
-    setModalCodigoAberto(false);
 
     const nums = raw.replace(/\D/g, '');
     if (nums.length === 11) {
@@ -221,7 +257,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   };
 
   const validarEmail = async (email: string) => {
-    // Regex avançado para validação de formato
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     
     if (!emailRegex.test(email)) {
@@ -234,10 +269,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     setErrors(prev => ({ ...prev, email: '' }));
 
     try {
-      // Validações adicionais mais robustas
       const domain = email.split('@')[1];
-      
-      // Lista de domínios temporários/descartáveis mais comuns
       const disposableEmailDomains = [
         '10minutemail.com', 'tempmail.org', 'guerrillamail.com', 
         'mailinator.com', 'temp-mail.org', 'throwaway.email',
@@ -250,7 +282,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         return;
       }
 
-      // Verificar se o domínio tem formato válido
       const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
       if (!domainRegex.test(domain)) {
         setEmailValido(false);
@@ -258,37 +289,23 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         return;
       }
 
-      // Simulação de verificação de domínio (em produção, usaria uma API real)
-      // Por agora, vamos aceitar domínios conhecidos e populares
       const commonDomains = [
         'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 
         'uol.com.br', 'bol.com.br', 'terra.com.br', 'globo.com',
         'live.com', 'icloud.com', 'me.com', 'protonmail.com',
-        'company.com', 'empresa.com.br' // Domínios corporativos genéricos
+        'company.com', 'empresa.com.br'
       ];
 
-      // Se for um domínio comum, aceitar imediatamente
       if (commonDomains.includes(domain.toLowerCase())) {
         setEmailValido(true);
         setErrors(prev => ({ ...prev, email: '' }));
         return;
       }
 
-      // Para outros domínios, simular uma verificação (em produção seria uma API real)
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simular delay de API
-      
-      // Simular 90% de sucesso para domínios não conhecidos
-      const isValid = Math.random() > 0.1;
-      
-      if (isValid) {
-        setEmailValido(true);
-        setErrors(prev => ({ ...prev, email: '' }));
-      } else {
-        setEmailValido(false);
-        setErrors(prev => ({ ...prev, email: 'Não foi possível verificar este e-mail' }));
-      }
-
-    } catch (error) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setEmailValido(true);
+      setErrors(prev => ({ ...prev, email: '' }));
+    } catch {
       setEmailValido(false);
       setErrors(prev => ({ ...prev, email: 'Erro ao validar e-mail. Tente novamente.' }));
     } finally {
@@ -299,22 +316,23 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   const handleEmailChange = (email: string) => {
     handleInputChange('email', email);
 
-    // Reset estados de validação de formato
     setEmailValido(null);
     setEmailValidando(false);
+    setCodigoEnviado(false);
+    setCodigoValidacao('');
+    setCodigoCorreto('123456');
+    setCodigoValido(null);
+    setTempoReenvio(0);
 
-    // Limpar timeout anterior
     if (emailTimeout) {
       clearTimeout(emailTimeout);
     }
 
-    // Se email estiver vazio, não validar
     if (!email.trim()) {
       setEmailValido(null);
       return;
     }
 
-    // Debounce: aguardar 800ms após parar de digitar para validar formato
     const newTimeout = setTimeout(() => {
       validarEmail(email);
     }, 800);
@@ -322,81 +340,75 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     setEmailTimeout(newTimeout);
   };
 
-  // Função para enviar código de validação por SMS
-  const enviarCodigoValidacao = async () => {
-    setEmailValidando(true); // reutilizamos esse estado como "enviando"
+  // Funções de envio e validação de código
+  const enviarCodigoValidacao = async (canal?: 'whatsapp' | 'sms' | 'email') => {
+    const canalEscolhido = canal || canalValidacao;
+    if (!canalEscolhido) return;
+    if (canal) setCanalValidacao(canal);
 
-    // Gerar código de 6 dígitos (fixo para facilitar testes — em produção seria gerado no backend)
+    setEnviandoCodigo(true);
+    setCodigoValidacao('');
+    setCodigoValido(null);
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.codigoValidacao;
+      return newErrors;
+    });
+
     const codigo = "123456";
     setCodigoCorreto(codigo);
 
-    // Simular envio por SMS
     setTimeout(() => {
-      setEmailValidando(false);
+      setEnviandoCodigo(false);
       setCodigoEnviado(true);
-      setModalCodigoAberto(true);
-
-      // Iniciar contagem regressiva para reenvio (60 segundos)
       setTempoReenvio(60);
-      const interval = setInterval(() => {
-        setTempoReenvio(prev => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }, 2000);
-  };
-
-  // Função para validar código inserido
-  const validarCodigo = async () => {
-    if (codigoValidacao.length !== 6) return;
-    
-    setValidandoCodigo(true);
-    
-    // Simular validação do código
-    setTimeout(() => {
-      const valido = codigoValidacao === codigoCorreto;
-      setCodigoValido(valido);
-      if (valido) {
-        setModalCodigoAberto(false); // Fechar modal quando válido
-      }
-      setValidandoCodigo(false);
-      
-      if (!valido) {
-        setErrors(prev => ({ ...prev, codigoValidacao: 'Código inválido. Verifique e tente novamente.' }));
-      } else {
-        setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors.codigoValidacao;
-          delete newErrors.email; // Limpar também erro de email
-          return newErrors;
-        });
-      }
-    }, 1500);
-  };
-
-  // Função para reenviar código do modal
-  const reenviarCodigoDoModal = () => {
-    // Gerar novo código
-    const novoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-    setCodigoCorreto(novoCodigo);
-    setCodigoValidacao(''); // Limpar campo
-    setErrors(prev => ({ ...prev, codigoValidacao: '' })); // Limpar erros
-    
-    // Reiniciar contagem regressiva
-    setTempoReenvio(60);
-    const interval = setInterval(() => {
-      setTempoReenvio(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
     }, 1000);
+  };
+
+  const reenviarCodigo = () => {
+    if (canalValidacao) {
+      enviarCodigoValidacao(canalValidacao);
+    }
+  };
+
+  const handleTrocarCanal = () => {
+    setCodigoEnviado(false);
+    setCodigoValidacao('');
+    setCodigoValido(null);
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.codigoValidacao;
+      return newErrors;
+    });
+  };
+
+  const handleCodigoChange = (valor: string) => {
+    const limpo = valor.replace(/\D/g, '').slice(0, 6);
+    setCodigoValidacao(limpo);
+    setErrors(prev => ({ ...prev, codigoValidacao: '' }));
+    setCodigoValido(null);
+
+    if (limpo.length === 6) {
+      setValidandoCodigo(true);
+      setTimeout(() => {
+        const valido = limpo === (codigoCorreto || "123456");
+        setCodigoValido(valido);
+        setValidandoCodigo(false);
+
+        if (!valido) {
+          setErrors(prev => ({
+            ...prev,
+            codigoValidacao: 'Código incorreto. Use 123456 para teste ou solicite um novo.'
+          }));
+        } else {
+          setErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors.codigoValidacao;
+            return newErrors;
+          });
+        }
+      }, 600);
+    }
   };
 
   const validarForcaSenha = (senha: string) => {
@@ -409,8 +421,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     };
 
     setRequisitosSenha(requisitos);
-
-    // Calcular força da senha
     const requisitosAtendidos = Object.values(requisitos).filter(Boolean).length;
     
     if (requisitosAtendidos < 3) {
@@ -426,7 +436,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
   const handleSenhaChange = (senha: string) => {
     handleInputChange('senha', senha);
-    
     if (senha.length > 0) {
       validarForcaSenha(senha);
     } else {
@@ -452,13 +461,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         formData.aceitaTermos
       );
       const cpfValido_check = cpfValido === true;
-      // Email só precisa ter formato válido (não exige código)
       const emailValido_check = emailValido !== false;
-      // Telefone só precisa ter formato válido nesta etapa — a confirmação por SMS acontece na etapa 3
       const telefoneValido_check = telefoneValido === true;
-      return camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check && telefoneValido_check;
+      return Boolean(camposObrigatoriosPreenchidos && cpfValido_check && emailValido_check && telefoneValido_check);
     } else if (etapaAtual === 2) {
-      // Senha
+      return codigoValido === true;
+    } else if (etapaAtual === 3) {
       if (!formData.senha) return false;
       const req = {
         tamanho: formData.senha.length >= 8,
@@ -469,15 +477,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       };
       if (!Object.values(req).every(Boolean)) return false;
       if (formData.senha !== formData.confirmarSenha) return false;
-    } else if (etapaAtual === 3) {
-      // Placa
+      return true;
+    } else if (etapaAtual === 4) {
+      if (formData.pularCadastroVeiculo) return true;
       if (!formData.placa.trim()) return false;
       const placaValidacao = validarPlaca(formData.placa);
-      if (!placaValidacao.isValid) return false;
-    } else if (etapaAtual === 4) {
-      // Telefone — precisa ter código SMS confirmado
-      const telefoneValido_check = (!codigoEnviado && telefoneValido === true) || (codigoEnviado && codigoValido === true);
-      return telefoneValido_check;
+      return placaValidacao.isValid;
     }
     return true;
   };
@@ -498,7 +503,14 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       else if (cpfValido === null && formData.cpf.trim()) newErrors.cpf = 'Aguarde a validação do CPF';
       if (!formData.aceitaTermos) newErrors.aceitaTermos = 'Você deve aceitar os termos de uso';
     } else if (etapaAtual === 2) {
-      // Senha
+      if (!canalValidacao) {
+        newErrors.codigoValidacao = 'Selecione um canal para receber o código';
+      } else if (!codigoEnviado) {
+        newErrors.codigoValidacao = 'Envie o código de validação primeiro';
+      } else if (codigoValido !== true) {
+        newErrors.codigoValidacao = 'Insira o código de validação de 6 dígitos para prosseguir';
+      }
+    } else if (etapaAtual === 3) {
       if (!formData.senha) {
         newErrors.senha = 'Senha é obrigatória';
       } else {
@@ -510,22 +522,17 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (formData.senha !== formData.confirmarSenha) {
         newErrors.confirmarSenha = 'Senhas não coincidem';
       }
-    } else if (etapaAtual === 3) {
-      // Placa
-      if (!formData.placa.trim()) {
-        newErrors.placa = 'Placa é obrigatória';
-      } else {
-        const placaValidacao = validarPlaca(formData.placa);
-        if (!placaValidacao.isValid) {
-          newErrors.placa = placaValidacao.error || 'Placa inválida';
+    } else if (etapaAtual === 4) {
+      if (!formData.pularCadastroVeiculo) {
+        if (!formData.placa.trim()) {
+          newErrors.placa = 'Placa é obrigatória';
+        } else {
+          const placaValidacao = validarPlaca(formData.placa);
+          if (!placaValidacao.isValid) {
+            newErrors.placa = placaValidacao.error || 'Placa inválida';
+          }
         }
       }
-    } else if (etapaAtual === 4) {
-      // Telefone (SMS)
-      if (!formData.telefone.trim()) newErrors.telefone = 'Telefone é obrigatório';
-      else if (telefoneValido === false) newErrors.telefone = 'Insira um celular válido com DDD (ex: (11) 98765-4321)';
-      else if (!codigoEnviado && telefoneValido !== true) newErrors.telefone = 'Aguarde a validação do telefone';
-      else if (codigoEnviado && codigoValido !== true) newErrors.telefone = 'Confirme o código enviado por SMS';
     }
 
     setErrors(newErrors);
@@ -536,7 +543,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     let progress = 0;
 
     if (etapaAtual === 1) {
-      // Etapa 1: 0% a 25%
       let fieldsCompleted = 0;
       const totalFields = 5;
       if (formData.cpf.trim() && cpfValido === true) fieldsCompleted++;
@@ -545,10 +551,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (formData.email.trim() && emailValido !== false) fieldsCompleted++;
       if (formData.aceitaTermos) fieldsCompleted++;
       progress = (fieldsCompleted / totalFields) * 25;
-
     } else if (etapaAtual === 2) {
-      // Etapa 2: 25% a 50% (Senha)
       progress = 25;
+      if (codigoEnviado) progress += 10;
+      if (codigoValido === true) progress += 15;
+    } else if (etapaAtual === 3) {
+      progress = 50;
       const calcularReq = (senha: string) => ({
         tamanho: senha.length >= 8,
         maiuscula: /[A-Z]/.test(senha),
@@ -560,37 +568,27 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
       if (formData.senha && Object.values(calcularReq(formData.senha)).every(Boolean)) fieldsCompleted++;
       if (formData.senha && formData.confirmarSenha && formData.senha === formData.confirmarSenha) fieldsCompleted++;
       progress += (fieldsCompleted / 2) * 25;
-
-    } else if (etapaAtual === 3) {
-      // Etapa 3: 50% a 75% (Placa)
-      progress = 50;
-      if (formData.placa.trim()) {
-        const placaValidacaoLocal = validarPlaca(formData.placa);
-        progress = placaValidacaoLocal.isValid ? 75 : 62;
-      }
-
     } else if (etapaAtual === 4) {
-      // Etapa 4: 75% a 100% (Telefone confirmado por SMS)
       progress = 75;
-      if (formData.telefone.trim() && codigoValido === true) {
+      if (formData.pularCadastroVeiculo) {
         progress = 100;
+      } else if (formData.placa.trim()) {
+        const placaValidacaoLocal = validarPlaca(formData.placa);
+        progress = placaValidacaoLocal.isValid ? 100 : 85;
       }
     }
 
     return Math.max(0, Math.min(100, progress));
-  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, emailValido, cpfValido, telefoneValido, codigoValido, formData.dataNascimento]);
+  }, [etapaAtual, formData.nome, formData.email, formData.telefone, formData.cpf, formData.aceitaTermos, formData.senha, formData.confirmarSenha, formData.placa, formData.pularCadastroVeiculo, emailValido, cpfValido, telefoneValido, codigoEnviado, codigoValido, formData.dataNascimento]);
 
   const handleNextStep = () => {
-    // Aguardar validação de e-mail em progresso (etapa 1)
     if (etapaAtual === 1 && emailValidando) {
       return;
     }
 
-    // Verificar se a etapa está válida usando a função mais simples
     if (isCurrentStepValid()) {
       setEtapaAtual(prev => prev + 1);
     } else {
-      // Se não estiver válida, fazer validação completa para mostrar erros
       validateCurrentStep();
     }
   };
@@ -599,33 +597,43 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
     setEtapaAtual(prev => prev - 1);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!validateCurrentStep()) return;
 
     setLoading(true);
-
-    // Simular criação de conta
     setTimeout(() => {
       setLoading(false);
-      onCadastrar(formData);
-    }, 2000);
+      onCadastrar({
+        ...formData,
+        canalValidacao: canalValidacao || 'whatsapp',
+        codigoValido: true
+      });
+    }, 1500);
   };
 
   const handlePularVeiculo = () => {
-    // Não cria a conta ainda — só pula a exigência de placa e avança para a
-    // etapa de confirmação de telefone, que continua obrigatória.
-    setFormData(prev => ({ ...prev, placa: '', pularCadastroVeiculo: true }));
-    setEtapaAtual(4);
+    const dadosFinais = {
+      ...formData,
+      placa: '',
+      pularCadastroVeiculo: true,
+      canalValidacao: canalValidacao || 'whatsapp',
+      codigoValido: true
+    };
+    setFormData(dadosFinais);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      onCadastrar(dadosFinais);
+    }, 1500);
   };
 
   const getStepTitle = () => {
     switch (etapaAtual) {
       case 1: return 'Dados pessoais';
-      case 2: return 'Senha e confirmação';
-      case 3: return 'Confirmar veículo';
-      case 4: return 'Confirmar telefone';
+      case 2: return 'Validação do cadastro';
+      case 3: return 'Senha e confirmação';
+      case 4: return 'Confirmar veículo';
       default: return '';
     }
   };
@@ -633,9 +641,9 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
   const getStepIcon = () => {
     switch (etapaAtual) {
       case 1: return <User className="h-6 w-6 text-[#5B2E8C]" />;
-      case 2: return <Lock className="h-6 w-6 text-[#5B2E8C]" />;
-      case 3: return <Car className="h-6 w-6 text-[#5B2E8C]" />;
-      case 4: return <Smartphone className="h-6 w-6 text-[#5B2E8C]" />;
+      case 2: return <ShieldCheck className="h-6 w-6 text-[#5B2E8C]" />;
+      case 3: return <Lock className="h-6 w-6 text-[#5B2E8C]" />;
+      case 4: return <Car className="h-6 w-6 text-[#5B2E8C]" />;
       default: return null;
     }
   };
@@ -664,27 +672,27 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-lg mx-auto">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        <div className="w-full max-w-lg mx-auto">
           {/* Título da seção */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-[#F7F5FB] text-[#8B5FFF] rounded-full px-4 py-2 mb-6">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 bg-[#F7F5FB] text-[#8B5FFF] rounded-full px-4 py-2 mb-4 sm:mb-6">
               <Shield className="h-4 w-4" />
-              <span className="text-sm font-semibold">CADASTRO SEGURO</span>
+              <span className="text-xs sm:text-sm font-semibold">CADASTRO SEGURO</span>
             </div>
 
-            <p className="text-lg text-[#8A8B95]">
+            <p className="text-base sm:text-lg text-[#8A8B95] px-2">
               Para prosseguir com o pagamento, precisamos de algumas informações
             </p>
           </div>
 
           {/* Indicador de Progresso */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-[#1A1B23]">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <span className="text-xs sm:text-sm font-medium text-[#1A1B23]">
                 Etapa {etapaAtual} de 4
               </span>
-              <span className="text-sm text-[#8A8B95]">
+              <span className="text-xs sm:text-sm text-[#8A8B95]">
                 {Math.round(progressoCalculado)}% concluído
               </span>
             </div>
@@ -692,14 +700,14 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
           </div>
 
           {/* Formulário */}
-          <Card className="shadow-lg border border-[#F7F5FB] rounded-lg">
-            <CardHeader className="text-center pb-1 pt-4">
-              <CardTitle className="text-xl text-[#1A1B23] flex items-center justify-center gap-3">
+          <Card className="shadow-lg border border-[#F7F5FB] rounded-xl overflow-hidden w-full">
+            <CardHeader className="text-center pb-2 pt-5 sm:pt-6 px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl text-[#1A1B23] flex items-center justify-center gap-2 sm:gap-3">
                 {getStepIcon()}
                 {getStepTitle()}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3.5 sm:px-6 pb-6">
               <form onSubmit={etapaAtual === 4 ? handleSubmit : (e) => { e.preventDefault(); handleNextStep(); }} className="space-y-6">
                 
                 {/* Etapa 1: Dados Pessoais */}
@@ -717,10 +725,7 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                             const cpfFormatado = formatCPF(e.target.value);
                             handleInputChange('cpf', cpfFormatado);
                             
-                            // Reset estados de validação
                             setCpfValido(null);
-                            
-                            // Validar automaticamente quando CPF estiver completo
                             if (cpfFormatado.replace(/\D/g, '').length === 11) {
                               const valido = validateCPF(cpfFormatado);
                               if (valido) buscarDadosCPF(cpfFormatado);
@@ -764,10 +769,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Data de nascimento */}
                     <div className="space-y-2">
-                      <Label htmlFor="dataNascimento" className="text-[#1A1B23] flex items-center justify-between">
+                      <Label htmlFor="dataNascimento" className="text-[#1A1B23] flex items-center justify-between flex-wrap gap-1">
                         Data de nascimento
                         {cpfAutoPreenchido.includes('dataNascimento') && (
-                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1 shrink-0">
                             <CheckCircle className="h-3 w-3" />
                             Preenchido via CPF
                           </span>
@@ -789,10 +794,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Nome completo */}
                     <div className="space-y-2">
-                      <Label htmlFor="nome" className="text-[#1A1B23] flex items-center justify-between">
+                      <Label htmlFor="nome" className="text-[#1A1B23] flex items-center justify-between flex-wrap gap-1">
                         Nome completo
                         {cpfAutoPreenchido.includes('nome') && (
-                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1 shrink-0">
                             <CheckCircle className="h-3 w-3" />
                             Preenchido via CPF
                           </span>
@@ -813,10 +818,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
 
                     {/* Email */}
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-[#1A1B23] flex items-center justify-between">
+                      <Label htmlFor="email" className="text-[#1A1B23] flex items-center justify-between flex-wrap gap-1">
                         Email
                         {cpfAutoPreenchido.includes('email') && (
-                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1 shrink-0">
                             <CheckCircle className="h-3 w-3" />
                             Preenchido via CPF
                           </span>
@@ -848,10 +853,10 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </div>
                       </div>
                       {errors.email && <p className="text-sm text-[#C8324A]">{errors.email}</p>}
-                      {(emailValido === true || (codigoEnviado && codigoValido === true)) && !errors.email && (
+                      {emailValido === true && !errors.email && (
                         <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
                           <CheckCircle className="h-4 w-4" />
-                          {codigoValido === true ? 'E-mail validado com código' : 'E-mail válido'}
+                          E-mail válido
                         </p>
                       )}
                       {emailValidando && (
@@ -862,14 +867,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                       )}
                     </div>
 
-
-
                     {/* Telefone */}
                     <div className="space-y-2">
-                      <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center justify-between">
+                      <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center justify-between flex-wrap gap-1">
                         Telefone
                         {cpfAutoPreenchido.includes('telefone') && (
-                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1">
+                          <span className="text-xs text-[#8B5FFF] font-normal flex items-center gap-1 shrink-0">
                             <CheckCircle className="h-3 w-3" />
                             Preenchido via CPF
                           </span>
@@ -934,12 +937,287 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         <p className="text-sm text-[#C8324A] mt-1 pl-7">{errors.aceitaTermos}</p>
                       )}
                     </div>
-
                   </div>
                 )}
 
-                {/* Etapa 2: Senha */}
+                {/* Etapa 2: Validação do Cadastro (WhatsApp, SMS ou E-mail) */}
                 {etapaAtual === 2 && (
+                  <div className="space-y-6">
+                    {!codigoEnviado ? (
+                      <>
+                        <div className="text-center space-y-1.5 pb-1">
+                          <p className="text-base font-semibold text-[#1A1B23]">
+                            Como deseja receber seu código de verificação?
+                          </p>
+                          <p className="text-sm text-[#8A8B95]">
+                            Escolha um canal para confirmarmos seus dados com segurança.
+                          </p>
+                        </div>
+
+                        {/* Opções de canais */}
+                        <div className="space-y-3">
+                          {/* Opção WhatsApp */}
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setCanalValidacao('whatsapp')}
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setCanalValidacao('whatsapp')}
+                            className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                              canalValidacao === 'whatsapp'
+                                ? 'border-[#25D366] bg-[#25D366]/5 shadow-sm ring-1 ring-[#25D366]'
+                                : 'border-[#E5E7EB] hover:border-[#25D366]/50 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#25D366]/15 flex items-center justify-center shrink-0">
+                                <WhatsAppIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[#25D366]" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-[#1A1B23] text-sm sm:text-base">WhatsApp</span>
+                                </div>
+                                <p className="text-xs sm:text-sm text-[#8A8B95] mt-0.5 truncate">
+                                  Enviar código para <strong className="text-[#1A1B23]">{mascararTelefone(formData.telefone)}</strong>
+                                </p>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ml-2 ${
+                              canalValidacao === 'whatsapp' ? 'border-[#25D366] bg-[#25D366]' : 'border-[#DCDDE3]'
+                            }`}>
+                              {canalValidacao === 'whatsapp' && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                            </div>
+                          </div>
+
+                          {/* Opção SMS */}
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setCanalValidacao('sms')}
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setCanalValidacao('sms')}
+                            className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                              canalValidacao === 'sms'
+                                ? 'border-[#5B2E8C] bg-[#5B2E8C]/5 shadow-sm ring-1 ring-[#5B2E8C]'
+                                : 'border-[#E5E7EB] hover:border-[#8B5FFF]/50 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#5B2E8C]/10 flex items-center justify-center shrink-0 text-[#5B2E8C]">
+                                <Smartphone className="h-5 w-5 sm:h-6 sm:w-6" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-[#1A1B23] text-sm sm:text-base">Mensagem SMS</span>
+                                </div>
+                                <p className="text-xs sm:text-sm text-[#8A8B95] mt-0.5 truncate">
+                                  Enviar torpedo para <strong className="text-[#1A1B23]">{mascararTelefone(formData.telefone)}</strong>
+                                </p>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ml-2 ${
+                              canalValidacao === 'sms' ? 'border-[#5B2E8C] bg-[#5B2E8C]' : 'border-[#DCDDE3]'
+                            }`}>
+                              {canalValidacao === 'sms' && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                            </div>
+                          </div>
+
+                          {/* Opção E-mail */}
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setCanalValidacao('email')}
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setCanalValidacao('email')}
+                            className={`flex items-center justify-between p-3.5 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                              canalValidacao === 'email'
+                                ? 'border-[#5B2E8C] bg-[#5B2E8C]/5 shadow-sm ring-1 ring-[#5B2E8C]'
+                                : 'border-[#E5E7EB] hover:border-[#8B5FFF]/50 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#5B2E8C]/10 flex items-center justify-center shrink-0 text-[#5B2E8C]">
+                                <Mail className="h-5 w-5 sm:h-6 sm:w-6" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-[#1A1B23] text-sm sm:text-base">E-mail</span>
+                                </div>
+                                <p className="text-xs sm:text-sm text-[#8A8B95] mt-0.5 truncate">
+                                  Enviar código para <strong className="text-[#1A1B23]">{mascararEmail(formData.email)}</strong>
+                                </p>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ml-2 ${
+                              canalValidacao === 'email' ? 'border-[#5B2E8C] bg-[#5B2E8C]' : 'border-[#DCDDE3]'
+                            }`}>
+                              {canalValidacao === 'email' && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Botão de Enviar Código */}
+                        <div className="pt-2">
+                          <Button
+                            type="button"
+                            size="lg"
+                            onClick={() => canalValidacao && enviarCodigoValidacao(canalValidacao)}
+                            disabled={enviandoCodigo || !canalValidacao}
+                            className={`w-full py-3.5 sm:py-4 text-sm sm:text-base font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 ${
+                              canalValidacao && !enviandoCodigo
+                                ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
+                                : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                            }`}
+                          >
+                            {enviandoCodigo ? (
+                              <>
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Enviando código...
+                              </>
+                            ) : canalValidacao ? (
+                              <>
+                                {canalValidacao === 'whatsapp' ? (
+                                  <WhatsAppIcon className="h-5 w-5" />
+                                ) : canalValidacao === 'sms' ? (
+                                  <Smartphone className="h-5 w-5" />
+                                ) : (
+                                  <Mail className="h-5 w-5" />
+                                )}
+                                Enviar código via {canalValidacao === 'whatsapp' ? 'WhatsApp' : canalValidacao === 'sms' ? 'SMS' : 'E-mail'}
+                              </>
+                            ) : (
+                              'Selecione um canal para receber o código'
+                            )}
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      /* Estado 2: Código enviado - Inserção dos 6 dígitos */
+                      <div className="space-y-6">
+                        {/* Resumo do canal selecionado */}
+                        <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-xl p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3">
+                          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0">
+                              {canalValidacao === 'whatsapp' ? (
+                                <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
+                              ) : canalValidacao === 'sms' ? (
+                                <Smartphone className="h-5 w-5 text-[#5B2E8C]" />
+                              ) : (
+                                <Mail className="h-5 w-5 text-[#5B2E8C]" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11px] sm:text-xs text-[#8A8B95]">
+                                Código enviado via {canalValidacao === 'whatsapp' ? 'WhatsApp' : canalValidacao === 'sms' ? 'SMS' : 'E-mail'}
+                              </p>
+                              <p className="text-xs sm:text-sm font-semibold text-[#1A1B23] truncate">
+                                {canalValidacao === 'email' ? mascararEmail(formData.email) : mascararTelefone(formData.telefone)}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleTrocarCanal}
+                            className="text-xs font-semibold text-[#5B2E8C] hover:text-[#8B5FFF] hover:underline shrink-0 ml-1"
+                          >
+                            Alterar canal
+                          </button>
+                        </div>
+
+                        {/* Card com código de teste para demonstração */}
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 sm:p-3 text-xs text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 sm:gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <KeyRound className="h-4 w-4 text-amber-600 shrink-0" />
+                            <span className="truncate">Código de teste: <strong className="font-mono text-sm tracking-wider">123456</strong></span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCodigoChange('123456')}
+                            className="text-xs font-semibold text-amber-700 hover:text-amber-900 underline shrink-0"
+                          >
+                            Preencher código
+                          </button>
+                        </div>
+
+                        {/* Campo de Código */}
+                        <div className="space-y-3">
+                          <Label htmlFor="codigoValidacaoInput" className="text-sm font-medium text-[#1A1B23] text-center block">
+                            Digite o código de 6 dígitos
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="codigoValidacaoInput"
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
+                              autoComplete="one-time-code"
+                              placeholder="000000"
+                              value={codigoValidacao}
+                              onChange={(e) => handleCodigoChange(e.target.value)}
+                              className={`text-xl sm:text-2xl py-3 sm:py-4 text-center tracking-[0.35em] sm:tracking-[0.6rem] font-mono font-bold border-2 rounded-xl focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
+                                errors.codigoValidacao ? 'border-[#C8324A]' : 
+                                codigoValido === true ? 'border-[#0E8B5A] bg-[#0E8B5A]/5' : 
+                                'border-[#DCDDE3]'
+                              }`}
+                              maxLength={6}
+                              autoFocus
+                            />
+                            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                              {validandoCodigo && (
+                                <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
+                              )}
+                              {!validandoCodigo && codigoValido === true && (
+                                <CheckCircle className="h-6 w-6 text-[#0E8B5A]" />
+                              )}
+                              {!validandoCodigo && codigoValido === false && (
+                                <XCircle className="h-6 w-6 text-[#C8324A]" />
+                              )}
+                            </div>
+                          </div>
+
+                          {errors.codigoValidacao && (
+                            <p className="text-sm text-[#C8324A] text-center flex items-center justify-center gap-1">
+                              <XCircle className="h-4 w-4" />
+                              {errors.codigoValidacao}
+                            </p>
+                          )}
+
+                          {codigoValido === true && !errors.codigoValidacao && (
+                            <p className="text-sm text-[#0E8B5A] text-center font-medium flex items-center justify-center gap-1.5 animate-in fade-in">
+                              <CheckCircle className="h-4 w-4" />
+                              Código validado com sucesso!
+                            </p>
+                          )}
+
+                          {validandoCodigo && (
+                            <p className="text-sm text-[#8A8B95] text-center flex items-center justify-center gap-1">
+                              <Loader2 className="h-4 w-4 animate-spin text-[#5B2E8C]" />
+                              Validando código...
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Reenvio de código */}
+                        <div className="text-center pt-2">
+                          <p className="text-xs text-[#8A8B95] mb-2">Não recebeu o código?</p>
+                          <button
+                            type="button"
+                            disabled={tempoReenvio > 0 || enviandoCodigo}
+                            onClick={() => reenviarCodigo()}
+                            className={`text-xs font-semibold inline-flex items-center gap-1.5 ${
+                              tempoReenvio > 0 
+                                ? 'text-[#8A8B95] cursor-not-allowed' 
+                                : 'text-[#5B2E8C] hover:text-[#8B5FFF] hover:underline'
+                            }`}
+                          >
+                            <RefreshCw className={`h-3.5 w-3.5 ${tempoReenvio > 0 ? '' : 'hover:rotate-180 transition-transform'}`} />
+                            {tempoReenvio > 0 ? `Reenviar código em ${tempoReenvio}s` : 'Reenviar código'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Etapa 3: Senha */}
+                {etapaAtual === 3 && (
                   <div className="space-y-6">
                     {/* Campo de Senha */}
                     <div className="space-y-3">
@@ -956,8 +1234,8 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                           onChange={(e) => handleSenhaChange(e.target.value)}
                           className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
                             errors.senha ? 'border-[#C8324A]' : 
-                            forcaSenha === 'forte' ? 'border-[#0E8B5A]' :
-                            forcaSenha === 'media' ? 'border-yellow-500' :
+                            forcaSenha === 'forte' ? 'border-[#0E8B5A]' : 
+                            forcaSenha === 'media' ? 'border-yellow-500' : 
                             forcaSenha === 'fraca' ? 'border-[#C8324A]' : ''
                           }`}
                         />
@@ -978,24 +1256,24 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                             <div className="flex-1 relative">
                               <Progress 
                                 value={
-                                  forcaSenha === 'fraca' ? 33 :
-                                  forcaSenha === 'media' ? 66 :
+                                  forcaSenha === 'fraca' ? 33 : 
+                                  forcaSenha === 'media' ? 66 : 
                                   forcaSenha === 'forte' ? 100 : 0
                                 }
                                 className={`h-2 ${
-                                  forcaSenha === 'forte' ? '[&>div]:bg-[#0E8B5A]' :
-                                  forcaSenha === 'media' ? '[&>div]:bg-[#C77700]' :
+                                  forcaSenha === 'forte' ? '[&>div]:bg-[#0E8B5A]' : 
+                                  forcaSenha === 'media' ? '[&>div]:bg-[#C77700]' : 
                                   '[&>div]:bg-[#C8324A]'
                                 }`}
                               />
                             </div>
                             <span className={`text-sm font-semibold ${
-                              forcaSenha === 'forte' ? 'text-[#0E8B5A]' :
-                              forcaSenha === 'media' ? 'text-[#C77700]' :
+                              forcaSenha === 'forte' ? 'text-[#0E8B5A]' : 
+                              forcaSenha === 'media' ? 'text-[#C77700]' : 
                               'text-[#C8324A]'
                             }`}>
-                              {forcaSenha === 'forte' ? 'Forte' :
-                               forcaSenha === 'media' ? 'Média' :
+                              {forcaSenha === 'forte' ? 'Forte' : 
+                               forcaSenha === 'media' ? 'Média' : 
                                'Fraca'}
                             </span>
                           </div>
@@ -1007,55 +1285,31 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                               <div className={`flex items-center gap-2 text-sm ${
                                 requisitosSenha.tamanho ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
-                                {requisitosSenha.tamanho ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <XCircle className="h-4 w-4" />
-                                )}
+                                {requisitosSenha.tamanho ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                                 <span>Mínimo 8 caracteres</span>
                               </div>
-                              
                               <div className={`flex items-center gap-2 text-sm ${
                                 requisitosSenha.maiuscula ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
-                                {requisitosSenha.maiuscula ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <XCircle className="h-4 w-4" />
-                                )}
+                                {requisitosSenha.maiuscula ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                                 <span>1 letra maiúscula (A-Z)</span>
                               </div>
-                              
                               <div className={`flex items-center gap-2 text-sm ${
                                 requisitosSenha.minuscula ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
-                                {requisitosSenha.minuscula ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <XCircle className="h-4 w-4" />
-                                )}
+                                {requisitosSenha.minuscula ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                                 <span>1 letra minúscula (a-z)</span>
                               </div>
-                              
                               <div className={`flex items-center gap-2 text-sm ${
                                 requisitosSenha.numero ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
-                                {requisitosSenha.numero ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <XCircle className="h-4 w-4" />
-                                )}
+                                {requisitosSenha.numero ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                                 <span>1 número (0-9)</span>
                               </div>
-                              
                               <div className={`flex items-center gap-2 text-sm ${
                                 requisitosSenha.especial ? 'text-[#0E8B5A]' : 'text-[#8A8B95]'
                               }`}>
-                                {requisitosSenha.especial ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <XCircle className="h-4 w-4" />
-                                )}
+                                {requisitosSenha.especial ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                                 <span>1 caractere especial (!@#$%^&*)</span>
                               </div>
                             </div>
@@ -1063,10 +1317,12 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </div>
                       )}
 
-                      {errors.senha && <p className="text-sm text-[#C8324A] flex items-center gap-1">
-                        <XCircle className="h-4 w-4" />
-                        {errors.senha}
-                      </p>}
+                      {errors.senha && (
+                        <p className="text-sm text-[#C8324A] flex items-center gap-1">
+                          <XCircle className="h-4 w-4" />
+                          {errors.senha}
+                        </p>
+                      )}
                     </div>
 
                     {/* Campo de Confirmar Senha */}
@@ -1096,7 +1352,6 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </button>
                       </div>
                       
-                      {/* Feedback de confirmação de senha */}
                       {formData.confirmarSenha && formData.senha && (
                         <div className="flex items-center gap-2">
                           {formData.senha === formData.confirmarSenha ? (
@@ -1113,17 +1368,18 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </div>
                       )}
                       
-                      {errors.confirmarSenha && <p className="text-sm text-[#C8324A] flex items-center gap-1">
-                        <XCircle className="h-4 w-4" />
-                        {errors.confirmarSenha}
-                      </p>}
+                      {errors.confirmarSenha && (
+                        <p className="text-sm text-[#C8324A] flex items-center gap-1">
+                          <XCircle className="h-4 w-4" />
+                          {errors.confirmarSenha}
+                        </p>
+                      )}
                     </div>
-
                   </div>
                 )}
 
-                {/* Etapa 3: Confirmação da Placa */}
-                {etapaAtual === 3 && (
+                {/* Etapa 4: Confirmação da Placa */}
+                {etapaAtual === 4 && (
                   <div className="space-y-6">
                     {/* Mensagem explicativa */}
                     <div className="bg-[#F4EFFB] border border-[#C9AEEA] rounded-lg p-4">
@@ -1187,121 +1443,68 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                         </p>
                       )}
                     </div>
-
-                  </div>
-                )}
-
-                {/* Etapa 4: Confirmação do Telefone */}
-                {etapaAtual === 4 && (
-                  <div className="space-y-6">
-                    {/* Telefone */}
-                    <div className="space-y-2">
-                      <Label htmlFor="telefone" className="text-[#1A1B23] flex items-center gap-2">
-                        <Smartphone className="h-4 w-4 text-[#5B2E8C]" />
-                        Telefone
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="telefone"
-                          type="tel"
-                          placeholder="(11) 98765-4321"
-                          value={formData.telefone}
-                          onChange={(e) => handleTelefoneChange(e.target.value)}
-                          className={`text-lg py-3 pr-12 border-[#F7F5FB] focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
-                            errors.telefone ? 'border-[#C8324A]' :
-                            codigoValido === true ? 'border-[#0E8B5A]' :
-                            telefoneValido === true ? 'border-[#5B2E8C]' :
-                            telefoneValido === false ? 'border-[#C8324A]' : ''
-                          }`}
-                          maxLength={15}
-                          disabled={codigoValido === true}
-                        />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          {codigoValido === true && (
-                            <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
-                          )}
-                          {codigoValido !== true && telefoneValido === false && (
-                            <XCircle className="h-5 w-5 text-[#C8324A]" />
-                          )}
-                        </div>
-                      </div>
-                      {errors.telefone && <p className="text-sm text-[#C8324A]">{errors.telefone}</p>}
-                      {codigoValido === true && !errors.telefone && (
-                        <p className="text-sm text-[#0E8B5A] flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4" />
-                          Telefone validado por SMS
-                        </p>
-                      )}
-                      {telefoneValido === true && !codigoEnviado && !errors.telefone && (
-                        <p className="text-sm text-[#5B2E8C] flex items-center gap-1">
-                          <Smartphone className="h-4 w-4" />
-                          Celular válido — enviaremos um SMS para confirmar
-                        </p>
-                      )}
-                    </div>
                   </div>
                 )}
 
                 {/* Botões de navegação */}
                 <div className="pt-6">
-                  {etapaAtual < 4 ? (
+                  {etapaAtual === 1 && (
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={!isCurrentStepValid() || emailValidando}
+                      className={`w-full py-3.5 sm:py-4 text-base sm:text-lg rounded-xl font-medium transition-colors ${
+                        isCurrentStepValid() && !emailValidando
+                          ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white shadow-md'
+                          : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                      }`}
+                    >
+                      Continuar <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  )}
+
+                  {etapaAtual === 2 && codigoEnviado && (
+                    <Button
+                      type="button"
+                      size="lg"
+                      disabled={!isCurrentStepValid()}
+                      onClick={handleNextStep}
+                      className={`w-full py-3.5 sm:py-4 text-base sm:text-lg rounded-xl font-medium transition-colors ${
+                        isCurrentStepValid()
+                          ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white shadow-md'
+                          : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                      }`}
+                    >
+                      Continuar para Senha <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  )}
+
+                  {etapaAtual === 3 && (
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={!isCurrentStepValid()}
+                      className={`w-full py-3.5 sm:py-4 text-base sm:text-lg rounded-xl font-medium transition-colors ${
+                        isCurrentStepValid()
+                          ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white shadow-md'
+                          : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
+                      }`}
+                    >
+                      Continuar <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  )}
+
+                  {etapaAtual === 4 && (
                     <>
                       <Button
                         type="submit"
                         size="lg"
-                        disabled={!isCurrentStepValid() || emailValidando}
-                        className={`w-full py-4 text-lg rounded-lg font-medium transition-colors ${
-                          isCurrentStepValid() && !emailValidando
-                            ? 'bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white'
-                            : 'bg-[#C6C7CF] text-[#8A8B95] cursor-not-allowed'
-                        }`}
+                        className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-3.5 sm:py-4 text-base sm:text-lg rounded-xl font-medium transition-colors shadow-md"
+                        disabled={loading || !isCurrentStepValid()}
                       >
-                        Continuar <ArrowRight className="h-5 w-5 ml-2" />
-                      </Button>
-
-                      {etapaAtual === 3 && (
-                        <div className="mt-4 text-center">
-                          <button
-                            type="button"
-                            onClick={handlePularVeiculo}
-                            className="text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors"
-                          >
-                            Criar conta sem vincular este veículo
-                          </button>
-                          <p className="text-xs text-[#C6C7CF] mt-1.5">
-                            Você poderá cadastrar veículos depois pelo dashboard
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-4 text-lg rounded-lg font-medium transition-colors"
-                      disabled={loading || emailValidando || validandoCodigo || !isCurrentStepValid()}
-                      onClick={(e) => {
-                        if (telefoneValido === true && !codigoEnviado) {
-                          e.preventDefault();
-                          enviarCodigoValidacao();
-                        }
-                      }}
-                    >
-                      {telefoneValido === true && !codigoEnviado
-                        ? (emailValidando ? (
-                            <>
-                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                              Enviando SMS...
-                            </>
-                          ) : (
-                            <>
-                              <Smartphone className="h-5 w-5 mr-2" />
-                              Enviar código por SMS
-                            </>
-                          ))
-                        : loading ? (
+                        {loading ? (
                           <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                             Criando conta...
                           </>
                         ) : (
@@ -1309,185 +1512,43 @@ export function CadastroUsuario({ onBack, onCadastrar, onLogin, placaConsultada 
                             <CheckCircle className="h-5 w-5 mr-2" />
                             Criar conta e prosseguir
                           </>
-                        )
-                      }
-                    </Button>
+                        )}
+                      </Button>
+
+                      <div className="mt-4 text-center">
+                        <button
+                          type="button"
+                          onClick={handlePularVeiculo}
+                          disabled={loading}
+                          className="text-xs sm:text-sm text-[#8A8B95] hover:text-[#5B2E8C] underline underline-offset-2 transition-colors"
+                        >
+                          Criar conta sem vincular este veículo
+                        </button>
+                        <p className="text-xs text-[#C6C7CF] mt-1.5">
+                          Você poderá cadastrar veículos depois pelo dashboard
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
               </form>
 
               {/* Link para login - apenas na primeira etapa */}
               {etapaAtual === 1 && onLogin && (
-                <>
-
-
-                  <div className="text-center">
-                    <button 
-                      type="button"
-                      onClick={onLogin}
-                      className="w-full py-3 text-lg text-[#5B2E8C] hover:text-[#8B5FFF] font-medium transition-colors text-center"
-                    >
-                      Já tenho cadastro
-                    </button>
-                  </div>
-                </>
+                <div className="text-center pt-2">
+                  <button 
+                    type="button"
+                    onClick={onLogin}
+                    className="w-full py-3 text-base text-[#5B2E8C] hover:text-[#8B5FFF] font-medium transition-colors text-center"
+                  >
+                    Já tenho cadastro
+                  </button>
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
-
-      {/* Modal para Validação do Código SMS */}
-      <Dialog open={modalCodigoAberto} onOpenChange={setModalCodigoAberto}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl text-[#5B2E8C] flex items-center justify-center gap-2">
-              <Smartphone className="h-6 w-6" />
-              Validar Telefone
-            </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#8A8B95]">
-              Digite o código de 6 dígitos enviado por SMS para confirmar seu número de celular.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 pt-4">
-            {/* Informação do telefone */}
-            <div className="text-center space-y-2">
-              <p className="text-sm text-[#8A8B95]">
-                Enviamos um SMS com o código para
-              </p>
-              <p className="text-base font-medium text-[#5B2E8C]">
-                {formData.telefone}
-              </p>
-            </div>
-
-            {/* Campo do código */}
-            <div className="space-y-3">
-              <Label htmlFor="codigoModal" className="text-[#1A1B23] text-center block">
-                Digite o código de verificação
-              </Label>
-              <div className="relative">
-                <Input
-                  id="codigoModal"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="one-time-code"
-                  placeholder="Digite o código"
-                  value={codigoValidacao}
-                  onChange={(e) => {
-                    const valor = e.target.value.replace(/\D/g, '').slice(0, 6);
-                    setCodigoValidacao(valor);
-                    setErrors(prev => ({ ...prev, codigoValidacao: '' }));
-                    setCodigoValido(null);
-                    
-                    // Validar automaticamente quando código estiver completo
-                    if (valor.length === 6) {
-                      setValidandoCodigo(true);
-                      
-                      const timer = setTimeout(() => {
-                        const valido = valor === codigoCorreto;
-                        setCodigoValido(valido);
-                        setValidandoCodigo(false);
-                        
-                        if (valido) {
-                          setErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors.codigoValidacao;
-                            delete newErrors.telefone;
-                            return newErrors;
-                          });
-                          // Fechar modal após validação bem-sucedida
-                          setTimeout(() => setModalCodigoAberto(false), 800);
-                        } else {
-                          setErrors(prev => ({ 
-                            ...prev, 
-                            codigoValidacao: 'Código inválido. Verifique e tente novamente.' 
-                          }));
-                        }
-                      }, 1000);
-                      
-                      // Cleanup function para evitar vazamentos de memória
-                      return () => clearTimeout(timer);
-                    }
-                  }}
-                  className={`text-xl py-4 text-center tracking-[0.5rem] font-mono border-2 focus:border-[#5B2E8C] focus:ring-[#5B2E8C] ${
-                    errors.codigoValidacao ? 'border-[#C8324A]' : 
-                    codigoValido === true ? 'border-[#0E8B5A]' : 
-                    codigoValido === false ? 'border-[#C8324A]' : 'border-[#DCDDE3]'
-                  }`}
-                  maxLength={6}
-                  autoFocus
-                />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  {validandoCodigo && (
-                    <Loader2 className="h-5 w-5 animate-spin text-[#5B2E8C]" />
-                  )}
-                  {!validandoCodigo && codigoValido === true && (
-                    <CheckCircle className="h-5 w-5 text-[#0E8B5A]" />
-                  )}
-                  {!validandoCodigo && codigoValido === false && (
-                    <XCircle className="h-5 w-5 text-[#C8324A]" />
-                  )}
-                </div>
-              </div>
-              
-              {/* Feedback do código */}
-              {errors.codigoValidacao && (
-                <p className="text-sm text-[#C8324A] text-center flex items-center justify-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.codigoValidacao}
-                </p>
-              )}
-              
-              {codigoValido === true && !errors.codigoValidacao && (
-                <p className="text-sm text-[#0E8B5A] text-center flex items-center justify-center gap-1">
-                  <CheckCircle className="h-4 w-4" />
-                  Código validado com sucesso!
-                </p>
-              )}
-              
-              {validandoCodigo && (
-                <p className="text-sm text-[#8A8B95] text-center flex items-center justify-center gap-1">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Validando código...
-                </p>
-              )}
-            </div>
-
-            {/* Botão de reenvio */}
-            <div className="text-center">
-              <p className="text-sm text-[#8A8B95] mb-3">
-                Não recebeu o SMS?
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={reenviarCodigoDoModal}
-                disabled={tempoReenvio > 0}
-                className={`border-[#5B2E8C] text-[#5B2E8C] hover:bg-[#5B2E8C] hover:text-white ${
-                  tempoReenvio > 0 ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {tempoReenvio > 0 ? `Reenviar em ${tempoReenvio}s` : 'Reenviar código'}
-              </Button>
-            </div>
-
-            {/* Botão de fechar - só aparece se o código foi validado */}
-            {codigoValido === true && (
-              <div className="pt-4 border-t border-[#F7F5FB]">
-                <Button
-                  onClick={() => setModalCodigoAberto(false)}
-                  className="w-full bg-[#5B2E8C] hover:bg-[#8B5FFF] text-white py-3"
-                >
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Continuar
-                </Button>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
