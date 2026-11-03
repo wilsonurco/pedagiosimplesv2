@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertasInteligentes } from "./AlertasInteligentes";
+import { ExcluirConta } from "./ExcluirConta";
 import { AutomacaoPagamentos } from "./AutomacaoPagamentos";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -14,7 +14,6 @@ import {
   Mail,
   Phone,
   Lock,
-  Bell,
   Shield,
   Eye,
   EyeOff,
@@ -29,9 +28,10 @@ import {
 interface ConfiguracoesContaProps {
   dadosUsuario: any;
   onLogout: () => void;
+  onExcluirConta: () => void;
 }
 
-export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesContaProps) {
+export function ConfiguracoesConta({ dadosUsuario, onLogout, onExcluirConta }: ConfiguracoesContaProps) {
   const [dadosPessoais, setDadosPessoais] = useState({
     nome: dadosUsuario?.nome || '',
     email: dadosUsuario?.email || '',
@@ -845,20 +845,6 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
         </CardContent>
       </Card>
 
-      {/* Notificações */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notificações e Alertas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AlertasInteligentes />
-        </CardContent>
-      </Card>
-
-
       {/* Automação de Pagamentos */}
       <Card>
         <CardHeader>
@@ -871,6 +857,8 @@ export function ConfiguracoesConta({ dadosUsuario, onLogout }: ConfiguracoesCont
           <AutomacaoPagamentos />
         </CardContent>
       </Card>
+
+      <ExcluirConta dadosUsuario={dadosUsuario} onExcluirConta={onExcluirConta} />
 
       {/* Modal para Validação do Código de E-mail */}
       <Dialog open={modalCodigoAberto} onOpenChange={setModalCodigoAberto}>

@@ -24,6 +24,7 @@ import LogoCinza from "./imports/LogoCinza";
 import { LoginConcessionaria } from "./components/LoginConcessionaria";
 import { DashboardConcessionaria } from "./components/DashboardConcessionaria";
 import { LandingBeneficios } from "./components/LandingBeneficios";
+import { toast } from "sonner@2.0.3";
 
 type TelasApp = 'landing' | 'consulta' | 'resultados' | 'cadastro' | 'login' | 'recuperar-senha' | 'resumo-pedido' | 'pagamento' | 'pix-qrcode' | 'confirmacao' | 'dashboard' | 'faq' | 'login-concessionaria' | 'dashboard-concessionaria';
 
@@ -147,6 +148,21 @@ export default function App() {
     setDadosPagamento(null);
     setDadosVeiculo(null);
     setTelaAtual('landing');
+  };
+
+  const handleExcluirConta = () => {
+    handleLogout();
+    setDebitosSelecionados([]);
+    setValorTotalSelecionado(0);
+    setPlacaConsultada('');
+    setPlacaValue('');
+    setPlacaError('');
+    setMostrandoResultados(false);
+    setCarregandoConsulta(false);
+    setTurnstileToken(null);
+    setTurnstileKey(k => k + 1);
+    toast.success('Conta excluída. Sua sessão foi encerrada.');
+    window.scrollTo({ top: 0 });
   };
 
   const handleLoginGestor = (dados: any) => {
@@ -363,6 +379,7 @@ export default function App() {
         <Toaster />
         <DashboardUsuario
           onLogout={handleLogout}
+          onExcluirConta={handleExcluirConta}
           onIrParaPagamento={handleIrParaPagamento}
           onIrParaCheckout={handleIrParaCheckout}
           onIrParaConsulta={handleIrParaConsulta}

@@ -47,6 +47,7 @@ import { FooterLogado } from './FooterLogado';
 
 interface DashboardUsuarioProps {
   onLogout: () => void;
+  onExcluirConta: () => void;
   onIrParaPagamento?: (debitos: any[], valorTotal: number) => void;
   onIrParaCheckout?: (debitos: any[], valorTotal: number) => void;
   onIrParaConsulta?: (placa: string) => void;
@@ -56,7 +57,7 @@ interface DashboardUsuarioProps {
 
 
 
-export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout, onIrParaConsulta, onIrParaPagamentoDireto, dadosUsuario }: DashboardUsuarioProps) {
+export function DashboardUsuario({ onLogout, onExcluirConta, onIrParaPagamento, onIrParaCheckout, onIrParaConsulta, onIrParaPagamentoDireto, dadosUsuario }: DashboardUsuarioProps) {
   const [abaSelecionada, setAbaSelecionada] = useState('home');
     
     // Garantir que sempre temos dados do usuário, mesmo que básicos
@@ -864,7 +865,7 @@ export function DashboardUsuario({ onLogout, onIrParaPagamento, onIrParaCheckout
       case 'veiculos':
         return <VeiculosCadastrados onIrParaConsulta={onIrParaConsulta} onIrParaPagamentoDireto={onIrParaPagamentoDireto} />;
       case 'conta':
-        return <ConfiguracoesConta dadosUsuario={usuario} onLogout={onLogout} />;
+        return <ConfiguracoesConta dadosUsuario={usuario} onLogout={onLogout} onExcluirConta={onExcluirConta} />;
       default:
         return renderHomeContent();
     }
