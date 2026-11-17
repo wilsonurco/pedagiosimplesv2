@@ -82,8 +82,9 @@ export function ExcluirConta({ dadosUsuario, onExcluirConta }: ExcluirContaProps
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir sua conta?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você perderá o acesso à sua conta e aos veículos e preferências cadastrados.
-              A exclusão não quita débitos de pedágio existentes. Esta ação não pode ser desfeita.
+              Ao excluir sua conta, você perderá o acesso aos veículos e às preferências cadastrados.
+              A exclusão é definitiva e não cancela débitos de pedágio em aberto.
+              Mesmo após a exclusão da conta, seus dados de pagamento serão mantidos para consulta em eventuais auditorias.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
